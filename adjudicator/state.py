@@ -33,7 +33,7 @@ class State(object):
 
         :return: string
         """
-        out = '|'.join([f'{x:3}' for x in self.card_position.keys()]) + "\n" + '|'.join([f'{x:3}' for x in self.card_vector])
+        out = '|'.join([f'{x:>3}' for x in self.card_position.keys()]) + "\n" + '|'.join([f'{x:3}' for x in self.card_vector])
 
         return out
 
