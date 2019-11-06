@@ -13,7 +13,13 @@ player_current = [21, 22, 23, 24]
 unknown = 0
 
 
-class State(object):
+class State:
+
+    def __init__(self):
+        self.values = None
+
+
+class HeartsState(State):
 
     """
 
@@ -24,7 +30,7 @@ class State(object):
         inits the state and randomly assigns player
 
         """
-        self.card_vector = None
+        super().__init__()
         self.shuffle()
 
     def __repr__(self):
@@ -33,14 +39,14 @@ class State(object):
 
         :return: string
         """
-        out = '|'.join([f'{x:>3}' for x in self.card_position.keys()]) + "\n" + '|'.join([f'{x:3}' for x in self.card_vector])
+        out = '|'.join([f'{x:>3}' for x in self.card_position.keys()]) + "\n" + '|'.join([f'{x:3}' for x in self.values])
 
         return out
 
     def shuffle(self):
         players = [1] * 13 + [2] * 13 + [3] * 13 + [4] * 13
         shuffle(players)
-        self.card_vector = np.array(players)
+        self.values = np.array(players)
 
     def set_encoding(self, encoding, card):
         """
@@ -52,7 +58,7 @@ class State(object):
         """
 
         element = self.card_position[card]
-        self.card_vector[element] = encoding
+        self.values[element] = encoding
 
     def get_encoding(self, card):
         """
@@ -62,7 +68,7 @@ class State(object):
         """
         element = self.card_position[card]
 
-        return self.card_vector[element]
+        return self.values[element]
 
     def hide_encoding(self, player):
         player_1 = [1, 11, 21]
@@ -70,7 +76,7 @@ class State(object):
         player_3 = [3, 13, 23]
         player_4 = [4, 14, 24]
         players = [player_1, player_2, player_3, player_4]
-        ret = self.card_vector
+        ret = self.values
         nrow = 0
         ncolumn = 0
         for row in ret:
