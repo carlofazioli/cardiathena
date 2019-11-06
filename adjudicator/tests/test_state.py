@@ -1,5 +1,5 @@
 import unittest
-from ..state import State
+from adjudicator.state import State
 import numpy as np
 
 
