@@ -76,20 +76,14 @@ class HeartsState(State):
         player_3 = [3, 13, 23]
         player_4 = [4, 14, 24]
         players = [player_1, player_2, player_3, player_4]
-        ret = self.values
-        nrow = 0
-        ncolumn = 0
-        for row in ret:
+        ret = []
+        for x in self.values:
+            if x in players[player]:
+                ret.append(x)
+            else:
+                ret.append(0)
+        return np.array(ret)
 
-            for column in row:
-                if column in players[player]:
-                    continue
-                else:
-                    ret[nrow , ncolumn] = 0
-                ncolumn += 1
-            nrow == 1
-
-        return ret
 
     @property
     def card_position(self):
