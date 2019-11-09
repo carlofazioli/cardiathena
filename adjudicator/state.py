@@ -71,6 +71,12 @@ class HeartsState(State):
         return self.values[element]
 
     def hide_encoding(self, player):
+        """
+         Mask state vector values
+
+         :param player: the player number 0-3 to recieve a tailored masked encoding state vector
+         :return: masked encoding np array
+         """
         player_1 = [1, 11, 21]
         player_2 = [2, 12, 22]
         player_3 = [3, 13, 23]
