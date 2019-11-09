@@ -28,7 +28,9 @@ class TestHeartsState(unittest.TestCase):
                 expected_p1_state[x] = 0
 
         expected_p1_state[43] = 21
-        p1_state = self.state.hide_encoding(0)
+        expected_p1_state[22] = 13
+        expected_p1_state[29] = 12
+        p1_state = self.state.hide_encoding(1)
         self.assertTrue(np.all(p1_state == np.array(expected_p1_state)))
 
 
