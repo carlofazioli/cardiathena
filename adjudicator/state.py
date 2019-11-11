@@ -72,16 +72,16 @@ class HeartsState(State):
 
     def hide_encoding(self, player):
         """
-         Mask state vector values
+         Mask state vector values replacing hidden information with zeros.
 
-         :param player: the player number 1-4 to recieve a tailored masked encoding state vector
+         :param player: the player number 1-4 to receive a tailored masked encoding state vector
          :return: masked encoding np array
          """
-        mask_array = np.zeros(52, dtype=bool)
-        masked_vector_bool = np.ma.masked_where(np.logical_and(self.values != player, self.values <= 10), mask_array)
-        masked_vector_int = np.where(masked_vector_bool == False, self.values, 0)
 
-        return masked_vector_int
+        held_cards = self.values == player
+        played_cards = self.values > 10
+
+        return np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
 
     @property
     def card_position(self):
@@ -92,7 +92,3 @@ class HeartsState(State):
         """
 
         return {f'{v[1]}{v[0]}': i for i, v in enumerate(product(suits, cards))}
-
-
-hearts = HeartsState()
-hearts.hide_encoding(1)
