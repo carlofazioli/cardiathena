@@ -20,7 +20,6 @@ class State:
 
 
 class HeartsState(State):
-
     """
 
     """
@@ -39,7 +38,8 @@ class HeartsState(State):
 
         :return: string
         """
-        out = '|'.join([f'{x:>3}' for x in self.card_position.keys()]) + "\n" + '|'.join([f'{x:3}' for x in self.values])
+        out = '|'.join([f'{x:>3}' for x in self.card_position.keys()]) + "\n" + '|'.join(
+            [f'{x:3}' for x in self.values])
 
         return out
 
@@ -71,25 +71,17 @@ class HeartsState(State):
         return self.values[element]
 
     def hide_encoding(self, player):
-        player_1 = [1, 11, 21]
-        player_2 = [2, 12, 22]
-        player_3 = [3, 13, 23]
-        player_4 = [4, 14, 24]
-        players = [player_1, player_2, player_3, player_4]
-        ret = self.values
-        nrow = 0
-        ncolumn = 0
-        for row in ret:
+        """
+         Mask state vector values replacing hidden information with zeros.
 
-            for column in row:
-                if column in players[player]:
-                    continue
-                else:
-                    ret[nrow , ncolumn] = 0
-                ncolumn += 1
-            nrow == 1
+         :param player: the player number 1-4 to receive a tailored masked encoding state vector
+         :return: masked encoding np array
+         """
 
-        return ret
+        held_cards = self.values == player
+        played_cards = self.values > 10
+
+        return np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
 
     @property
     def card_position(self):
@@ -100,5 +92,3 @@ class HeartsState(State):
         """
 
         return {f'{v[1]}{v[0]}': i for i, v in enumerate(product(suits, cards))}
-
-
