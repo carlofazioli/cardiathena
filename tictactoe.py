@@ -138,16 +138,3 @@ class TicTacToeAdjudicator(Adjudicator):
         # The partial state is just the state, since tic-tac-toe is perfect-information.
         partial_state = deepcopy(self.state)
         return agent_index, partial_state
-
-
-class TicTacToeGameManager(GameManager):
-    """
-    The GameManager controls game logic and moderates interactions between Agents and the Adjudicator.  The
-    adjudicator stores the current game state, and updates it based on agent actions obtained by the GameManager
-    from its agents.
-
-    The GameManager also tracks that state/action histories of the game.
-
-    The GameManager has helper functions to determine when the game is over, and if any partial information needs
-    to be masked out before presenting the game state to agents.
-    """
