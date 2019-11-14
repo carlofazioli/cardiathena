@@ -20,6 +20,7 @@ class TicTacToeState(State):
     """
     def __init__(self):
         self.positions = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.scores = [0, 0]
 
 
 class TicTacToeAction(Action):
@@ -58,6 +59,17 @@ class TicTacToeAdjudicator(Adjudicator):
     """
     def __init__(self):
         super().__init__()
+        # The win conditions are the row-, column-, and diagonal-indices that make a tic tac toe.
+        self.win_conditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6],
+        ]
 
     def start_game(self):
         """
@@ -65,7 +77,7 @@ class TicTacToeAdjudicator(Adjudicator):
         point for the game.
         :return: State instance
         """
-        # TicTacToeState objects initialize to the starting position.
+        # TicTacToeState objects already initialize to the starting position.
         self.state = TicTacToeState()
         return self.state
 
@@ -86,6 +98,23 @@ class TicTacToeAdjudicator(Adjudicator):
             # It's agent 2's turn:
             mark = 2
         self.state.positions[action.position] = mark
+        # If the game is finished, updated the score.
+        if self.is_finished():
+            # Check if a win condition is satisfied.
+            win_condition = False
+            for condition in self.win_conditions:
+                marks = [self.state.positions[i] for i in condition]
+                if marks.count(1) == 3:
+                    # Player 1 has won:
+                    self.state.scores = [1, 0]
+                    win_condition = True
+                elif marks.count(2) == 3:
+                    # Player 2 has won:
+                    self.state.scores = [0, 1]
+                    win_condition = True
+            # If no win condition is satisfied, the game is a tie:
+            if not win_condition:
+                self.state.scores = [0.5, 0.5]
         return self.state
 
     def get_state(self):
@@ -104,17 +133,7 @@ class TicTacToeAdjudicator(Adjudicator):
         if self.state.positions.count(0) == 0:
             return True
         # If the any win condition is satisfied, the game is finished.
-        win_conditions = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6],
-        ]
-        for condition in win_conditions:
+        for condition in self.win_conditions:
             marks = [self.state.positions[i] for i in condition]
             if marks.count(1) == 3 or marks.count(2) == 3:
                 return True
