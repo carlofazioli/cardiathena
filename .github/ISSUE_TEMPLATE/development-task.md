@@ -18,6 +18,8 @@ Include checkboxes for the sub tasks that need to be accomplished in order to ma
 - [ ] complete integration of adjudicator with state
   - [ ] refactor code to include new item
   - [ ] test code
+- [ ] another task
+  - [ ]  and its subtasks
 
 Keep in mind that the task list is fluid and will need to be updated if your understating of what is required changes. 
 
