@@ -1,5 +1,5 @@
 ---
-name: Development Task
+name: Development task
 about: Describe this issue template's purpose here.
 title: Task
 labels: ''
@@ -9,7 +9,7 @@ assignees: ''
 
 # Description
 
-- Describe here the major task you need to complete
+- Describe here the major task you need to complete, make sure to note dependencies on other tasks. 
 
 # Tasks
 
