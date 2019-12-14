@@ -1,5 +1,5 @@
 from base import GameManager
-from tictactoe import RandomTicTacToeAgent, TicTacToeAdjudicator
+from examples.tictactoe import RandomTicTacToeAgent, TicTacToeAdjudicator
 
 
 # Create the players, the adjudicator, and the game object.
