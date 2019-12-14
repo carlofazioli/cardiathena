@@ -1,5 +1,6 @@
 from base import *
 from adjudicator.state import *
+from agent.RandomHeartsAgent import HeartsAction
 
 
 class HeartsAdjudicator(Adjudicator):
@@ -15,6 +16,8 @@ class HeartsAdjudicator(Adjudicator):
     # list of agents
     trick_number = START_OF_ROUND
     trick_winner = -1
+    current_player = 1
+    cards_of_trick = []
     CLOCKWISE = 0
     COUNTER_CLOCKWISE = 1
     ACROSS = 2
@@ -32,6 +35,17 @@ class HeartsAdjudicator(Adjudicator):
         super().__init__()
         # The win conditions are the row-, column-, and diagonal-indices that make a tic tac toe.
 
+    def ini_deck(self):
+        # a note: looks like state.values contains which players all of the cards have been dealt out to
+        while self.trick_number != self.FIRST_TRICK and not (self.trick_number > self.FIRST_TRICK):
+            #
+            if self.trick_number == self.START_OF_ROUND:
+                self.state.shuffle()
+                self.trick_number = self.EXCHANGE_CARDS
+            elif self.trick_number == self.EXCHANGE_CARDS:
+                # exchange the cards between the players <= need to do that
+                self.trick_number = self.FIRST_TRICK
+
     def start_game(self):
         """
         The start_game() method creates a new State data type instance and manipulates it to represent the starting
@@ -45,18 +59,58 @@ class HeartsAdjudicator(Adjudicator):
         self.points = [0, 0, 0, 0]
         # Hearts objects already initialize to the starting position.
         self.state = HeartsState()
-        self.deal_cards()
+
+        self.ini_deck()
+
         return self.state
 
     def step_game(self,
-                  action: HeartsState):
+                  action: HeartsAction):
         """
         Given an action by the agent whose turn it is, step_game() updates the state according to the rules and
         returns the new state.
         :param action: the Action of the Agent whose turn it is
         :return: the updated State
         """
+        self.ini_deck()
 
+        if self.trick_number == self.CALCULATE_ROUND_WINNER:
+            # do whatever we do when we finish a round
+
+            self.trick_number = self.START_OF_ROUND
+
+        elif self.current_player == 4 and self.trick_number >= self.FIRST_TRICK:
+            # do whatever we do for each trick
+            # at this point we have all four players having played their cards
+            # a count for the player (will be 0 (player 1) through 3 (player4)
+            count = 1
+            # the largest card that has been played
+            max_card_index = 0
+            # the points accumulated for the current trick
+            trick_points = 0
+            # iterating through all of the played cards
+            for i in self.cards_of_trick:
+                max_card_index = i
+                # 36 is the index of the Queen of spades
+                if i == 36:
+                    trick_points = trick_points + 13
+                # Some Hearts card was played
+                if i >= 39:
+                    trick_points = trick_points + 1
+                # Checking for our biggest card
+                if i % 13 > max_card_index:
+                    self.trick_winner = count
+                    self.points[count - 1] = trick_points
+                count += 1
+
+            for j in self.cards_of_trick:
+                self.state.set_encoding(count + 10, j)
+
+            # Clearing out the trick list
+            self.cards_of_trick.clear()
+            self.trick_number += 1
+        self.state.values[action.position] = 20 + self.current_player
+        self.cards_of_trick.append(action.position)
 
     def get_state(self):
         """
@@ -70,6 +124,7 @@ class HeartsAdjudicator(Adjudicator):
         The is_finished() method is a helper function to determine when the game is over.
         :return: boolean determination of whether the game is finished or not
         """
+        return False
 
     def agent_turn(self):
         """
@@ -77,21 +132,10 @@ class HeartsAdjudicator(Adjudicator):
         any elements of the current state need to be masked before showing the agent.
         :return:
         """
-        # This code is kinda bad, its kinda broken
-        # a note: looks like state.values contains which players all of the cards have been dealt out to
-        while self.trick_number != self.FIRST_TRICK:
-            #
-            if self.trick_number == self.START_OF_ROUND:
-                self.state.shuffle()
-                self.trick_number = self.EXCHANGE_CARDS
-            elif self.trick_number == self.EXCHANGE_CARDS:
-                # exchange the cards between the players
+        ret = self.current_player
+        if self.current_player > 4:
+            self.current_player = 1
+        else:
+            self.current_player = self.current_player + 1
 
-                self.trick_number = self.FIRST_TRICK
-            elif self.trick_number >= self.FIRST_TRICK:
-                # do whatever we do for each trick
-
-                self.trick_number += 1
-            elif self.trick_number == self.CALCULATE_ROUND_WINNER:
-                # do whatever we do when we finish a round
-                self.trick_number = self.START_OF_ROUND
+        return ret, self.state.hide_encoding(ret)

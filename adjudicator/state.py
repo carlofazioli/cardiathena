@@ -121,8 +121,9 @@ class HeartsState(State):
 
         held_cards = self.values == player
         played_cards = self.values > 10
+        temp = np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
 
-        return np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
+        return temp
 
     @property
     def card_position(self):
