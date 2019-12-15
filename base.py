@@ -103,6 +103,7 @@ class GameManager:
         self.agent_list = agent_list
         self.state_history = list()
         self.action_history = list()
+        # self.state_action_history = [HeartsState, HeartsAction]
 
     def play_game(self):
         """

@@ -1,14 +1,15 @@
-from adjudicator.hearts_adjudicator import *
+from numpy import size
 import random
+from adjudicator.hearts_adjudicator import *
 
 
 class HeartsAction(Action):
     """
-    A tic-tac-toe action is a specification of a player adding a mark to a position
+    A Hearts action is the card index chosen by the agent
     """
     def __init__(self,
-                 position: int):
-        self.position = position
+                 card_index: int):
+        self.card_index = card_index
 
 
 class RandomHeartsAgent(Agent):
@@ -23,13 +24,15 @@ class RandomHeartsAgent(Agent):
         :param partial_state: the position vector of the game.
         :return: an Action.
         """
-        # Parse the state for legal moves:
-        # legal_indices = [i for (i, mark) in enumerate(partial_state.positions) if mark == 0]
-        count = 0
+        # Get legal indices, given the masked state, the legal values will be between 1 and 4
         legal_indices = []
-        for i in np.nditer(partial_state):
-            if i != 0:
-                legal_indices.append(count)
-            count = count + 1
-        choice = random.choice(legal_indices)
-        return HeartsAction(choice)
+        for i in range(0, partial_state.size):
+            if 0 < partial_state[i] < 5:
+                legal_indices.append(i)
+
+        # Return element if only one choice available otherwise choose a random card
+        if legal_indices:
+            choice = random.choice(legal_indices)
+            return HeartsAction(choice)
+        else:
+            return None

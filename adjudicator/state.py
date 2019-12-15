@@ -13,57 +13,18 @@ player_current = [21, 22, 23, 24]
 unknown = 0
 
 
-# class Card:
-#     suit = ''
-#     card = ''
-#
-#     def set(self, suit, card):
-#         """
-#         inits the state and randomly assigns player
-#
-#         """
-#         self.suit = suit
-#         self.card = card
-
-
-# class Deck:
-#     cards = []
-#
-#     def shuffle_cards(self):
-#         for s in suits:
-#             for ct in cards:
-#                 c = Card
-#                 c.set(s, ct)
-#                 cards.append(self, c)
-#         shuffle(cards)
-#
-#     def get_top_card(self):
-#         return cards.pop()
-
-
 class State:
 
     def __init__(self):
+        # Probably want to change values to something else to reflect Adjudicator doc (Card deck?)
         self.values = None
+        self.score = [0, 0, 0, 0]
 
 
 class HeartsState(State):
     """
 
     """
-
-    # need a list of the players hands
-    # need a deck of 52 cards that we are going to shuffle
-    # players = [1] * 13 + [2] * 13 + [3] * 13 + [4] * 13
-    #
-    # def deal_cards(self):
-    #     deck_of_cards = Deck
-    #     deck_of_cards.shuffle_cards()
-    #     for p in self.players:
-    #         for i in p:
-    #             i = deck_of_cards.get_top_card()
-
-    # Stuff from SMEs (I think?), no clue what we're supposed to do with it
 
     def __init__(self):
         """

@@ -1,29 +1,18 @@
 from base import *
-from adjudicator.state import *
+from adjudicator.state import HeartsState
 from agent.RandomHeartsAgent import HeartsAction
 
 
 class HeartsAdjudicator(Adjudicator):
-    # if the variable name is in all caps, it's a constant.
-    # don't change it
-    START_OF_ROUND = -2
-    EXCHANGE_CARDS = -1
-    # for additional tricks, just add 1
-    FIRST_TRICK = 0
-    LAST_TRICK = 12
-    CALCULATE_ROUND_WINNER = 13
-    # non-constants
-    # list of agents
-    trick_number = START_OF_ROUND
-    trick_winner = -1
+
+    # Game Logic
+    trick_number = 0
+    trick_winner = 0
     current_player = 1
-    cards_of_trick = []
-    CLOCKWISE = 0
-    COUNTER_CLOCKWISE = 1
-    ACROSS = 2
-    NONE = 3
     pass_type = 0
+    cards_of_trick = []
     points = [0, 0, 0, 0]
+
     """
     The Adjudicator is an encapsulation of the rules.  It tracks the ground truth state of a game in progress,
     updating when presented with agent actions.
@@ -35,32 +24,16 @@ class HeartsAdjudicator(Adjudicator):
         super().__init__()
         # The win conditions are the row-, column-, and diagonal-indices that make a tic tac toe.
 
-    def ini_deck(self):
-        # a note: looks like state.values contains which players all of the cards have been dealt out to
-        while self.trick_number != self.FIRST_TRICK and not (self.trick_number > self.FIRST_TRICK):
-            #
-            if self.trick_number == self.START_OF_ROUND:
-                self.state.shuffle()
-                self.trick_number = self.EXCHANGE_CARDS
-            elif self.trick_number == self.EXCHANGE_CARDS:
-                # exchange the cards between the players <= need to do that
-                self.trick_number = self.FIRST_TRICK
-
     def start_game(self):
         """
         The start_game() method creates a new State data type instance and manipulates it to represent the starting
         point for the game.
         :return: State instance
         """
-        # need to get our players
-        self.trick_number = self.START_OF_ROUND
-        self.trick_winner = -1
-        self.pass_type = self.CLOCKWISE
-        self.points = [0, 0, 0, 0]
         # Hearts objects already initialize to the starting position.
         self.state = HeartsState()
 
-        self.ini_deck()
+        # Pass cards
 
         return self.state
 
@@ -72,45 +45,53 @@ class HeartsAdjudicator(Adjudicator):
         :param action: the Action of the Agent whose turn it is
         :return: the updated State
         """
-        self.ini_deck()
+        # Check if game is finished
+        if self.is_finished():
+            return self.state
+        else:
+            # Add agent action to cards of tricks
+            self.cards_of_trick.append(action.card_index)
+            # Update state with encoding for played in current trick
+            self.state.values[action.card_index] = (20 + self.current_player - 1)
 
-        if self.trick_number == self.CALCULATE_ROUND_WINNER:
-            # do whatever we do when we finish a round
+            # All 4 players have played a card, tally points
+            if self.current_player > 4:
 
-            self.trick_number = self.START_OF_ROUND
+                # the points accumulated for the current trick
+                trick_points = 0
 
-        elif self.current_player == 4 and self.trick_number >= self.FIRST_TRICK:
-            # do whatever we do for each trick
-            # at this point we have all four players having played their cards
-            # a count for the player (will be 0 (player 1) through 3 (player4)
-            count = 1
-            # the largest card that has been played
-            max_card_index = 0
-            # the points accumulated for the current trick
-            trick_points = 0
-            # iterating through all of the played cards
-            for i in self.cards_of_trick:
-                max_card_index = i
-                # 36 is the index of the Queen of spades
-                if i == 36:
-                    trick_points = trick_points + 13
-                # Some Hearts card was played
-                if i >= 39:
-                    trick_points = trick_points + 1
-                # Checking for our biggest card
-                if i % 13 > max_card_index:
-                    self.trick_winner = count
-                    self.points[count - 1] = trick_points
-                count += 1
+                # The index of the max card in cards_of_trick is the player with the highest card for now
+                max_card = (self.cards_of_trick.index(max(self.cards_of_trick)))
+                self.trick_winner = max_card
+                print("trick winner:", max_card, " trick#:", self.trick_number, "  High card: ",
+                      self.cards_of_trick[max_card])
+                # Check for point cards (Queen of Spades and Hearts)
+                for i in self.cards_of_trick:
+                    # 36 is the index of the Queen of spades
+                    if i == 36:
+                        trick_points = trick_points + 13
+                    # 39 and up are the indices for hearts
+                    if i >= 39:
+                        trick_points = trick_points + 1
 
-            for j in self.cards_of_trick:
-                self.state.set_encoding(count + 10, j)
+                # Update state score
+                self.points[max_card] = self.points[max_card] + trick_points
+                self.state.score = deepcopy(self.points)
 
-            # Clearing out the trick list
-            self.cards_of_trick.clear()
-            self.trick_number += 1
-        self.state.values[action.position] = 20 + self.current_player
-        self.cards_of_trick.append(action.position)
+                # All of these cards belong to the trick winner (tricks won)
+                for card in self.cards_of_trick:
+                    self.state.values[card] = max_card + 11
+
+                # Clear out the cards in current trick
+                self.cards_of_trick.clear()
+                self.trick_number += 1
+
+                # Check if new round, reset trick_number and deal new cards
+                if self.trick_number > 12:
+                    # New round, Get new state and Pass cards
+                    self.trick_number = 0
+                    self.state = HeartsState()
+        return self.state
 
     def get_state(self):
         """
@@ -122,20 +103,34 @@ class HeartsAdjudicator(Adjudicator):
     def is_finished(self):
         """
         The is_finished() method is a helper function to determine when the game is over.
+        The game is over when the first player has reached 100 or more points
         :return: boolean determination of whether the game is finished or not
         """
+
+        for i in range(0, 4):
+            if self.points[i] >= 100:
+                print("P1: ", self.points[0],
+                      " P2: ", self.points[1],
+                      " P3: ", self.points[2],
+                      " P4: ", self.points[3])
+                return True
         return False
 
     def agent_turn(self):
         """
         The agent_turn() method is a helper function to determine from the current state whose turn it is and whether
         any elements of the current state need to be masked before showing the agent.
-        :return:
+        :return: player index and a masked state
         """
-        ret = self.current_player
+
+        player = self.current_player
+
+        # Reset current player
         if self.current_player > 4:
-            self.current_player = 1
+            self.current_player = 2
+            player = self.current_player - 1
+            return player, self.state.hide_encoding(player)
+        # Set next player
         else:
             self.current_player = self.current_player + 1
-
-        return ret, self.state.hide_encoding(ret)
+            return player, self.state.hide_encoding(player)
