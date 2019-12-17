@@ -5,14 +5,6 @@ from agent.RandomHeartsAgent import HeartsAction
 
 class HeartsAdjudicator(Adjudicator):
 
-    # Game Logic
-    trick_number = 0
-    trick_winner = 0
-    current_player = 1
-    pass_type = 0
-    cards_of_trick = []
-    points = [0, 0, 0, 0]
-
     """
     The Adjudicator is an encapsulation of the rules.  It tracks the ground truth state of a game in progress,
     updating when presented with agent actions.
@@ -50,23 +42,23 @@ class HeartsAdjudicator(Adjudicator):
             return self.state
         else:
             # Add agent action to cards of tricks
-            self.cards_of_trick.append(action.card_index)
+            self.state.cards_of_trick.append(action.card_index)
             # Update state with encoding for played in current trick
-            self.state.values[action.card_index] = (20 + self.current_player - 1)
+            self.state.values[action.card_index] = (20 + self.state.current_player - 1)
 
             # All 4 players have played a card, tally points
-            if self.current_player > 4:
+            if self.state.current_player > 4:
 
                 # the points accumulated for the current trick
                 trick_points = 0
 
                 # The index of the max card in cards_of_trick is the player with the highest card for now
-                max_card = (self.cards_of_trick.index(max(self.cards_of_trick)))
+                max_card = (self.state.cards_of_trick.index(max(self.state.cards_of_trick)))
                 self.trick_winner = max_card
-                print("trick winner:", max_card, " trick#:", self.trick_number, "  High card: ",
-                      self.cards_of_trick[max_card])
+                print("trick winner:", max_card, " trick#:", self.state.trick_number, "  High card: ",
+                      self.state.cards_of_trick[max_card])
                 # Check for point cards (Queen of Spades and Hearts)
-                for i in self.cards_of_trick:
+                for i in self.state.cards_of_trick:
                     # 36 is the index of the Queen of spades
                     if i == 36:
                         trick_points = trick_points + 13
@@ -75,22 +67,22 @@ class HeartsAdjudicator(Adjudicator):
                         trick_points = trick_points + 1
 
                 # Update state score
-                self.points[max_card] = self.points[max_card] + trick_points
-                self.state.score = deepcopy(self.points)
+                self.state.points[max_card] = self.state.points[max_card] + trick_points
+                self.state.score = deepcopy(self.state.points)
 
                 # All of these cards belong to the trick winner (tricks won)
-                for card in self.cards_of_trick:
+                for card in self.state.cards_of_trick:
                     self.state.values[card] = max_card + 11
 
                 # Clear out the cards in current trick
-                self.cards_of_trick.clear()
-                self.trick_number += 1
+                self.state.cards_of_trick.clear()
+                self.state.trick_number += 1
 
                 # Check if new round, reset trick_number and deal new cards
-                if self.trick_number > 12:
+                if self.state.trick_number > 12:
                     # New round, Get new state and Pass cards
                     self.trick_number = 0
-                    self.state = HeartsState()
+                    self.state.shuffle()
         return self.state
 
     def get_state(self):
@@ -108,11 +100,11 @@ class HeartsAdjudicator(Adjudicator):
         """
 
         for i in range(0, 4):
-            if self.points[i] >= 100:
-                print("P1: ", self.points[0],
-                      " P2: ", self.points[1],
-                      " P3: ", self.points[2],
-                      " P4: ", self.points[3])
+            if self.state.points[i] >= 100:
+                print("P1: ", self.state.points[0],
+                      " P2: ", self.state.points[1],
+                      " P3: ", self.state.points[2],
+                      " P4: ", self.state.points[3])
                 return True
         return False
 
@@ -123,14 +115,14 @@ class HeartsAdjudicator(Adjudicator):
         :return: player index and a masked state
         """
 
-        player = self.current_player
+        player = self.state.current_player
 
         # Reset current player
-        if self.current_player > 4:
-            self.current_player = 2
-            player = self.current_player - 1
+        if self.state.current_player > 4:
+            self.state.current_player = 2
+            player = self.state.current_player - 1
             return player, self.state.hide_encoding(player)
         # Set next player
         else:
-            self.current_player = self.current_player + 1
+            self.state.current_player = self.state.current_player + 1
             return player, self.state.hide_encoding(player)

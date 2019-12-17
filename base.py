@@ -1,5 +1,7 @@
 from typing import List
 from copy import deepcopy
+import xlwt
+from xlwt import Workbook
 
 
 class State:
@@ -103,7 +105,7 @@ class GameManager:
         self.agent_list = agent_list
         self.state_history = list()
         self.action_history = list()
-        # self.state_action_history = [HeartsState, HeartsAction]
+        self.state_action_history = list()
 
     def play_game(self):
         """
@@ -125,6 +127,7 @@ class GameManager:
             # Record this activity in the history.
             self.state_history.append(deepcopy(state))
             self.action_history.append(deepcopy(player_action))
+            self.state_action_history.append([deepcopy(state),deepcopy(player_action)])
             # Adjudicate the action to receive an updated state.
             state = self.adjudicator.step_game(player_action)
         # At this point, the game is over.  Record the final state.
@@ -135,4 +138,17 @@ class GameManager:
         The save_game() method should process the state/action histories for the DB.
         :return:
         """
-        pass
+        wb = Workbook()
+        sheet1 = wb.add_sheet("Sheet 1")
+
+        strings = self.state_history[0].store_strings()
+        for j in range(len(strings)): #write the classifications at the top
+            sheet1.write(0,j,strings[j])
+
+        for i in range(len(self.state_history)):
+            values = self.state_history[i].store_values()
+            for j in range(len(values)):
+                sheet1.write(i+1,j,str(values[j]))
+
+        wb.save("HeartsGame.xls")
+        #pass

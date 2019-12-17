@@ -11,6 +11,9 @@ class HeartsAction(Action):
                  card_index: int):
         self.card_index = card_index
 
+    def __str__(self):
+        return str(self.card_index)
+
 
 class RandomHeartsAgent(Agent):
     """

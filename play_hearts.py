@@ -14,6 +14,7 @@ game = GameManager(agent_list=[0, agent_1, agent_2, agent_3, agent_4],
 
 # Play a game.
 game.play_game()
+game.save_game()
 
 # Put a debug point here to inspect the game object.
 input()
