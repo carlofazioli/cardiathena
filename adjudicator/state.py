@@ -40,7 +40,6 @@ class HeartsState(State):
         self.trick_winner = -1
         self.pass_type = 0
         self.cards_of_trick = []
-        self.points = [0, 0, 0, 0] # points for a round rather than a game
 
     def __repr__(self):
         """
@@ -87,14 +86,12 @@ class HeartsState(State):
          :param player: the player number 1-4 to receive a tailored masked encoding state vector
          :return: masked encoding np array
          """
+        # currently not differentiating between valid cards and invalid cards
+        # so agents are playing any of the cards in their hands
 
         held_cards = self.values == player
         played_cards = self.values > 10
-        temp = np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
-        #print(temp)
-        #currently not differentiating between valid cards and invalid cards so agents are playing any of the cards in their hands
-
-        return temp
+        return np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
 
     def store_values(self):
 
@@ -104,10 +101,9 @@ class HeartsState(State):
         store_value.append(self.trick_number)
         store_value.append(self.trick_winner)
         store_value.append(self.pass_type)
-        store_value = store_value + self.points
+        store_value = store_value + self.score
 
         return store_value
-
 
     def store_strings(self):
 

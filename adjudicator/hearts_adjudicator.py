@@ -46,9 +46,6 @@ class HeartsAdjudicator(Adjudicator):
             # Update state with encoding for played in current trick
             self.state.values[action.card_index] = (20 + self.state.current_player)
 
-            # All 4 players have played a card, tally points
-            # if self.state.current_player > 4:
-
             # Check the current state for when trick is over
             if self.is_trick_over():
 
@@ -70,8 +67,7 @@ class HeartsAdjudicator(Adjudicator):
                         trick_points = trick_points + 1
 
                 # Update state score
-                self.state.points[max_card] = self.state.points[max_card] + trick_points
-                self.state.score = deepcopy(self.state.points)
+                self.state.score[max_card] = self.state.score[max_card] + trick_points
 
                 # All of these cards belong to the trick winner (tricks won)
                 for card in self.state.cards_of_trick:
@@ -104,11 +100,11 @@ class HeartsAdjudicator(Adjudicator):
         """
 
         for i in range(0, 4):
-            if self.state.points[i] >= 100:
-                print("P1: ", self.state.points[0],
-                      " P2: ", self.state.points[1],
-                      " P3: ", self.state.points[2],
-                      " P4: ", self.state.points[3])
+            if self.state.score[i] >= 100:
+                print("P1: ", self.state.score[0],
+                      " P2: ", self.state.score[1],
+                      " P3: ", self.state.score[2],
+                      " P4: ", self.state.score[3])
                 return True
         return False
 
@@ -132,7 +128,7 @@ class HeartsAdjudicator(Adjudicator):
             if player == 5:
                 player = 1
             self.state.current_player = player
-        # Trick is over, trick winner is set to current player
+        # Trick is over, current player is set to trick winner
         else:
             self.state.current_player = self.state.trick_winner
 
