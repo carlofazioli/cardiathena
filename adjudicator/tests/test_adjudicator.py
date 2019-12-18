@@ -19,7 +19,7 @@ class TestHeartsState(unittest.TestCase):
         self.adj.start_game()
         self.adj.state.trick_winner = 4
         self.adj.state.current_player = 4
-        self.adj.state.set_encoding(24, '5S')
+        self.adj.state.set_encoding(24, 'JS')
 
         agent_index, partial_state = self.adj.agent_turn()
         self.assertEqual(1, agent_index)
@@ -30,7 +30,7 @@ class TestHeartsState(unittest.TestCase):
         self.assertEqual(2, agent_index)
 
         agent_index, partial_state = self.adj.agent_turn()
-        self.adj.state.set_encoding(23, 'JD')
+        self.adj.state.set_encoding(23, '5S')
         self.assertEqual(3, agent_index)
 
         self.adj.state.trick_winner = 2
