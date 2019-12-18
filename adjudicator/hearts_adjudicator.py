@@ -44,13 +44,13 @@ class HeartsAdjudicator(Adjudicator):
             # Add agent action to cards of tricks
             self.state.cards_of_trick.append(action.card_index)
             # Update state with encoding for played in current trick
-            self.state.values[action.card_index] = (20 + self.state.current_player - 1)
+            self.state.values[action.card_index] = (20 + self.state.current_player)
 
             # All 4 players have played a card, tally points
             # if self.state.current_player > 4:
 
             # Check the current state for when trick is over
-            if len(list(x for x in self.state.values if 21 <= x <= 24)) >= 4:
+            if self.is_trick_over():
 
                 # the points accumulated for the current trick
                 trick_points = 0
@@ -85,6 +85,7 @@ class HeartsAdjudicator(Adjudicator):
                 if self.state.trick_number > 12:
                     # New round, Get new state and Pass cards
                     self.state.trick_number = 0
+                    self.state.trick_winner = -1
                     self.state.shuffle()
         return self.state
 
@@ -117,18 +118,27 @@ class HeartsAdjudicator(Adjudicator):
         any elements of the current state need to be masked before showing the agent.
         :return: player index and a masked state
         """
-
         player = self.state.current_player
 
-        # if len(list(x for x in self.state.values if 21 <= x <= 24)):
+        # Start of a new round, return the player with 2 of clubs
+        if self.state.trick_winner == -1:
+            self.state.current_player = self.state.values[0]
+            player = self.state.current_player
+            self.state.trick_winner = 0
 
-
-        # Reset current player
-        if self.state.current_player > 4:
-            self.state.current_player = 2
-            player = self.state.current_player - 1
-            return player, self.state.hide_encoding(player)
         # Set next player
+        elif not self.is_trick_over():
+            player = player + 1
+            if player == 5:
+                player = 1
+            self.state.current_player = player
+        # Trick is over, trick winner is set to current player
         else:
-            self.state.current_player = self.state.current_player + 1
-            return player, self.state.hide_encoding(player)
+            self.state.current_player = self.state.trick_winner
+
+        return player, self.state.hide_encoding(player)
+
+    def is_trick_over(self):
+        if len(list(x for x in self.state.values if 21 <= x <= 24)) >= 4:
+            return True
+        return False

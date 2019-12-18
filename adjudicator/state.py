@@ -37,10 +37,10 @@ class HeartsState(State):
         # Game Logic
         self.current_player = 1
         self.trick_number = 0
-        self.trick_winner = 0
+        self.trick_winner = -1
         self.pass_type = 0
         self.cards_of_trick = []
-        self.points = [0, 0, 0, 0] #points for a round rather than a game
+        self.points = [0, 0, 0, 0] # points for a round rather than a game
 
     def __repr__(self):
         """
@@ -107,6 +107,7 @@ class HeartsState(State):
         store_value = store_value + self.points
 
         return store_value
+
 
     def store_strings(self):
 

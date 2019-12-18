@@ -126,7 +126,7 @@ class GameManager:
             # Record this activity in the history.
             self.state_history.append(deepcopy(state))
             self.action_history.append(deepcopy(player_action))
-            self.state_action_history.append([deepcopy(state),deepcopy(player_action)])
+            self.state_action_history.append([deepcopy(state), deepcopy(player_action)])
             # Adjudicate the action to receive an updated state.
             state = self.adjudicator.step_game(player_action)
         # At this point, the game is over.  Record the final state.
