@@ -1,6 +1,6 @@
-from numpy import size
 import random
 from adjudicator.hearts_adjudicator import *
+from numpy import size
 
 
 class HeartsAction(Action):

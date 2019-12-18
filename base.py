@@ -1,6 +1,5 @@
 from typing import List
 from copy import deepcopy
-import xlwt
 from xlwt import Workbook
 
 

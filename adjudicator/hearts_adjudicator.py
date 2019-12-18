@@ -47,14 +47,17 @@ class HeartsAdjudicator(Adjudicator):
             self.state.values[action.card_index] = (20 + self.state.current_player - 1)
 
             # All 4 players have played a card, tally points
-            if self.state.current_player > 4:
+            # if self.state.current_player > 4:
+
+            # Check the current state for when trick is over
+            if len(list(x for x in self.state.values if 21 <= x <= 24)) >= 4:
 
                 # the points accumulated for the current trick
                 trick_points = 0
 
                 # The index of the max card in cards_of_trick is the player with the highest card for now
                 max_card = (self.state.cards_of_trick.index(max(self.state.cards_of_trick)))
-                self.trick_winner = max_card
+                self.state.trick_winner = max_card
                 print("trick winner:", max_card, " trick#:", self.state.trick_number, "  High card: ",
                       self.state.cards_of_trick[max_card])
                 # Check for point cards (Queen of Spades and Hearts)
@@ -81,7 +84,7 @@ class HeartsAdjudicator(Adjudicator):
                 # Check if new round, reset trick_number and deal new cards
                 if self.state.trick_number > 12:
                     # New round, Get new state and Pass cards
-                    self.trick_number = 0
+                    self.state.trick_number = 0
                     self.state.shuffle()
         return self.state
 
@@ -116,6 +119,9 @@ class HeartsAdjudicator(Adjudicator):
         """
 
         player = self.state.current_player
+
+        # if len(list(x for x in self.state.values if 21 <= x <= 24)):
+
 
         # Reset current player
         if self.state.current_player > 4:
