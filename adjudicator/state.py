@@ -171,8 +171,6 @@ class HeartsState(State):
         :param card: position in the state vector the be encoded
         :return: None
         """
-        print(self.values)
-        print(self.card_position)
         element = self.card_position[card]
         self.values[element] = encoding
 
@@ -197,7 +195,6 @@ class HeartsState(State):
         held_cards = self.values == player
         played_cards = self.values > 10
         temp = np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
-        #print(temp)
         #currently not differentiating between valid cards and invalid cards so agents are playing any of the cards in their hands
 
         return temp
@@ -237,7 +234,7 @@ class HeartsState(State):
 
         return {f'{v[1]}{v[0]}': i for i, v in enumerate(product(suits, cards))}
 
-state_test = HeartsState()
+"""state_test = HeartsState()
 state_test.shuffle()
 
 state_test.set_encoding(21,"3H")
@@ -250,4 +247,4 @@ print("Restrictions")
 print(state_test.values)
 print(state_test.restriction_and_pledge(0,1))
 print(state_test)
-state_test.update_scoreboard()
+state_test.update_scoreboard()"""

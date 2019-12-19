@@ -29,8 +29,8 @@ class RandomHeartsAgent(Agent):
         """
         # Get legal indices, given the masked state, the legal values will be between 1 and 4
         legal_indices = []
-        for i in range(0, partial_state.size):
-            if 0 < partial_state[i] < 5:
+        for i in range(len(partial_state.values)):
+            if 0 < partial_state.values[i] < 5:
                 legal_indices.append(i)
 
         # Return element if only one choice available otherwise choose a random card
