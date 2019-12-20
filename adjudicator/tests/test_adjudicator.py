@@ -1,6 +1,7 @@
 import unittest
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from agent.RandomHeartsAgent import RandomHeartsAgent
+from agent.RandomHeartsAgent import HeartsAction
 from base import GameManager
 
 
@@ -37,6 +38,24 @@ class TestHeartsState(unittest.TestCase):
         agent_index, partial_state = self.adj.agent_turn()
         self.assertEqual(3, agent_index)
 
+    def test_find_max(self):
+        adj = HeartsAdjudicator()
+        adj.start_game()
+        # should ignore that obnoxious value
+        fake_action = HeartsAction(100000)
+        adj.step_game(fake_action)
+
+        fake_action.card_index = 0
+        adj.step_game(fake_action)
+
+        fake_action.card_index = 38
+        adj.step_game(fake_action)
+
+        fake_action.card_index = 50
+        adj.step_game(fake_action)
+
+        fake_action.card_index = 20
+        adj.step_game(fake_action)
 
 if __name__ == "__main__":
     unittest.main()

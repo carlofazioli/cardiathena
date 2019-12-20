@@ -39,6 +39,8 @@ class HeartsAdjudicator(Adjudicator):
         :param action: the Action of the Agent whose turn it is
         :return: the updated State
         """
+        if self.state.trick_number >= 4:
+            print("python :(")
         # Check if game is finished
         if self.is_finished():
             return self.state
@@ -65,8 +67,10 @@ class HeartsAdjudicator(Adjudicator):
                     trick_points = 0
 
                     #Find max card and then find the owner of the card
-                    max_card = max(self.state.cards_of_trick)
+                    max_card = self.find_max_card()
+                    print("max_card is " + str(max_card))
                     trick_winner = self.state.values[max_card] - 20
+                    print("value[max_card] is " + str(self.state.values[max_card]))
                     self.state.trick_winner = trick_winner
                     print("trick winner:", trick_winner, " trick#:", self.state.trick_number, "  High card: ",
                           max_card)
@@ -80,7 +84,8 @@ class HeartsAdjudicator(Adjudicator):
                             trick_points = trick_points + 1
 
                     # Update state points
-                    self.state.points[trick_winner-1] = self.state.points[trick_winner-1] + trick_points
+                    print("trick_winner is " + str(trick_winner))
+                    self.state.points[trick_winner - 1] = self.state.points[trick_winner - 1] + trick_points
 
                     # All of these cards belong to the trick winner (tricks won)
                     for card in self.state.cards_of_trick:
@@ -109,14 +114,29 @@ class HeartsAdjudicator(Adjudicator):
                     if self.state.current_player == 5:
                         self.state.current_player = 1
                     
-                    max_card = max(self.state.cards_of_trick)
+                    max_card = self.find_max_card()
                     trick_winner = self.state.values[max_card] - 20
                     self.state.trick_winner = trick_winner
                     
                     #First card of trick has been played, remember the suit to make players follow it
-                    if self.state.trick_number == 1:
+                    if self.lead_suit == -1 or self.lead_suit == -2:
                         self.lead_suit = int((action.card_index)/13)
         return self.state
+
+    def find_max_card(self):
+        begin = 13 * self.lead_suit  # beginning of range of valid cards
+        end = 13 * (self.lead_suit + 1)  # end of range of valid cards
+
+        card_max = 0
+
+        if begin < 0 and end < 0:
+            card_max = self.state.cards_of_trick[0]
+        else:
+            for x in self.state.cards_of_trick:
+                if begin <= x < end:
+                    if x > card_max:
+                        card_max = x
+        return card_max
 
     def get_state(self):
         """
