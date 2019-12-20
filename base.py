@@ -142,12 +142,12 @@ class GameManager:
 
         strings = self.state_history[0].store_strings()
         for j in range(len(strings)): #write the classifications at the top
-            sheet1.write(0,j,strings[j])
+            sheet1.write(0, j, strings[j])
 
         for i in range(len(self.state_history)):
             values = self.state_history[i].store_values()
             for j in range(len(values)):
-                sheet1.write(i+1,j,str(values[j]))
+                sheet1.write(i+1, j, str(values[j]))
 
         wb.save("HeartsGame.xls")
         #pass

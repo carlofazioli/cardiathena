@@ -32,7 +32,7 @@ class RandomHeartsAgent(Agent):
         for i in range(len(partial_state.values)):
             if 0 < partial_state.values[i] < 5:
                 cards_in_hand.append(i)
-
+        print("Given: player: ", partial_state.current_player, "Partial state: ", partial_state.values)
         # Agent picks 3 cards to pass
         if partial_state.trick_number == 0:
             c1 = random.choice(cards_in_hand)
@@ -51,7 +51,7 @@ class RandomHeartsAgent(Agent):
             choice = random.choice(cards_in_hand)
             return HeartsAction(choice)
 
-        # Agent is out of suits
+        # Agent is void
         elif partial_state.trick_number > 0 and len(cards_in_hand) == 0:
             print("player: ", partial_state.current_player, "cards: ", cards_in_hand)
             return HeartsAction(cards_in_hand[0])

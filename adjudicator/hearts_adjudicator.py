@@ -146,7 +146,7 @@ class HeartsAdjudicator(Adjudicator):
                             self.state.score[i] += self.state.points[i]
                             self.state.points[i] = 0
                 else:
-                    # Normal trickplay
+                    # Normal trickplay, set next player
                     self.state.current_player = self.state.current_player + 1
                     if self.state.current_player == 5:
                         self.state.current_player = 1
@@ -154,10 +154,6 @@ class HeartsAdjudicator(Adjudicator):
                     # First card of trick has been played, remember the suit to make players follow it
                     if self.lead_suit == -1 or self.lead_suit == -2:
                         self.lead_suit = int(action.card_index / 13)
-
-                    max_card = self.find_max_card()
-                    trick_winner = self.state.values[max_card] - 20
-                    self.state.trick_winner = trick_winner
 
         return self.state
 
@@ -212,6 +208,7 @@ class HeartsAdjudicator(Adjudicator):
         if self.lead_suit == -1:
             # Need to code in that players can not lead with any Hearts cards until that suit has been "broken"
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
+
             return encode_state.current_player, encode_state
         
         # first hides values then changes returned ones if they can not be seen
@@ -226,7 +223,7 @@ class HeartsAdjudicator(Adjudicator):
         for i in range(begin, end):
             if 0 < encode_state.values[i] < 5:
                 has_suit = True
-        if has_suit == False:
+        if not has_suit:
             # Player did not have suit and can play whatever
             return encode_state.current_player, encode_state
         # Encode it if we know they have valid cards
