@@ -17,7 +17,7 @@ class TestHeartsState(unittest.TestCase):
                                 adjudicator=self.adj)
 
     def test_pass_round(self):
-        round_number = 0
+
         self.adj.start_game()
         while not self.adj.is_finished():
             # New round, check passing
@@ -25,37 +25,36 @@ class TestHeartsState(unittest.TestCase):
                 for i in range(0, 4):
                     agent_index, partial_state = self.adj.agent_turn()
                     p_action = self.game.agent_list[agent_index].get_action(partial_state)
-                    state = self.adj.step_game(p_action)
-                round_number += 1
-                print(round_number)
+                    self.adj.step_game(p_action)
+
                 # Passing CW
                 if self.adj.state.pass_type == 0:
-                    self.assertTrue(list(x for x in self.adj.pass_actions[0] if self.adj.state.values[x] == 2))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[1] if self.adj.state.values[x] == 3))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[2] if self.adj.state.values[x] == 4))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[3] if self.adj.state.values[x] == 1))
+                    self.assertTrue(x for x in self.adj.pass_actions[0] if self.adj.state.values[x] == 2)
+                    self.assertTrue(x for x in self.adj.pass_actions[1] if self.adj.state.values[x] == 3)
+                    self.assertTrue(x for x in self.adj.pass_actions[2] if self.adj.state.values[x] == 4)
+                    self.assertTrue(x for x in self.adj.pass_actions[3] if self.adj.state.values[x] == 1)
                 # Passing CCW
                 elif self.adj.state.pass_type == 1:
-                    self.assertTrue(list(x for x in self.adj.pass_actions[0] if self.adj.state.values[x] == 4))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[1] if self.adj.state.values[x] == 1))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[2] if self.adj.state.values[x] == 2))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[3] if self.adj.state.values[x] == 3))
+                    self.assertTrue(x for x in self.adj.pass_actions[0] if self.adj.state.values[x] == 4)
+                    self.assertTrue(x for x in self.adj.pass_actions[1] if self.adj.state.values[x] == 1)
+                    self.assertTrue(x for x in self.adj.pass_actions[2] if self.adj.state.values[x] == 2)
+                    self.assertTrue(x for x in self.adj.pass_actions[3] if self.adj.state.values[x] == 3)
                 # Passing Straight
                 elif self.adj.state.pass_type == 2:
-                    self.assertTrue(list(x for x in self.adj.pass_actions[0] if self.adj.state.values[x] == 3))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[1] if self.adj.state.values[x] == 4))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[2] if self.adj.state.values[x] == 1))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[3] if self.adj.state.values[x] == 2))
+                    self.assertTrue(x for x in self.adj.pass_actions[0] if self.adj.state.values[x] == 3)
+                    self.assertTrue(x for x in self.adj.pass_actions[1] if self.adj.state.values[x] == 4)
+                    self.assertTrue(x for x in self.adj.pass_actions[2] if self.adj.state.values[x] == 1)
+                    self.assertTrue(x for x in self.adj.pass_actions[3] if self.adj.state.values[x] == 2)
                 # No pass
                 elif self.adj.state.pass_type == 3:
-                    self.assertTrue(list(x for x in self.adj.pass_actions[0] if self.adj.state.values[x] == 1))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[1] if self.adj.state.values[x] == 2))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[2] if self.adj.state.values[x] == 3))
-                    self.assertTrue(list(x for x in self.adj.pass_actions[3] if self.adj.state.values[x] == 4))
+                    self.assertTrue(x for x in self.adj.pass_actions[0] if self.adj.state.values[x] == 1)
+                    self.assertTrue(x for x in self.adj.pass_actions[1] if self.adj.state.values[x] == 2)
+                    self.assertTrue(x for x in self.adj.pass_actions[2] if self.adj.state.values[x] == 3)
+                    self.assertTrue(x for x in self.adj.pass_actions[3] if self.adj.state.values[x] == 4)
 
             agent_index, partial_state = self.adj.agent_turn()
             p_action = self.game.agent_list[agent_index].get_action(partial_state)
-            state = self.adj.step_game(p_action)
+            self.adj.step_game(p_action)
 
     def test_player_turns_trick_winner(self):
         self.adj.start_game()
