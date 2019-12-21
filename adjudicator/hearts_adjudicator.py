@@ -49,31 +49,7 @@ class HeartsAdjudicator(Adjudicator):
             if self.state.trick_number == 0 and self.lead_suit == -2:
                 # Implement pass here
                 self.pass_actions.append(action.card_index)
-                player_to_pass = 0
-                # Pass 3 cards Clockwise(CW) : 1,2,3,4...
-                if self.state.pass_type == 0:
-                    player_to_pass = self.state.current_player + 1
-                    # Loop around
-                    if player_to_pass >= 5:
-                        player_to_pass = 1
 
-                # Pass 3 cards Counter-Clockwise(CCW) : 1,4,3,2...
-                if self.state.pass_type == 1:
-                    player_to_pass = self.state.current_player - 1
-                    # Loop around
-                    if player_to_pass <= 0:
-                        player_to_pass = 1
-
-                # Pass 3 cards Straight : 1 <-> 3 and 2 <-> 4
-                if self.state.pass_type == 2:
-                    player_to_pass = self.state.current_player + 2
-                    # Loop around
-                    if player_to_pass >= 3:
-                        player_to_pass = self.state.current_player - 2
-
-                # Pass cards to player_to_pass
-                for card_i in self.pass_actions[len(self.pass_actions) - 1]:
-                    self.state.values[card_i] = player_to_pass
 
                 # Set next player to pass three cards
                 self.state.current_player = self.state.current_player + 1
@@ -81,14 +57,42 @@ class HeartsAdjudicator(Adjudicator):
                 # All players have passed cards
                 if len(self.pass_actions) > 3:
                     # prepare found agent to handle two of clubs at beginning of round
+                    # Pass cards to player_to_pass
+                    for action in range(len(self.pass_actions)):
+                        
+                        player_to_pass = 0
+                        action += 1 #action starts from 0 while players start from 1
+                        # Pass 3 cards Clockwise(CW) : 1,2,3,4...
+                        if self.state.pass_type == 0:
+                            player_to_pass = action + 1
+                            # Loop around
+                            if player_to_pass >= 5:
+                                player_to_pass = 1
+                
+                        # Pass 3 cards Counter-Clockwise(CCW) : 4,3,2,1...
+                        if self.state.pass_type == 1:
+                            player_to_pass = action - 1
+                            # Loop around
+                            if player_to_pass <= 0:
+                                player_to_pass = 4
+                
+                        # Pass 3 cards Straight : 1 <-> 3 and 2 <-> 4
+                        if self.state.pass_type == 2:
+                            player_to_pass = action + 2
+                            # Loop around
+                            if player_to_pass >= 5:
+                                player_to_pass = player_to_pass - 4
+                        
+                        
+                        for card_i in self.pass_actions[action - 1]:
+                            self.state.values[card_i] = player_to_pass
+                            
                     self.state.trick_number = 1
-                    self.state.pass_type += 1
                     self.lead_suit = -2
                     self.state.current_player = self.state.values[0]
-                    if self.state.pass_type > 2:
-                        self.state.pass_type = 0
 
-            elif self.state.trick_number >= 1:
+            #elif self.state.trick_number >= 1:
+            else:
                 # Add agent action to cards of tricks
                 self.state.cards_of_trick.append(action.card_index)
                 # Update state with encoding for played in current trick
@@ -139,8 +143,12 @@ class HeartsAdjudicator(Adjudicator):
                         # New round, shuffle cards, and Pass cards
                         self.state.trick_number = 0
                         self.state.trick_winner = 0
+                        self.state.current_player = 1
                         self.pass_actions.clear()
                         self.lead_suit = -2
+                        self.state.pass_type += 1
+                        if self.state.pass_type > 2:
+                            self.state.pass_type = 0
                         self.state.shuffle()
                         for i in range(len(self.state.score)):
                             self.state.score[i] += self.state.points[i]
@@ -191,7 +199,7 @@ class HeartsAdjudicator(Adjudicator):
 
         # Mask only cards that belong to agent for passing
         if encode_state.trick_number == 0 and self.lead_suit == -2:
-            encode_state.hide_encoding(encode_state.current_player)
+            encode_state.values = encode_state.hide_encoding(encode_state.current_player)
             return encode_state.current_player, encode_state
 
         # Make the two of clubs the only valid card if starting a round
