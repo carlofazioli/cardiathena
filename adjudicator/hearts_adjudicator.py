@@ -15,8 +15,9 @@ class HeartsAdjudicator(Adjudicator):
 
     def __init__(self):
         super().__init__()
-        # The win conditions are the row-, column-, and diagonal-indices that make a tic tac toe.
-        self.lead_suit = -2 #a variable that will range from 0-3 to determine the leading suit; -2 for beginning of round after pass; -1 for rest of trick starts
+        # A variable that will range from 0-3 to determine the leading suit;
+        # -2 for beginning of round after pass; -1 for rest of trick starts
+        self.lead_suit = -2
         self.pass_actions = []
         self.agent_types = []
 
@@ -28,8 +29,6 @@ class HeartsAdjudicator(Adjudicator):
         """
         # Hearts objects already initialize to the starting position.
         self.state = HeartsState()
-
-        # Pass cards
 
         return self.state
 
@@ -49,19 +48,17 @@ class HeartsAdjudicator(Adjudicator):
             if self.state.trick_number == 0 and self.lead_suit == -2:
                 # Implement pass here
                 self.pass_actions.append(action.card_index)
-
-
                 # Set next player to pass three cards
                 self.state.current_player = self.state.current_player + 1
 
-                # All players have passed cards
+                # All players have chosen cards to pass
                 if len(self.pass_actions) > 3:
                     # prepare found agent to handle two of clubs at beginning of round
                     # Pass cards to player_to_pass
                     for action in range(len(self.pass_actions)):
-                        
                         player_to_pass = 0
-                        action += 1 #action starts from 0 while players start from 1
+                        # action starts from 0 while players start from 1
+                        action += 1
                         # Pass 3 cards Clockwise(CW) : 1,2,3,4...
                         if self.state.pass_type == 0:
                             player_to_pass = action + 1
@@ -82,8 +79,14 @@ class HeartsAdjudicator(Adjudicator):
                             # Loop around
                             if player_to_pass >= 5:
                                 player_to_pass = player_to_pass - 4
-                        
-                        
+
+                        if self.state.pass_type == 3:
+                            self.state.trick_number = 1
+                            self.lead_suit = -2
+                            self.state.current_player = self.state.values[0]
+                            return self.state
+
+                        # Pass Cards
                         for card_i in self.pass_actions[action - 1]:
                             self.state.values[card_i] = player_to_pass
                             
@@ -91,7 +94,6 @@ class HeartsAdjudicator(Adjudicator):
                     self.lead_suit = -2
                     self.state.current_player = self.state.values[0]
 
-            #elif self.state.trick_number >= 1:
             else:
                 # Add agent action to cards of tricks
                 self.state.cards_of_trick.append(action.card_index)
@@ -147,14 +149,14 @@ class HeartsAdjudicator(Adjudicator):
                         self.pass_actions.clear()
                         self.lead_suit = -2
                         self.state.pass_type += 1
-                        if self.state.pass_type > 2:
+                        if self.state.pass_type > 3:
                             self.state.pass_type = 0
                         self.state.shuffle()
                         for i in range(len(self.state.score)):
                             self.state.score[i] += self.state.points[i]
                             self.state.points[i] = 0
                 else:
-                    # Normal trickplay, set next player
+                    # Normal trick play, set next player
                     self.state.current_player = self.state.current_player + 1
                     if self.state.current_player == 5:
                         self.state.current_player = 1
@@ -216,7 +218,6 @@ class HeartsAdjudicator(Adjudicator):
         if self.lead_suit == -1:
             # Need to code in that players can not lead with any Hearts cards until that suit has been "broken"
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
-
             return encode_state.current_player, encode_state
         
         # first hides values then changes returned ones if they can not be seen
