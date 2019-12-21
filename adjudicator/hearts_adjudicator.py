@@ -96,7 +96,15 @@ class HeartsAdjudicator(Adjudicator):
 
             else:
                 # Add agent action to cards of tricks
-                self.state.cards_of_trick.append(action.card_index)
+                try:
+                    self.state.cards_of_trick.append(action.card_index)
+                except:
+                    print("cards of check append fail")
+                    print(self.state.values)
+                    print("p: ", self.state.current_player)
+                    print("trick_lead ", self.state.trick_winner)
+                    print("suit_lead :", self.lead_suit)
+                    print("action: ", action.card_index)
                 # Update state with encoding for played in current trick
                 self.state.values[action.card_index] = (20 + self.state.values[action.card_index])
 
@@ -112,7 +120,7 @@ class HeartsAdjudicator(Adjudicator):
                     self.state.trick_winner = trick_winner
 
                     print("trick winner:", trick_winner, " trick#:", self.state.trick_number, "  High card: ",
-                          max_card)
+                          max_card, " Points: ", self.state.points)
 
                     # Check for point cards (Queen of Spades and Hearts)
                     for i in self.state.cards_of_trick:
@@ -180,7 +188,6 @@ class HeartsAdjudicator(Adjudicator):
         The game is over when the first player has reached 100 or more points
         :return: boolean determination of whether the game is finished or not
         """
-
         for i in range(0, 4):
             if self.state.score[i] >= 100:
                 print("P1: ", self.state.score[0],
@@ -216,10 +223,24 @@ class HeartsAdjudicator(Adjudicator):
 
         # Player can play any of their cards if they lead the trick (unless starting a round)
         if self.lead_suit == -1:
-            # Need to code in that players can not lead with any Hearts cards until that suit has been "broken"
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
+            # Need to code in that players can not lead with any Hearts cards until that suit has been "broken"
+            if not self.hearts_broken():
+                # Check if player has anything other than hearts to play
+                has_more_than_hearts = False
+                for i in range(0, 39):
+                    if encode_state.values[i] == encode_state.current_player:
+                        has_more_than_hearts = True
+                        break
+                # Player only has hearts left, and must lead with it
+                if not has_more_than_hearts:
+                    return encode_state.current_player, encode_state
+                for i in range(39, 52):
+                    if encode_state.values[i] == encode_state.current_player:
+                        encode_state.values[i] = encode_state.values[i] * (-1)
+                return encode_state.current_player, encode_state
             return encode_state.current_player, encode_state
-        
+
         # first hides values then changes returned ones if they can not be seen
         encode_state.values = encode_state.hide_encoding(encode_state.current_player)
         # beginning of range of valid cards
@@ -242,9 +263,14 @@ class HeartsAdjudicator(Adjudicator):
                     encode_state.values[i] = encode_state.values[i]*(-1)
         return encode_state.current_player, encode_state
 
+    def is_void(self, lead_suit):
+        print()
+
     def hearts_broken(self):
-        if len(list(x for x in self.state.values if 39 <= x <= 51)) > 10:
-            return True
+        for i in range(39, 52):
+            if self.state.values[i] > 10:
+                # print("Hearts broken index=", i, " player cards=", self.state.values[i])
+                return True
         return False
 
     def is_trick_over(self):
