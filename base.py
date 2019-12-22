@@ -131,6 +131,7 @@ class GameManager:
             state = self.adjudicator.step_game(player_action)
         # At this point, the game is over.  Record the final state.
         self.state_history.append(state)
+        self.state_action_history.append([deepcopy(state), "None"])
 
     def save_game(self):
         """
@@ -148,6 +149,7 @@ class GameManager:
             values = self.state_history[i].store_values()
             for j in range(len(values)):
                 sheet1.write(i+1, j, str(values[j]))
+            sheet1.write(i+1, len(values), str(self.state_action_history[i][1]))
 
         wb.save("HeartsGame.xls")
         #pass

@@ -221,6 +221,7 @@ class HeartsState(State):
         for i in range(4):
             game_logic.append("Points of " + str(i))
         store_string = store_string + game_logic
+        store_string.append("Action")
 
         return store_string
     @property
