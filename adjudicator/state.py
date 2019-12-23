@@ -152,9 +152,9 @@ class HeartsState(State):
             for p in player:
                 print(p)
                 for points in self.points_cond:
-                    if(p==points):
-                        self.points[cur]+=1
-        cur+=1
+                    if(p == points):
+                        self.points[cur] += 1
+        cur += 1
 
         print(self.points)
 
@@ -191,13 +191,10 @@ class HeartsState(State):
          :param player: the player number 1-4 to receive a tailored masked encoding state vector
          :return: masked encoding np array
          """
-
+        # currently not differentiating between valid cards and invalid cards so agents are playing any of the cards in their hands
         held_cards = self.values == player
         played_cards = self.values > 10
-        temp = np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
-        #currently not differentiating between valid cards and invalid cards so agents are playing any of the cards in their hands
-
-        return temp
+        return np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
 
     def store_values(self):
 
@@ -214,14 +211,17 @@ class HeartsState(State):
     def store_strings(self):
 
         store_string = []
-        for i in range(52): #label indices for storage of values
+        # label indices for storage of values
+        for i in range(52):
             store_string.append(i)
-        for i in range(4): #label numbers of players for storage of score
+        # label numbers of players for storage of score
+        for i in range(4):
             store_string.append("Score of " + str(i))
-        game_logic = ["Current Player","Trick Number","Trick Winner","Pass Type"]
+        game_logic = ["Current Player", "Trick Number", "Trick Winner", "Pass Type"]
         for i in range(4):
             game_logic.append("Points of " + str(i))
         store_string = store_string + game_logic
+        store_string.append("Action")
 
         return store_string
     @property

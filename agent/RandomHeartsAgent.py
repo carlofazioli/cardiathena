@@ -1,6 +1,5 @@
 import random
 from adjudicator.hearts_adjudicator import *
-from numpy import size
 
 
 class HeartsAction(Action):
@@ -8,7 +7,7 @@ class HeartsAction(Action):
     A Hearts action is the card index chosen by the agent
     """
     def __init__(self,
-                 card_index: int):
+                 card_index):
         self.card_index = card_index
 
     def __str__(self):
@@ -27,15 +26,24 @@ class RandomHeartsAgent(Agent):
         :param partial_state: the position vector of the game.
         :return: an Action.
         """
-        # Get legal indices, given the masked state, the legal values will be between 1 and 4
-        legal_indices = []
+        # Given the masked state, only cards in hand of agent is available
+        cards_in_hand = []
         for i in range(len(partial_state.values)):
             if 0 < partial_state.values[i] < 5:
-                legal_indices.append(i)
+                cards_in_hand.append(i)
 
-        # Return element if only one choice available otherwise choose a random card
-        if legal_indices:
-            choice = random.choice(legal_indices)
+        # Agent picks 3 cards to pass
+        if partial_state.trick_number == 0:
+            c1 = random.choice(cards_in_hand)
+            cards_in_hand.remove(c1)
+            c2 = random.choice(cards_in_hand)
+            cards_in_hand.remove(c2)
+            c3 = random.choice(cards_in_hand)
+            cards_in_hand.remove(c3)
+            three_cards = [c1, c2, c3]
+            return HeartsAction(three_cards)
+
+        # Agent picks a card to play
+        elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
+            choice = random.choice(cards_in_hand)
             return HeartsAction(choice)
-        else:
-            return None
