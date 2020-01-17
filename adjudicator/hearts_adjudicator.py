@@ -2,6 +2,7 @@ from base import *
 from adjudicator.state import HeartsState
 from agent.RandomHeartsAgent import HeartsAction
 import copy
+import numpy as np
 
 
 class HeartsAdjudicator(Adjudicator):
@@ -21,6 +22,32 @@ class HeartsAdjudicator(Adjudicator):
         self.pass_actions = []
         self.agent_types = []
 
+    def current_player(self):
+        # Returns the current player
+        return 0
+
+    def trick_winner(self):
+        # Returns the current player set to win the trick
+        print(np.argmax(self.state.values == 21))
+        print(np.argmax(self.state.values == 22))
+        print(np.argmax(self.state.values == 23))
+        print(np.argmax(self.state.values == 24))
+        #players that have not played yet are going to get 0 even though they have not played that
+
+        #find trick leader and use that to check who is in suit and who is not
+        #largest one following trick is leader
+    
+    def trick_number(self):
+        # Returns the trick number in the round
+        played_count = 0
+        played_count += (self.state.values == 11).sum()
+        played_count += (self.state.values == 12).sum()
+        played_count += (self.state.values == 13).sum()
+        played_count += (self.state.values == 14).sum()
+        played_count = int(played_count/4)
+        played_count += 1
+        return played_count
+    
     def start_game(self):
         """
         The start_game() method creates a new State data type instance and manipulates it to represent the starting
@@ -45,6 +72,7 @@ class HeartsAdjudicator(Adjudicator):
             return self.state
         else:
             # First trick of a round - all four players choose their cards before incrementing
+            print("stored trick_number: " + str(self.state.trick_number) + "\ncalculated trick_number: " + str(self.trick_number()))
             if self.state.trick_number == 0 and self.lead_suit == -2:
                 # Implement pass here
                 self.pass_actions.append(action.card_index)
