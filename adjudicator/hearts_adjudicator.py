@@ -26,6 +26,19 @@ class HeartsAdjudicator(Adjudicator):
         # Returns the current player
         return 0
 
+    def trick_leader(self):
+        # Returns the first player of the current trick
+        cards_played = self.state.values[self.state.values > 20]
+        if len(cards_played) == 0:
+            print("empty")
+        else:
+            for x in range(4):
+                found = cards_played[cards_played == (20 + 1 + x)]
+                if len(found) == 1:
+                    print(str(20+1+x) + " exists")
+        print(cards_played)
+        return 0
+
     def trick_winner(self):
         # Returns the current player set to win the trick
         print(np.argmax(self.state.values == 21))
@@ -233,6 +246,7 @@ class HeartsAdjudicator(Adjudicator):
         """
         # copy of the state to manipulate for the agent
         encode_state = copy.deepcopy(self.state)
+        print(self.trick_leader())
 
         # Mask only cards that belong to agent for passing
         if encode_state.trick_number == 0 and self.lead_suit == -2:
