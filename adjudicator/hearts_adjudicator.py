@@ -27,17 +27,33 @@ class HeartsAdjudicator(Adjudicator):
         return 0
 
     def trick_leader(self):
+        """
+        The trick_leader() method is a helper function to determine who the trick leader of a trick. The determination
+        is decided by looking at the current state using the encoded values for cards played in the trick.
+        :return: trick leader or None
+        """
         # Returns the first player of the current trick
         cards_played = self.state.values[self.state.values > 20]
+        cards_played_length = len(cards_played) - 1
+
+        # no cards have been played yet, trick leader can't be inferred
         if len(cards_played) == 0:
-            print("empty")
-        else:
-            for x in range(4):
-                found = cards_played[cards_played == (20 + 1 + x)]
-                if len(found) == 1:
-                    print(str(20+1+x) + " exists")
-        print(cards_played)
-        return 0
+            return None
+
+        # All for players have played, trick leader can no longer be inferred
+        if len(cards_played) == 4:
+            return None
+
+        sorted_cards_played = np.sort(cards_played)
+
+        # Find trick leader
+        for i in range(0, cards_played_length):
+            # Check if sequentially subtracting index (i+1) - i is >= 2. If so trick leader is at index i+1.
+            if (sorted_cards_played[i + 1] - sorted_cards_played[i]) >= 2:
+                return sorted_cards_played[i + 1]
+            # we've iterated through the whole list and the trick leader is at index 0
+            elif i == cards_played_length - 1:
+                return sorted_cards_played[0]
 
     def trick_winner(self):
         # Returns the current player set to win the trick
