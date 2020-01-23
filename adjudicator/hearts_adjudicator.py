@@ -1,8 +1,10 @@
-from base import *
+import copy
+
+import numpy as np
+
 from adjudicator.state import HeartsState
 from agent.RandomHeartsAgent import HeartsAction
-import copy
-import numpy as np
+from base import *
 
 
 class HeartsAdjudicator(Adjudicator):
@@ -249,11 +251,13 @@ class HeartsAdjudicator(Adjudicator):
         print(self.trick_leader())
 
         # Mask only cards that belong to agent for passing
+        # Functionize this into a mask for passing trick
         if encode_state.trick_number == 0 and self.lead_suit == -2:
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
             return encode_state.current_player, encode_state
 
         # Make the two of clubs the only valid card if starting a round
+        # Functionize this into make first trick function
         if encode_state.trick_number == 1 and self.lead_suit == -2:
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
             for i in range(len(encode_state.values)):
@@ -264,6 +268,7 @@ class HeartsAdjudicator(Adjudicator):
             return encode_state.current_player, encode_state
 
         # Player can play any of their cards if they lead the trick (unless starting a round)
+        # Functionize this into a normal trick function
         if self.lead_suit == -1:
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
             # Need to code in that players can not lead with any Hearts cards until that suit has been "broken"
@@ -291,6 +296,7 @@ class HeartsAdjudicator(Adjudicator):
         end = 13 * (self.lead_suit + 1)
         
         # Check that the player actually has cards in the current suit before hiding everything else
+        # Functionize into a check suit function
         has_suit = False
         for i in range(begin, end):
             if 0 < encode_state.values[i] < 5:
