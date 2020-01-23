@@ -5,8 +5,8 @@ from mysql.connector import errorcode
 
 config = {
   'user': 'remote_usr',
-  'password': 'VceIqmj9',
-  'host': '127.0.0.1',
+  'password': '',
+  'port': '3306',
   'raise_on_warnings': True
 }
 
