@@ -1,4 +1,4 @@
 #!/bin/bash
 
-rm *.err *.out
-rm /scratch/dha5/mysql/var/lib/mysql/*lock
+rm /scratch/$USER/*.err /scratch/$USER/*.out
+rm /scratch/$USER/mysql/var/lib/mysql/*lock
