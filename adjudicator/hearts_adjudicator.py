@@ -84,6 +84,9 @@ class HeartsAdjudicator(Adjudicator):
         if self.is_finished():
             return self.state
         else:
+            #
+            # The if statement below can be a "pass_cards" function
+            #
             # First trick of a round - all four players choose their cards before incrementing
             print("stored trick_number: " + str(self.state.trick_number) + "\ncalculated trick_number: " + str(self.trick_number()))
             if self.state.trick_number == 0 and self.lead_suit == -2:
@@ -135,6 +138,9 @@ class HeartsAdjudicator(Adjudicator):
                     self.lead_suit = -2
                     self.state.current_player = self.state.values[0]
 
+                    # Testing for adjudicator trick_winner
+                    self.trick_winner(self)
+
             else:
                 # Add agent action to cards of tricks
                 try:
@@ -148,7 +154,9 @@ class HeartsAdjudicator(Adjudicator):
                     print("action: ", action.card_index)
                 # Update state with encoding for played in current trick
                 self.state.values[action.card_index] = (20 + self.state.values[action.card_index])
-
+                #
+                # Content in the "trick is over" if-statement can be a function.
+                #
                 # Check the current state for when trick is over
                 if self.is_trick_over():
 
@@ -204,6 +212,7 @@ class HeartsAdjudicator(Adjudicator):
                         for i in range(len(self.state.score)):
                             self.state.score[i] += self.state.points[i]
                             self.state.points[i] = 0
+                # This is normal play, nothing special about it so I think we can leave it as is
                 else:
                     # Normal trick play, set next player
                     self.state.current_player = self.state.current_player + 1
