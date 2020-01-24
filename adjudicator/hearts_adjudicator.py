@@ -87,54 +87,7 @@ class HeartsAdjudicator(Adjudicator):
             # First trick of a round - all four players choose their cards before incrementing
             print("stored trick_number: " + str(self.state.trick_number) + "\ncalculated trick_number: " + str(self.trick_number()))
             if self.state.trick_number == 0 and self.lead_suit == -2:
-                # Implement pass here
-                self.pass_actions.append(action.card_index)
-                # Set next player to pass three cards
-                self.state.current_player = self.state.current_player + 1
-
-                # All players have chosen cards to pass
-                if len(self.pass_actions) > 3:
-                    # prepare found agent to handle two of clubs at beginning of round
-                    # Pass cards to player_to_pass
-                    for action in range(len(self.pass_actions)):
-                        player_to_pass = 0
-                        # action starts from 0 while players start from 1
-                        action += 1
-                        # Pass 3 cards Clockwise(CW) : 1,2,3,4...
-                        if self.state.pass_type == 0:
-                            player_to_pass = action + 1
-                            # Loop around
-                            if player_to_pass >= 5:
-                                player_to_pass = 1
-                
-                        # Pass 3 cards Counter-Clockwise(CCW) : 4,3,2,1...
-                        if self.state.pass_type == 1:
-                            player_to_pass = action - 1
-                            # Loop around
-                            if player_to_pass <= 0:
-                                player_to_pass = 4
-                
-                        # Pass 3 cards Straight : 1 <-> 3 and 2 <-> 4
-                        if self.state.pass_type == 2:
-                            player_to_pass = action + 2
-                            # Loop around
-                            if player_to_pass >= 5:
-                                player_to_pass = player_to_pass - 4
-
-                        if self.state.pass_type == 3:
-                            self.state.trick_number = 1
-                            self.lead_suit = -2
-                            self.state.current_player = self.state.values[0]
-                            return self.state
-
-                        # Pass Cards
-                        for card_i in self.pass_actions[action - 1]:
-                            self.state.values[card_i] = player_to_pass
-                            
-                    self.state.trick_number = 1
-                    self.lead_suit = -2
-                    self.state.current_player = self.state.values[0]
-
+                self.pass_cards(action)
             else:
                 # Add agent action to cards of tricks
                 try:
@@ -148,62 +101,12 @@ class HeartsAdjudicator(Adjudicator):
                     print("action: ", action.card_index)
                 # Update state with encoding for played in current trick
                 self.state.values[action.card_index] = (20 + self.state.values[action.card_index])
-
+                #
+                # Content in the "trick is over" if-statement can be a function.
+                #
                 # Check the current state for when trick is over
                 if self.is_trick_over():
-
-                    # the points accumulated for the current trick
-                    trick_points = 0
-
-                    # Find max card and then find the owner of the card
-                    max_card = self.find_max_card()
-                    trick_winner = self.state.values[max_card] - 20
-                    self.state.trick_winner = trick_winner
-
-                    print("trick winner:", trick_winner, " trick#:", self.state.trick_number, "  High card: ",
-                          max_card, " Points: ", self.state.points)
-
-                    # Check for point cards (Queen of Spades and Hearts)
-                    for i in self.state.cards_of_trick:
-                        # 36 is the index of the Queen of spades
-                        if i == 36:
-                            trick_points = trick_points + 13
-                        # 39 and up are the indices for hearts
-                        if i >= 39:
-                            trick_points = trick_points + 1
-
-                    # Update state points
-                    self.state.points[trick_winner - 1] = self.state.points[trick_winner - 1] + trick_points
-
-                    # All of these cards belong to the trick winner (tricks won)
-                    for card in self.state.cards_of_trick:
-                        self.state.values[card] = trick_winner + 10
-
-                    # Clear out the cards in current trick
-                    self.state.cards_of_trick.clear()
-                    self.state.trick_number += 1
-
-                    # Trick winner should be set up to start next trick
-                    self.state.current_player = self.state.trick_winner
-
-                    # suit is no longer leading at end of a trick
-                    self.lead_suit = -1
-
-                    # Check if new round, reset trick_number and deal new cards
-                    if self.state.trick_number > 13:
-                        # New round, shuffle cards, and Pass cards
-                        self.state.trick_number = 0
-                        self.state.trick_winner = 0
-                        self.state.current_player = 1
-                        self.pass_actions.clear()
-                        self.lead_suit = -2
-                        self.state.pass_type += 1
-                        if self.state.pass_type > 3:
-                            self.state.pass_type = 0
-                        self.state.shuffle()
-                        for i in range(len(self.state.score)):
-                            self.state.score[i] += self.state.points[i]
-                            self.state.points[i] = 0
+                    self.end_of_trick()
                 else:
                     # Normal trick play, set next player
                     self.state.current_player = self.state.current_player + 1
@@ -215,6 +118,112 @@ class HeartsAdjudicator(Adjudicator):
                         self.lead_suit = int(action.card_index / 13)
 
         return self.state
+
+    def pass_cards(self, action: HeartsAction):
+        # Implement pass here
+        self.pass_actions.append(action.card_index)
+        # Set next player to pass three cards
+        self.state.current_player = self.state.current_player + 1
+
+        # All players have chosen cards to pass
+        if len(self.pass_actions) > 3:
+            # prepare found agent to handle two of clubs at beginning of round
+            # Pass cards to player_to_pass
+            for action in range(len(self.pass_actions)):
+                player_to_pass = 0
+                # action starts from 0 while players start from 1
+                action += 1
+                # Pass 3 cards Clockwise(CW) : 1,2,3,4...
+                if self.state.pass_type == 0:
+                    player_to_pass = action + 1
+                    # Loop around
+                    if player_to_pass >= 5:
+                        player_to_pass = 1
+
+                # Pass 3 cards Counter-Clockwise(CCW) : 4,3,2,1...
+                if self.state.pass_type == 1:
+                    player_to_pass = action - 1
+                    # Loop around
+                    if player_to_pass <= 0:
+                        player_to_pass = 4
+
+                # Pass 3 cards Straight : 1 <-> 3 and 2 <-> 4
+                if self.state.pass_type == 2:
+                    player_to_pass = action + 2
+                    # Loop around
+                    if player_to_pass >= 5:
+                        player_to_pass = player_to_pass - 4
+
+                if self.state.pass_type == 3:
+                    self.state.trick_number = 1
+                    self.lead_suit = -2
+                    self.state.current_player = self.state.values[0]
+                    return self.state
+
+                # Pass Cards
+                for card_i in self.pass_actions[action - 1]:
+                    self.state.values[card_i] = player_to_pass
+
+            self.state.trick_number = 1
+            self.lead_suit = -2
+            self.state.current_player = self.state.values[0]
+
+            # Testing for adjudicator trick_winner
+            # self.trick_winner()
+
+    def end_of_trick(self):
+        # the points accumulated for the current trick
+        trick_points = 0
+
+        # Find max card and then find the owner of the card
+        max_card = self.find_max_card()
+        trick_winner = self.state.values[max_card] - 20
+        self.state.trick_winner = trick_winner
+
+        print("trick winner:", trick_winner, " trick#:", self.state.trick_number, "  High card: ",
+              max_card, " Points: ", self.state.points)
+
+        # Check for point cards (Queen of Spades and Hearts)
+        for i in self.state.cards_of_trick:
+            # 36 is the index of the Queen of spades
+            if i == 36:
+                trick_points = trick_points + 13
+            # 39 and up are the indices for hearts
+            if i >= 39:
+                trick_points = trick_points + 1
+
+        # Update state points
+        self.state.points[trick_winner - 1] = self.state.points[trick_winner - 1] + trick_points
+
+        # All of these cards belong to the trick winner (tricks won)
+        for card in self.state.cards_of_trick:
+            self.state.values[card] = trick_winner + 10
+
+        # Clear out the cards in current trick
+        self.state.cards_of_trick.clear()
+        self.state.trick_number += 1
+
+        # Trick winner should be set up to start next trick
+        self.state.current_player = self.state.trick_winner
+
+        # suit is no longer leading at end of a trick
+        self.lead_suit = -1
+
+        # Check if new round, reset trick_number and deal new cards
+        if self.state.trick_number > 13:
+            # New round, shuffle cards, and Pass cards
+            self.state.trick_number = 0
+            self.state.trick_winner = 0
+            self.state.current_player = 1
+            self.pass_actions.clear()
+            self.lead_suit = -2
+            self.state.pass_type += 1
+            if self.state.pass_type > 3:
+                self.state.pass_type = 0
+            self.state.shuffle()
+            for i in range(len(self.state.score)):
+                self.state.score[i] += self.state.points[i]
+                self.state.points[i] = 0
 
     def get_state(self):
         """
