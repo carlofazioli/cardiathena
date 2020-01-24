@@ -10,6 +10,7 @@ suits = ['C', 'D', 'S', 'H']
 player_hand = [1, 2, 3, 4]
 player_won = [11, 12, 13, 14]
 player_current = [21, 22, 23, 24]
+trick_leader = [31, 32, 33, 34]
 unknown = 0
 
 

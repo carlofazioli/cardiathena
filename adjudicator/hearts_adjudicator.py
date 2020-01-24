@@ -22,6 +22,7 @@ class HeartsAdjudicator(Adjudicator):
         self.lead_suit = -2
         self.pass_actions = []
         self.agent_types = []
+        self.leading = 1
 
     def current_player(self):
         # Returns the current player
@@ -102,7 +103,13 @@ class HeartsAdjudicator(Adjudicator):
                     print("suit_lead :", self.lead_suit)
                     print("action: ", action.card_index)
                 # Update state with encoding for played in current trick
-                self.state.values[action.card_index] = (20 + self.state.values[action.card_index])
+                if self.leading == 1:
+                    # check if leading and make 31-34 for leader
+                    self.state.values[action.card_index] = (30 + self.state.values[action.card_index])
+                    self.leading = 0 # no more leading
+                else:
+                    # regular plays that are not leading are 21-24
+                    self.state.values[action.card_index] = (20 + self.state.values[action.card_index])
                 #
                 # Content in the "trick is over" if-statement can be a function.
                 #
@@ -174,12 +181,15 @@ class HeartsAdjudicator(Adjudicator):
             # self.trick_winner()
 
     def end_of_trick(self):
+        # prepare to lead in next trick
+        self.leading = 1
+
         # the points accumulated for the current trick
         trick_points = 0
 
         # Find max card and then find the owner of the card
         max_card = self.find_max_card()
-        trick_winner = self.state.values[max_card] - 20
+        trick_winner = self.state.values[max_card] % 10
         self.state.trick_winner = trick_winner
 
         print("trick winner:", trick_winner, " trick#:", self.state.trick_number, "  High card: ",
@@ -292,7 +302,7 @@ class HeartsAdjudicator(Adjudicator):
         return False
 
     def is_trick_over(self):
-        if len(list(x for x in self.state.values if 21 <= x <= 24)) >= 4:
+        if len(list(x for x in self.state.values if 21 <= x <= 34)) >= 4:
             return True
         return False
 
