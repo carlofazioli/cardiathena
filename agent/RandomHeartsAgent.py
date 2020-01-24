@@ -1,5 +1,7 @@
 import random
-from adjudicator.hearts_adjudicator import *
+
+from adjudicator.state import HeartsState
+from base import Action, Agent
 
 
 class HeartsAction(Action):
