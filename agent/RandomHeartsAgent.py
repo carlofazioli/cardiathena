@@ -1,5 +1,7 @@
 import random
-from adjudicator.hearts_adjudicator import *
+
+from adjudicator.state import HeartsState
+from base import Action, Agent
 
 
 class HeartsAction(Action):
@@ -12,6 +14,7 @@ class HeartsAction(Action):
 
     def __str__(self):
         return str(self.card_index)
+
 
 
 class RandomHeartsAgent(Agent):
