@@ -67,6 +67,7 @@ class HeartsAdjudicator(Adjudicator):
         """
         The start_game() method creates a new State data type instance and manipulates it to represent the starting
         point for the game.
+
         :return: State instance
         """
         # Hearts objects already initialize to the starting position.
@@ -79,6 +80,7 @@ class HeartsAdjudicator(Adjudicator):
         """
         Given an action by the agent whose turn it is, step_game() updates the state according to the rules and
         returns the new state.
+
         :param action: the Action of the Agent whose turn it is
         :return: the updated State
         """
@@ -129,6 +131,13 @@ class HeartsAdjudicator(Adjudicator):
         return self.state
 
     def pass_cards(self, action: HeartsAction):
+        """
+        Handles the passing cards at the beginning of each round. Swaps cards once all 4 players have chosen three
+        cards to pass.
+
+        :param action: the Action of the Agent whose turn it is
+        :returns unaltered state for non passing round, otherwise returns nothing.
+        """
         # Implement pass here
         self.pass_actions.append(action.card_index)
         # Set next player to pass three cards
@@ -181,6 +190,10 @@ class HeartsAdjudicator(Adjudicator):
             # self.trick_winner()
 
     def end_of_trick(self):
+        """
+        Function handles the end of a trick which entails tallying up points, determining the trick winner,
+        setting the current player, and incrementing the pass type.
+        """
         # prepare to lead in next trick
         self.leading = 1
 
@@ -239,7 +252,6 @@ class HeartsAdjudicator(Adjudicator):
 
     def get_state(self):
         """
-        Tic-tac-toe is perfect-information so no masking takes place.
         :return: the current state
         """
         return self.state
@@ -270,19 +282,14 @@ class HeartsAdjudicator(Adjudicator):
         print(self.trick_leader())
 
         # Mask only cards that belong to agent for passing
-        # Functionize this into a mask for passing trick
         if self.agent_passing(encode_state) is not None:
             return self.agent_passing(encode_state)
 
         # Make the two of clubs the only valid card if starting a round
-        # Functionize this into make first trick function
-
         if self.first_trick(encode_state) is not None:
             return self.first_trick(encode_state)
 
         # Player can play any of their cards if they lead the trick (unless starting a round)
-        # Functionize this into a normal trick function
-
         if self.normal_trick(encode_state) is not None:
             return self.normal_trick(encode_state)
 
@@ -302,11 +309,21 @@ class HeartsAdjudicator(Adjudicator):
         return False
 
     def is_trick_over(self):
+        """
+        Checks the current state for encoded values 21 to 34 to determine if the trick is over.
+
+        :returns True if trick is over, False otherwise
+        """
         if len(list(x for x in self.state.values if 21 <= x <= 34)) >= 4:
             return True
         return False
 
     def find_max_card(self):
+        """
+        Finds the highest value card based off the lead suit.
+
+        :returns the max suited card
+        """
         begin = 13 * self.lead_suit  # beginning of range of valid cards
         end = 13 * (self.lead_suit + 1)  # end of range of valid cards
 
@@ -321,11 +338,13 @@ class HeartsAdjudicator(Adjudicator):
                         card_max = x
         return card_max
 
-    """ Functions for the agent movement """
-    """ Functionize agent passing 
-        ;param encode_state : the state """
-
     def agent_passing(self, encode_state):
+        """
+        Masks encoding for the pass round.
+
+        :returns current player
+        :returns masked encoded state for pass round, None otherwise
+        """
         if encode_state.trick_number == 0 and self.lead_suit == -2:
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
             return encode_state.current_player, encode_state
@@ -333,6 +352,12 @@ class HeartsAdjudicator(Adjudicator):
             return None
 
     def first_trick(self, encode_state):
+        """
+        Masks the encoding for the first trick where 2 of clubs must be played.
+
+        :returns current player
+        :returns masked encoded state
+        """
         if encode_state.trick_number == 1 and self.lead_suit == -2:
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
             for i in range(len(encode_state.values)):
@@ -343,7 +368,13 @@ class HeartsAdjudicator(Adjudicator):
             return encode_state.current_player, encode_state
 
     def normal_trick(self, encode_state):
+        """
+        Masks the encoding for any trick other than the passing trick and the first trick. Factors in if hearts as been
+        broken in the masked encoded state.
 
+        :returns current player
+        :returns masked encoded state
+        """
         if self.lead_suit == -1:
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
             # Need to code in that players can not lead with any Hearts cards until that suit has been "broken"
@@ -364,7 +395,12 @@ class HeartsAdjudicator(Adjudicator):
             return encode_state.current_player, encode_state
 
     def check_suit(self, encode_state):
+        """
+        Checks if player has suit or is void.
 
+        :returns current player
+        :returns masked encoded state
+        """
         encode_state.values = encode_state.hide_encoding(encode_state.current_player)
         # beginning of range of valid cards
         begin = 13 * self.lead_suit
