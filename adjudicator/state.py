@@ -16,7 +16,9 @@ unknown = 0
 class State:
 
     def __init__(self):
+        # Probably want to change values to something else to reflect Adjudicator doc (Card deck?)
         self.values = None
+        self.score = [0, 0, 0, 0]
 
 
 class HeartsState(State):
@@ -29,8 +31,22 @@ class HeartsState(State):
         inits the state and randomly assigns player
 
         """
+
         super().__init__()
         self.shuffle()
+        # Game Logic
+        self.current_player = 1
+        self.trick_number = 0
+        self.trick_winner = 0
+        self.pass_type = 0
+        self.cards_of_trick = []
+        self.points = [0, 0, 0, 0] #points for a round rather than a game
+
+
+        #What we are defining as points for the game. Here we have the indices for all the hearts as well as the
+        #queen of spade
+        self.points_cond = [ 36,39,40,41,42,43,44,45,46,47,48,49,50,51,52]
+
 
     def __repr__(self):
         """
@@ -56,7 +72,6 @@ class HeartsState(State):
         :param card: position in the state vector the be encoded
         :return: None
         """
-
         element = self.card_position[card]
         self.values[element] = encoding
 
@@ -77,11 +92,16 @@ class HeartsState(State):
          :param player: the player number 1-4 to receive a tailored masked encoding state vector
          :return: masked encoding np array
          """
-
+        # currently not differentiating between valid cards and invalid cards so agents are playing any of the cards in their hands
         held_cards = self.values == player
         played_cards = self.values > 10
-
         return np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
+
+    def get_statevalues(self):
+        return self.values
+
+    def get_score(self):
+        return self.score
 
     @property
     def card_position(self):
