@@ -25,8 +25,24 @@ class HeartsAdjudicator(Adjudicator):
         self.leading = 1
 
     def current_player(self):
+        # Gets a list of all of the players, including the trick leader
+        player_list = self.state.values[self.state.values > 20]
+        if player_list is not None:
+            # Getting the trick leader, can use this and the length of the player list to calculate current player
+            # TODO: We may want to turn this into a call to the trick_leader function rather than calling it here!
+            trick_leader = player_list[player_list > 30] % 10
+            # What this line does:
+            # Say trick_leader is 4, and players 1 and 2 have gone.
+            # Add the length of the player list to 4, get 7.  Mod by 4, get 3
+            current_player = (trick_leader + len(player_list)) % 4
+        else:
+            # TODO: This is a potential edge case which we may need to handle
+            current_player = None
         # Returns the current player
-        return 0
+        return current_player
+
+    # TODO: This line may be enough to add into trick_leader, but we need to consider edge cases
+    # return self.state.values[self.state.values > 30] % 10
 
     def trick_leader(self):
         # Returns the first player of the current trick
@@ -40,6 +56,15 @@ class HeartsAdjudicator(Adjudicator):
                     print(str(20 + 1 + x) + " exists")
         print(cards_played)
         return 0
+
+    def lead_suit(self):
+        # TODO: is there ever an instance where searching for the trick leader brings up null?
+        trick_leader_card = np.where(self.state.values > 30)
+        return int(trick_leader_card / 13)
+
+    def cards_of_trick(self):
+        return self.state.values[self.state.values > 20]
+    # TODO: Do we even need this function?
 
     def trick_winner(self):
         # Returns the current player set to win the trick
@@ -297,9 +322,6 @@ class HeartsAdjudicator(Adjudicator):
 
         if self.check_suit(encode_state) is not None:
             return self.check_suit(encode_state)
-
-    def is_void(self, lead_suit):
-        print()
 
     def hearts_broken(self):
         for i in range(39, 52):
