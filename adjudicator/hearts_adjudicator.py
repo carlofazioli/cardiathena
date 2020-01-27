@@ -58,7 +58,9 @@ class HeartsAdjudicator(Adjudicator):
         return 0
 
     def lead_suit(self):
-        return np.where(self.state.values > 30)
+        # TODO: is there ever an instance where searching for the trick leader brings up null?
+        trick_leader_card = np.where(self.state.values > 30)
+        return int(trick_leader_card / 13)
 
     def cards_of_trick(self):
         return self.state.values[self.state.values > 20]
