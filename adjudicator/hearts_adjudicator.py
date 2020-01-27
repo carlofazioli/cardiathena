@@ -88,6 +88,34 @@ class HeartsAdjudicator(Adjudicator):
         played_count += 1
         return played_count
 
+    def points(self):
+        # Returns a list of the points for each player in the current round
+        points = [0, 0, 0, 0] #store the points here to return them
+        for i in range(4):
+            # Loop through the four players to find the cards they own
+            owned = self.state.values == 11 + i # Returns True for all the cards owned by the player
+            if owned[36] == True:
+                points[i] += 13 # 13 points for the queen of spades
+            for j in range(39, 52, 1):
+                if owned[j] == True:
+                    points[i] += 1 # Add one point for each heart which are found in the range 39-52
+        return points
+
+    def update_score(self):
+        # Updates the scores of all the players by using the points and determining if anyone shot for the moon
+        points = self.points()
+        
+        if points.count(26) > 0:
+            # If anyone has 26, they got all the points and successfully shot for the moon
+            winner = points.index(26) # Only find the index of 26 if it exists
+            for i in range(4):
+                if i != winner: # The winner does not get 26 added to their score
+                    self.state.score[i] += 26
+        else:
+            # No players successfuly shot for the moon so points are added normally
+            for i in range(4):
+                self.state.score[i] += points[i]
+
     def start_game(self):
         """
         The start_game() method creates a new State data type instance and manipulates it to represent the starting
@@ -231,7 +259,7 @@ class HeartsAdjudicator(Adjudicator):
         self.state.trick_winner = trick_winner
 
         print("trick winner:", trick_winner, " trick#:", self.state.trick_number, "  High card: ",
-              max_card, " Points: ", self.state.points)
+              max_card, " Points: ", self.points())
 
         # Check for point cards (Queen of Spades and Hearts)
         for i in self.state.cards_of_trick:
@@ -262,6 +290,7 @@ class HeartsAdjudicator(Adjudicator):
         # Check if new round, reset trick_number and deal new cards
         if self.state.trick_number > 13:
             # New round, shuffle cards, and Pass cards
+            self.update_score()
             self.state.trick_number = 0
             self.state.trick_winner = 0
             self.state.current_player = 1
@@ -271,9 +300,9 @@ class HeartsAdjudicator(Adjudicator):
             if self.state.pass_type > 3:
                 self.state.pass_type = 0
             self.state.shuffle()
-            for i in range(len(self.state.score)):
-                self.state.score[i] += self.state.points[i]
-                self.state.points[i] = 0
+            #for i in range(len(self.state.score)):
+             #   self.state.score[i] += self.state.points[i]
+                #self.state.points[i] = 0
 
     def get_state(self):
         """
@@ -442,3 +471,19 @@ class HeartsAdjudicator(Adjudicator):
                 if encode_state.values[i] < 5:
                     encode_state.values[i] = encode_state.values[i] * (-1)
         return encode_state.current_player, encode_state
+
+    """def check_update_score(self, string):
+        if string == "moon":
+            # Checking for shooting for the moon
+            new_state = HeartsState()
+            for i in range(len(new_state.values)):
+                new_state.values[i] = 11
+        else:
+            new_state = HeartsState()
+            for i in range(len(new_state.values)):
+                new_state.values[i] = 11
+            new_state.values[36] = 12
+        self.state = new_state
+        print(self.state.score)
+        self.update_score()
+        print(self.state.score)"""
