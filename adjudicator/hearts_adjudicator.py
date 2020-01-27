@@ -54,6 +54,8 @@ class HeartsAdjudicator(Adjudicator):
     def alead_suit(self):
         # TODO: is there ever an instance where searching for the trick leader brings up null?
         trick_leader_card = np.where(self.state.values > 30)
+        if len(trick_leader_card[0]) == 0:
+            return None
         return int(trick_leader_card[0] / 13)
 
     def cards_of_trick(self):
@@ -63,6 +65,9 @@ class HeartsAdjudicator(Adjudicator):
         # Returns the current player set to win the trick
         played_cards = self.cards_of_trick()[0]
         suit = self.alead_suit()
+        # We do not have a trick_winner
+        if len(played_cards) == 0 and suit is None:
+            return None
         max_card = -1
         for i in played_cards:
             # print(str(i > max_card))
@@ -124,7 +129,8 @@ class HeartsAdjudicator(Adjudicator):
                     print("suit_lead :", self.lead_suit)
                     print("action: ", action.card_index)
                 # Update state with encoding for played in current trick
-                if self.leading == 1:
+                if self.trick_winner() is None:
+                    # if self.leading == 1:
                     # check if leading and make 31-34 for leader
                     self.state.values[action.card_index] = (30 + self.state.values[action.card_index])
                     self.leading = 0 # no more leading
