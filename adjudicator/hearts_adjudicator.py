@@ -29,53 +29,55 @@ class HeartsAdjudicator(Adjudicator):
         player_list = self.state.values[self.state.values > 20]
         if player_list is not None:
             # Getting the trick leader, can use this and the length of the player list to calculate current player
-            # TODO: We may want to turn this into a call to the trick_leader function rather than calling it here!
-            trick_leader = player_list[player_list > 30] % 10
+            trick_leader = self.trick_leader()
             # What this line does:
             # Say trick_leader is 4, and players 1 and 2 have gone.
             # Add the length of the player list to 4, get 7.  Mod by 4, get 3
             current_player = (trick_leader + len(player_list)) % 4
         else:
-            # TODO: This is a potential edge case which we may need to handle
+            '''From Angela about the validity of this edge case: This all depends on how we handle changing the state but if this edge case does happen, we know it is 
+            because the leader has not played yet and needs to choose a card. If we go this path, we might want to 
+            use the suggestion Michael made where we mark the winner from the last state with a placeholder 31-34 
+            until after they have made their decision, at which point we assign their past card properly and set the 
+            card they chose. '''
             current_player = None
         # Returns the current player
         return current_player
 
-    # TODO: This line may be enough to add into trick_leader, but we need to consider edge cases
-    # return self.state.values[self.state.values > 30] % 10
-
     def trick_leader(self):
         # Returns the first player of the current trick
-        cards_played = self.state.values[self.state.values > 20]
-        if len(cards_played) == 0:
-            print("empty")
-        else:
-            for x in range(4):
-                found = cards_played[cards_played == (20 + 1 + x)]
-                if len(found) == 1:
-                    print(str(20 + 1 + x) + " exists")
-        print(cards_played)
-        return 0
+        trick_lead = self.state.values[self.state.values > 30]
+        if len(trick_lead) == 0:
+            return None
+        return trick_lead % 10
 
-    def lead_suit(self):
+    # TODO: rename this back to "lead_suit". apparently python doesnt like that we have a variable and function
+    # TODO: with the same name
+
+    def alead_suit(self):
         # TODO: is there ever an instance where searching for the trick leader brings up null?
         trick_leader_card = np.where(self.state.values > 30)
-        return int(trick_leader_card / 13)
+        if len(trick_leader_card[0]) == 0:
+            return None
+        return int(trick_leader_card[0] / 13)
 
     def cards_of_trick(self):
-        return self.state.values[self.state.values > 20]
-    # TODO: Do we even need this function?
+        return np.where(self.state.values > 20)
 
     def trick_winner(self):
         # Returns the current player set to win the trick
-        print(np.argmax(self.state.values == 21))
-        print(np.argmax(self.state.values == 22))
-        print(np.argmax(self.state.values == 23))
-        print(np.argmax(self.state.values == 24))
-        # players that have not played yet are going to get 0 even though they have not played that
-
-        # find trick leader and use that to check who is in suit and who is not
-        # largest one following trick is leader
+        played_cards = self.cards_of_trick()[0]
+        suit = self.alead_suit()
+        # We do not have a trick_winner
+        if len(played_cards) == 0 and suit is None:
+            return None
+        max_card = -1
+        for i in played_cards:
+            # print(str(i > max_card))
+            # print(str(int(i / 13) == suit))
+            if (i > max_card) and (int(i / 13) == suit):
+                max_card = i
+        return self.state.values[max_card] % 10
 
     def trick_number(self):
         # Returns the trick number in the round
@@ -126,11 +128,12 @@ class HeartsAdjudicator(Adjudicator):
                     print("cards of check append fail")
                     print(self.state.values)
                     print("p: ", self.state.current_player)
-                    print("trick_lead ", self.state.trick_winner)
+                    print("trick_lead ", self.trick_winner())
                     print("suit_lead :", self.lead_suit)
                     print("action: ", action.card_index)
                 # Update state with encoding for played in current trick
-                if self.leading == 1:
+                if self.trick_leader() is None:
+                    # if self.leading == 1:
                     # check if leading and make 31-34 for leader
                     self.state.values[action.card_index] = (30 + self.state.values[action.card_index])
                     self.leading = 0 # no more leading
@@ -227,8 +230,9 @@ class HeartsAdjudicator(Adjudicator):
 
         # Find max card and then find the owner of the card
         max_card = self.find_max_card()
-        trick_winner = self.state.values[max_card] % 10
-        self.state.trick_winner = trick_winner
+        atrick_winner = self.state.values[max_card] % 10
+        trick_winner = self.trick_winner()
+        # self.state.trick_winner = trick_winner
 
         print("trick winner:", trick_winner, " trick#:", self.state.trick_number, "  High card: ",
               max_card, " Points: ", self.state.points)
@@ -254,7 +258,8 @@ class HeartsAdjudicator(Adjudicator):
         self.state.trick_number += 1
 
         # Trick winner should be set up to start next trick
-        self.state.current_player = self.state.trick_winner
+        # self.state.current_player = self.state.trick_winner
+        self.state.current_player = trick_winner
 
         # suit is no longer leading at end of a trick
         self.lead_suit = -1
@@ -263,7 +268,7 @@ class HeartsAdjudicator(Adjudicator):
         if self.state.trick_number > 13:
             # New round, shuffle cards, and Pass cards
             self.state.trick_number = 0
-            self.state.trick_winner = 0
+            # self.state.trick_winner = 0
             self.state.current_player = 1
             self.pass_actions.clear()
             self.lead_suit = -2
@@ -304,7 +309,6 @@ class HeartsAdjudicator(Adjudicator):
         """
         # copy of the state to manipulate for the agent
         encode_state = copy.deepcopy(self.state)
-        print(self.trick_leader())
 
         # Mask only cards that belong to agent for passing
         if self.agent_passing(encode_state) is not None:
