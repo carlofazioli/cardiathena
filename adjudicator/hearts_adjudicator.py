@@ -46,7 +46,10 @@ class HeartsAdjudicator(Adjudicator):
 
     def trick_leader(self):
         # Returns the first player of the current trick
-        return self.state.values[self.state.values > 30] % 10
+        trick_lead = self.state.values[self.state.values > 30]
+        if len(trick_lead) == 0:
+            return None
+        return trick_lead % 10
 
     # TODO: rename this back to "lead_suit". apparently python doesnt like that we have a variable and function
     # TODO: with the same name
@@ -129,7 +132,7 @@ class HeartsAdjudicator(Adjudicator):
                     print("suit_lead :", self.lead_suit)
                     print("action: ", action.card_index)
                 # Update state with encoding for played in current trick
-                if self.trick_winner() is None:
+                if self.trick_leader() is None:
                     # if self.leading == 1:
                     # check if leading and make 31-34 for leader
                     self.state.values[action.card_index] = (30 + self.state.values[action.card_index])
@@ -306,7 +309,6 @@ class HeartsAdjudicator(Adjudicator):
         """
         # copy of the state to manipulate for the agent
         encode_state = copy.deepcopy(self.state)
-        print(self.trick_leader())
 
         # Mask only cards that belong to agent for passing
         if self.agent_passing(encode_state) is not None:
