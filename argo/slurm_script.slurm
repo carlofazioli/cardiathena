@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## Give your job a name to distinguish it from other jobs you run.
-#SBATCH --job-name=sqltestavocado
+#SBATCH --job-name=cardiathena
 
 ## General partitions: all-HiPri, bigmem-HiPri   --   (12 hour limit)
 ##                     all-LoPri, bigmem-LoPri, gpuq  (5 days limit)
@@ -10,21 +10,32 @@
 
 ## Separate output and error messages into 2 files.
 ## NOTE: %u=userID, %x=jobName, %N=nodeID, %j=jobID, %A=arrayID, %a=arrayTaskID
-#SBATCH --output=/scratch/%u/%x-%N-%j.out  # Output file
-#SBATCH --error=/scratch/%u/%x-%N-%j.err   # Error file
+#SBATCH --output=/scratch/%u/logs_argo/out/%a-%N.out  # Output file
+#SBATCH --error=/scratch/%u/logs_argo/err/%a-%N.err   # Error file
 
 ## Slurm can send you updates via email
-#SBATCH --mail-type=NONE         # ALL,NONE,BEGIN,END,FAIL,REQUEUE,..
-#SBATCH --mail-user=dha5@gmu.edu     # Put your GMU email address here
+#SBATCH --mail-type=BEGIN,END,FAIL         # ALL,NONE,BEGIN,END,FAIL,REQUEUE,..
+#SBATCH --mail-user=$USER5@gmu.edu     # Put your GMU email address here
 
 ## Specify how much memory your job needs. (2G is the default)
 #SBATCH --mem=1G        # Total memory needed per task (units: K,M,G,T)
-##SBATCH --cpus-per-task 2
+
+## Specify number of threads per task
+##SBATCH --cpus-per-task 1
+
+## Specify number of processes
+##SBATCH --ntasks=32
+
+## Specify number of nodes
+##SBATCH --nodes=16
+
+## Specify how processes will be distributed over the nodes
+##SBATCH --ntasks-per-node=1
 
 ## Specify how much time your job needs. (default: see partition above)
 #SBATCH --time=0-00:20  # Total time needed for job: Days-Hours:Minutes
 
-##SBATCH --array=1-4
+#SBATCH --array=1-1000%16
 
 ## Load the relevant modules needed for the job
 module load python/3.6.7
@@ -32,7 +43,8 @@ module load singularity/3.3.0
 
 ## Run your program or script
 
-singularity instance start -e -c -home /scratch/dha5/ --bind ${PWD}/mysql/var/lib/mysql/:/var/lib/mysql --bind ${PWD}/mysql/run/mysqld:/run/mysqld --network-args "portmap=6603:3306/tcp" mysqlavacado.simg mysql
 
-singularity run instance://mysql
+python3 $SCRATCH/cardiathena/play_hearts.py 
 
+
+ 
