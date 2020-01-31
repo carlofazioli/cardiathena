@@ -1,4 +1,5 @@
 #!/bin/bash
 
-rm /scratch/$USER/*.err /scratch/$USER/*.out
-rm /scratch/$USER/mysql/var/lib/mysql/*lock
+rm /scratch/$USER/logs_argo/err/*.err 
+rm /scratch/$USER/logs_argo/out/*.out
+rm /scratch/$USER/runtimes
