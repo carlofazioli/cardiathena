@@ -3,7 +3,8 @@ from mysql.connector import errorcode
 import json
 config = {
   'user': 'remote_usr',
-  'password': 'M7FNXDgy',
+  'password': '',
+  'host': '',
   'port': '3306',
   'db': 'state_db',
   'raise_on_warnings': True
@@ -16,8 +17,9 @@ ID_COLUMN = "id"
 SHOW_DATABASE = "SHOW DATABASES"
 SHOW_TABLES = "SHOW TABLES"
 SHOW_DATA = "SELECT * FROM {}".format(TABLE_NAME)
-INSERT_DATA = "INSERT INTO {} ({}, {}) VALUES (%s, %s)".format(TABLE_NAME, ID_COLUMN, STATE_COLUMN)
-SET_INITIAL = "ALTER TABLE {} AUTO_INCREMENT=1".format(TABLE_NAME)
+SHOW_GAMEID = "SELECT id FROM {}".format(TABLE_NAME) 
+INSERT_DATA = "INSERT INTO {} ({}, {}) VALUES (%s, %s)".format(TABLE_NAME, ID_COLUMN, STATE_COLUMN) 
+SET_INITIAL = "ALTER TABLE {} AUTO_INCREMENT=1".format(TABLE_NAME) 
 CREATE_TABLE = "CREATE TABLE {}" \
                "(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, state JSON)".format(TABLE_NAME)
 CREATE_DB = "CREATE DATABASE {}".format(DB)
@@ -88,9 +90,11 @@ def initialize_db():
     query_database(CREATE_TABLE, None, None)
 
 
-# initialize_db()
-# query_database(DROP_TABLE, None, None)
+initialize_db()
+#query_database(DROP_TABLE, None, None)
+
 # test_db()
 #query = "show variables like 'max_allowed_packet'"
-query = "show global status like 'Max_used_connections'"
-query_database(query, None, None)
+#query = "show global status like 'Max_used_connections
+
+#query_database(SHOW_GAMEID, "TABLE_NAME", None)
