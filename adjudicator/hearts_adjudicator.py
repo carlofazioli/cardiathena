@@ -27,7 +27,7 @@ class HeartsAdjudicator(Adjudicator):
     def current_player(self):
         # Gets a list of all of the players, including the trick leader
         player_list = self.state.values[self.state.values > 20]
-        if player_list is not None:
+        if len(player_list) != 0:
             # Getting the trick leader, can use this and the length of the player list to calculate current player
             trick_leader = self.trick_leader()
             # What this line does:
@@ -88,6 +88,7 @@ class HeartsAdjudicator(Adjudicator):
         played_count += (self.state.values == 14).sum()
         played_count = int(played_count / 4)
         played_count += 1
+
         return played_count
 
     def points(self):
