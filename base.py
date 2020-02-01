@@ -122,7 +122,7 @@ class GameManager:
             agent_index, partial_state = self.adjudicator.agent_turn()
             # Show the partial state to the current player and obtain their action.
             current_player = self.agent_list[agent_index]
-            player_action = current_player.get_action(partial_state)
+            player_action = current_player.get_action(partial_state, self.adjudicator.trick_number())
             # Record this activity in the history.
             self.state_history.append(deepcopy(state))
             self.action_history.append(deepcopy(player_action))
