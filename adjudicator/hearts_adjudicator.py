@@ -81,8 +81,7 @@ class HeartsAdjudicator(Adjudicator):
 
     def trick_number(self):
         # Returns the trick number in the round
-        played_count = 0
-        played_count += (self.state.values > 10).sum()
+        played_count = (self.state.values > 10).sum()
         if self.is_passing():
             return 0
         played_count = int(played_count / 4)
@@ -436,7 +435,7 @@ class HeartsAdjudicator(Adjudicator):
         :returns current player
         :returns masked encoded state
         """
-        if encode_state.trick_number == 1 and self.lead_suit == -2:
+        if self.trick_number() == 1 and (self.state.values > 10).sum() == 0:
             encode_state.values = encode_state.hide_encoding(encode_state.current_player)
             for i in range(len(encode_state.values)):
                 if i != 0:
