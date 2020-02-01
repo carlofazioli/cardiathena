@@ -82,14 +82,20 @@ class HeartsAdjudicator(Adjudicator):
     def trick_number(self):
         # Returns the trick number in the round
         played_count = 0
-        played_count += (self.state.values == 11).sum()
-        played_count += (self.state.values == 12).sum()
-        played_count += (self.state.values == 13).sum()
-        played_count += (self.state.values == 14).sum()
+        played_count += (self.state.values > 10).sum()
+        if self.is_passing():
+            return 0
         played_count = int(played_count / 4)
         played_count += 1
 
         return played_count
+
+    def is_passing(self):
+        # A function that returns whether the players are currently passing
+
+        if self.state.pass_type > 0:
+            return True # The players should pass
+        return False # negative or 0 which represents not passing
 
     def points(self):
         # Returns a list of the points for each player in the current round
@@ -242,6 +248,12 @@ class HeartsAdjudicator(Adjudicator):
             self.state.trick_number = 1
             self.lead_suit = -2
             self.state.current_player = self.state.values[0]
+            # Make the value negative so we know to no longer pass the cards until the beginning of next trick
+            if self.state.pass_type > 0:
+                self.state.pass_type = self.state.pass_type * -1
+            print("at the end of passing so should not be passing anymore (should be negative)")
+            print(self.state.pass_type)
+            print(self.is_passing())
 
             # Testing for adjudicator trick_winner
             # self.trick_winner()
@@ -295,21 +307,31 @@ class HeartsAdjudicator(Adjudicator):
 
         # Check if new round, reset trick_number and deal new cards
         if self.state.trick_number > 13:
-            # New round, shuffle cards, and Pass cards
-            self.update_score()
-            self.state.trick_number = 0
-            # self.state.trick_winner = 0
-            self.state.current_player = 1
-            self.pass_actions.clear()
-            self.lead_suit = -2
-            self.state.pass_type += 1
-            if self.state.pass_type > 3:
-                self.state.pass_type = 0
-            self.state.shuffle()
-            #for i in range(len(self.state.score)):
-             #   self.state.score[i] += self.state.points[i]
-                #self.state.points[i] = 0
+            self.new_round()
 
+    def new_round(self):
+        # New round, shuffle cards, and Pass cards
+        self.update_score()
+        self.state.trick_number = 0
+        # self.state.trick_winner = 0
+        self.state.current_player = 1
+        self.pass_actions.clear()
+        self.lead_suit = -2
+        self.state.pass_type += 1
+        if self.state.pass_type > 3:
+            self.state.pass_type = 0
+        self.state.shuffle()
+        # for i in range(len(self.state.score)):
+         #   self.state.score[i] += self.state.points[i]
+            #self.state.points[i] = 0
+        
+        # Make the value positive to show that we will be passing (unless zero because 0 * -1 is 0)
+        if self.state.pass_type < 0:
+            self.state.pass_type = self.state.pass_type * -1
+        print("at the end of a round so preparing for pass (should be positive)")
+        print(self.state.pass_type)
+        print(self.is_passing())
+    
     def get_state(self):
         """
         :return: the current state
