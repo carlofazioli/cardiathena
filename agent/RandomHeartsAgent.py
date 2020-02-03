@@ -38,7 +38,6 @@ class RandomHeartsAgent(Agent):
                 cards_in_hand.append(i)
 
         # Agent picks 3 cards to pass
-        print("trick number should not be 0: " + str(trick_number))
         if trick_number == 0:
             c1 = random.choice(cards_in_hand)
             cards_in_hand.remove(c1)
@@ -52,7 +51,5 @@ class RandomHeartsAgent(Agent):
         # Agent picks a card to play
         #elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
         else:
-            print("we are picking one card to play rather than pass")
-            print(cards_in_hand)
             choice = random.choice(cards_in_hand)
             return HeartsAction(choice)
