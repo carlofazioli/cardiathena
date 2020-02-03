@@ -27,19 +27,28 @@ class HeartsAdjudicator(Adjudicator):
     def current_player(self):
         # Gets a list of all of the players, including the trick leader
         player_list = self.state.values[self.state.values > 20]
-        if player_list is not None:
+        if len(player_list) != 0:
             # Getting the trick leader, can use this and the length of the player list to calculate current player
             trick_leader = self.trick_leader()
             # What this line does:
             # Say trick_leader is 4, and players 1 and 2 have gone.
             # Add the length of the player list to 4, get 7.  Mod by 4, get 3
-            current_player = (trick_leader + len(player_list)) % 4
+            current_player = (trick_leader + len(player_list))
+            if current_player > 4:
+                # 4 % 4 is 0 and we do not want that
+                current_player = current_player % 4
+            # was returning a list instead of a number, can change later if needed but causing issues now
+            current_player = current_player[0]
         else:
             '''From Angela about the validity of this edge case: This all depends on how we handle changing the state but if this edge case does happen, we know it is 
             because the leader has not played yet and needs to choose a card. If we go this path, we might want to 
             use the suggestion Michael made where we mark the winner from the last state with a placeholder 31-34 
             until after they have made their decision, at which point we assign their past card properly and set the 
             card they chose. '''
+            if self.trick_number() == 1 and (self.state.values > 10).sum() == 0:
+                # Return the owner of the two of clubs if this is the first card of the first trick
+                return self.state.values[0]
+            return self.state.current_player
             current_player = None
         # Returns the current player
         return current_player
@@ -55,18 +64,22 @@ class HeartsAdjudicator(Adjudicator):
     # TODO: with the same name
 
     def alead_suit(self):
-        # TODO: is there ever an instance where searching for the trick leader brings up null?
+        # TODO: when we do simultaneous passing this will need to change
+        # Getting the card index of the trick leader
         trick_leader_card = np.where(self.state.values > 30)
+        # If there is no trick leader card
         if len(trick_leader_card[0]) == 0:
-            return None
+            if self.trick_number() >= 1:
+                # -1 means there needs to be a new leader
+                return -1
         return int(trick_leader_card[0] / 13)
 
     def cards_of_trick(self):
-        return np.where(self.state.values > 20)
+        return np.where(self.state.values > 20)[0]
 
     def trick_winner(self):
         # Returns the current player set to win the trick
-        played_cards = self.cards_of_trick()[0]
+        played_cards = self.cards_of_trick()
         suit = self.alead_suit()
         # We do not have a trick_winner
         if len(played_cards) == 0 and suit is None:
@@ -81,14 +94,21 @@ class HeartsAdjudicator(Adjudicator):
 
     def trick_number(self):
         # Returns the trick number in the round
-        played_count = 0
-        played_count += (self.state.values == 11).sum()
-        played_count += (self.state.values == 12).sum()
-        played_count += (self.state.values == 13).sum()
-        played_count += (self.state.values == 14).sum()
+        played_count = (self.state.values > 10).sum()
+        if self.is_passing():
+            # print("probably should not be here if 0")
+            return 0
         played_count = int(played_count / 4)
         played_count += 1
+
         return played_count
+
+    def is_passing(self):
+        # A function that returns whether the players are currently passing
+
+        if self.state.pass_type > 0:
+            return True # The players should pass
+        return False # negative or 0 which represents not passing
 
     def points(self):
         # Returns a list of the points for each player in the current round
@@ -144,21 +164,20 @@ class HeartsAdjudicator(Adjudicator):
             return self.state
         else:
             # First trick of a round - all four players choose their cards before incrementing
-            print("stored trick_number: " + str(self.state.trick_number) + "\ncalculated trick_number: " + str(
-                self.trick_number()))
-            if self.state.trick_number == 0 and self.lead_suit == -2:
+            print("calculated trick_number: " + str(self.trick_number()))
+            if self.is_passing():
                 self.pass_cards(action)
             else:
                 # Add agent action to cards of tricks
-                try:
-                    self.state.cards_of_trick.append(action.card_index)
-                except:
-                    print("cards of check append fail")
-                    print(self.state.values)
-                    print("p: ", self.state.current_player)
-                    print("trick_lead ", self.trick_winner())
-                    print("suit_lead :", self.lead_suit)
-                    print("action: ", action.card_index)
+                # try:
+                #     self.state.cards_of_trick.append(action.card_index)
+                # except:
+                #     print("cards of check append fail")
+                #     print(self.state.values)
+                #     print("p: ", self.state.current_player)
+                #     print("trick_lead ", self.trick_winner())
+                #     print("suit_lead :", self.lead_suit)
+                #     print("action: ", action.card_index)
                 # Update state with encoding for played in current trick
                 if self.trick_leader() is None:
                     # if self.leading == 1:
@@ -180,6 +199,7 @@ class HeartsAdjudicator(Adjudicator):
                     if self.state.current_player == 5:
                         self.state.current_player = 1
 
+                    print("lead suit: " + str(self.lead_suit) + " is_passing: " + str(self.is_passing()))
                     # First card of trick has been played, remember the suit to make players follow it
                     if self.lead_suit == -1 or self.lead_suit == -2:
                         self.lead_suit = int(action.card_index / 13)
@@ -207,40 +227,37 @@ class HeartsAdjudicator(Adjudicator):
                 player_to_pass = 0
                 # action starts from 0 while players start from 1
                 action += 1
+
                 # Pass 3 cards Clockwise(CW) : 1,2,3,4...
-                if self.state.pass_type == 0:
+                if self.state.pass_type == 1:
                     player_to_pass = action + 1
                     # Loop around
                     if player_to_pass >= 5:
                         player_to_pass = 1
 
                 # Pass 3 cards Counter-Clockwise(CCW) : 4,3,2,1...
-                if self.state.pass_type == 1:
+                if self.state.pass_type == 2:
                     player_to_pass = action - 1
                     # Loop around
                     if player_to_pass <= 0:
                         player_to_pass = 4
 
                 # Pass 3 cards Straight : 1 <-> 3 and 2 <-> 4
-                if self.state.pass_type == 2:
+                if self.state.pass_type == 3:
                     player_to_pass = action + 2
                     # Loop around
                     if player_to_pass >= 5:
                         player_to_pass = player_to_pass - 4
 
-                if self.state.pass_type == 3:
-                    self.state.trick_number = 1
-                    self.lead_suit = -2
-                    self.state.current_player = self.state.values[0]
-                    return self.state
-
                 # Pass Cards
                 for card_i in self.pass_actions[action - 1]:
                     self.state.values[card_i] = player_to_pass
 
-            self.state.trick_number = 1
             self.lead_suit = -2
             self.state.current_player = self.state.values[0]
+            # Make the value negative so we know to no longer pass the cards until the beginning of next trick
+            if self.state.pass_type > 0:
+                self.state.pass_type = self.state.pass_type * -1
 
             # Testing for adjudicator trick_winner
             # self.trick_winner()
@@ -262,11 +279,11 @@ class HeartsAdjudicator(Adjudicator):
         trick_winner = self.trick_winner()
         # self.state.trick_winner = trick_winner
 
-        print("trick winner:", trick_winner, " trick#:", self.state.trick_number, "  High card: ",
+        print("trick winner:", trick_winner, " trick#:", self.trick_number(), "  High card: ",
               max_card, " Points: ", self.points())
 
         # Check for point cards (Queen of Spades and Hearts)
-        for i in self.state.cards_of_trick:
+        for i in self.cards_of_trick():
             # 36 is the index of the Queen of spades
             if i == 36:
                 trick_points = trick_points + 13
@@ -278,12 +295,11 @@ class HeartsAdjudicator(Adjudicator):
         self.state.points[trick_winner - 1] = self.state.points[trick_winner - 1] + trick_points
 
         # All of these cards belong to the trick winner (tricks won)
-        for card in self.state.cards_of_trick:
+        for card in self.cards_of_trick():
             self.state.values[card] = trick_winner + 10
 
         # Clear out the cards in current trick
-        self.state.cards_of_trick.clear()
-        self.state.trick_number += 1
+        # self.state.cards_of_trick.clear()
 
         # Trick winner should be set up to start next trick
         # self.state.current_player = self.state.trick_winner
@@ -293,22 +309,28 @@ class HeartsAdjudicator(Adjudicator):
         self.lead_suit = -1
 
         # Check if new round, reset trick_number and deal new cards
-        if self.state.trick_number > 13:
-            # New round, shuffle cards, and Pass cards
-            self.update_score()
-            self.state.trick_number = 0
-            # self.state.trick_winner = 0
-            self.state.current_player = 1
-            self.pass_actions.clear()
-            self.lead_suit = -2
-            self.state.pass_type += 1
-            if self.state.pass_type > 3:
-                self.state.pass_type = 0
-            self.state.shuffle()
-            #for i in range(len(self.state.score)):
-             #   self.state.score[i] += self.state.points[i]
-                #self.state.points[i] = 0
+        if self.trick_number() > 13:
+            self.new_round()
 
+    def new_round(self):
+        # New round, shuffle cards, and Pass cards
+        self.update_score()
+        # self.state.trick_winner = 0
+        self.state.current_player = 1
+        self.pass_actions.clear()
+        self.lead_suit = -2
+        self.state.pass_type += 1
+        if self.state.pass_type > 3:
+            self.state.pass_type = 0
+        self.state.shuffle()
+        # for i in range(len(self.state.score)):
+         #   self.state.score[i] += self.state.points[i]
+            #self.state.points[i] = 0
+        
+        # Make the value positive to show that we will be passing (unless zero because 0 * -1 is 0)
+        if self.state.pass_type < 0:
+            self.state.pass_type = self.state.pass_type * -1
+    
     def get_state(self):
         """
         :return: the current state
@@ -340,20 +362,27 @@ class HeartsAdjudicator(Adjudicator):
         encode_state = copy.deepcopy(self.state)
 
         # Mask only cards that belong to agent for passing
-        if self.agent_passing(encode_state) is not None:
+        #if self.agent_passing(encode_state) is not None:
+        if self.is_passing():
+            print("preparing for passing")
             return self.agent_passing(encode_state)
 
         # Make the two of clubs the only valid card if starting a round
         if self.first_trick(encode_state) is not None:
+            print("preparing for two of clubs")
+            encode_state = copy.deepcopy(self.state)
             return self.first_trick(encode_state)
 
         # Player can play any of their cards if they lead the trick (unless starting a round)
-        if self.normal_trick(encode_state) is not None:
-            return self.normal_trick(encode_state)
+        if self.lead_trick(encode_state) is not None:
+            print("preparing for leading")
+            encode_state = copy.deepcopy(self.state)
+            return self.lead_trick(encode_state)
 
         # first hides values then changes returned ones if they can not be seen
 
         if self.check_suit(encode_state) is not None:
+            encode_state = copy.deepcopy(self.state)
             return self.check_suit(encode_state)
 
     def hearts_broken(self):
@@ -379,15 +408,15 @@ class HeartsAdjudicator(Adjudicator):
 
         :returns the max suited card
         """
-        begin = 13 * self.lead_suit  # beginning of range of valid cards
-        end = 13 * (self.lead_suit + 1)  # end of range of valid cards
+        begin = 13 * self.alead_suit()  # beginning of range of valid cards
+        end = 13 * (self.alead_suit() + 1)  # end of range of valid cards
 
         card_max = 0
 
         if begin < 0 and end < 0:
-            card_max = self.state.cards_of_trick[0]
+            card_max = self.cards_of_trick()[0]
         else:
-            for x in self.state.cards_of_trick:
+            for x in self.cards_of_trick():
                 if begin <= x < end:
                     if x > card_max:
                         card_max = x
@@ -400,9 +429,10 @@ class HeartsAdjudicator(Adjudicator):
         :returns current player
         :returns masked encoded state for pass round, None otherwise
         """
-        if encode_state.trick_number == 0 and self.lead_suit == -2:
-            encode_state.values = encode_state.hide_encoding(encode_state.current_player)
-            return encode_state.current_player, encode_state
+        if self.trick_number() == 0 and self.is_passing():
+            encode_state.values = encode_state.hide_encoding(self.current_player())
+            print(self.current_player())
+            return self.current_player(), encode_state
         else:
             return None
 
@@ -413,41 +443,44 @@ class HeartsAdjudicator(Adjudicator):
         :returns current player
         :returns masked encoded state
         """
-        if encode_state.trick_number == 1 and self.lead_suit == -2:
-            encode_state.values = encode_state.hide_encoding(encode_state.current_player)
-            for i in range(len(encode_state.values)):
+        encode_state_copy = copy.deepcopy(encode_state)
+        if self.trick_number() == 1 and (self.state.values > 10).sum() == 0:
+            player = self.current_player()
+            encode_state_copy.values = encode_state_copy.hide_encoding(player)
+            for i in range(len(encode_state_copy.values)):
                 if i != 0:
-                    if encode_state.values[i] < 5:
+                    if encode_state_copy.values[i] < 5:
                         # Turn values negative if they are held cards but not valid to play
-                        encode_state.values[i] = encode_state.values[i] * (-1)
-            return encode_state.current_player, encode_state
+                        encode_state_copy.values[i] = encode_state_copy.values[i] * (-1)
+            return player, encode_state_copy
 
-    def normal_trick(self, encode_state):
+    def lead_trick(self, encode_state):
         """
-        Masks the encoding for any trick other than the passing trick and the first trick. Factors in if hearts as been
-        broken in the masked encoded state.
+        Masks the encoding for a player leading the trick
 
         :returns current player
         :returns masked encoded state
         """
-        if self.lead_suit == -1:
-            encode_state.values = encode_state.hide_encoding(encode_state.current_player)
+        encode_state_copy = copy.deepcopy(encode_state)
+        if self.alead_suit() == -1:
+            encode_state.values = encode_state.hide_encoding(self.current_player())
             # Need to code in that players can not lead with any Hearts cards until that suit has been "broken"
             if not self.hearts_broken():
                 # Check if player has anything other than hearts to play
                 has_more_than_hearts = False
                 for i in range(0, 39):
-                    if encode_state.values[i] == encode_state.current_player:
+                    if encode_state.values[i] == self.current_player():
                         has_more_than_hearts = True
                         break
                 # Player only has hearts left, and must lead with it
                 if not has_more_than_hearts:
-                    return encode_state.current_player, encode_state
+                    print(self.current_player())
+                    return self.current_player(), encode_state
                 for i in range(39, 52):
-                    if encode_state.values[i] == encode_state.current_player:
+                    if encode_state.values[i] == self.current_player():
                         encode_state.values[i] = encode_state.values[i] * (-1)
-                return encode_state.current_player, encode_state
-            return encode_state.current_player, encode_state
+                return self.current_player(), encode_state
+            return self.current_player(), encode_state
 
     def check_suit(self, encode_state):
         """
@@ -456,25 +489,27 @@ class HeartsAdjudicator(Adjudicator):
         :returns current player
         :returns masked encoded state
         """
-        encode_state.values = encode_state.hide_encoding(encode_state.current_player)
+        encode_state_copy = copy.deepcopy(encode_state)
+        #encode_state_copy.values = encode_state_copy.hide_encoding(encode_state_copy.current_player)
+        encode_state_copy.values = encode_state_copy.hide_encoding(self.current_player())
         # beginning of range of valid cards
-        begin = 13 * self.lead_suit
+        begin = 13 * self.alead_suit()
         # end of range of valid cards
-        end = 13 * (self.lead_suit + 1)
+        end = 13 * (self.alead_suit() + 1)
 
         has_suit = False
         for i in range(begin, end):
-            if 0 < encode_state.values[i] < 5:
+            if 0 < encode_state_copy.values[i] < 5:
                 has_suit = True
         if not has_suit:
             # Player did not have suit and can play whatever
-            return encode_state.current_player, encode_state
+            return self.current_player(), encode_state_copy
         # Encode it if we know they have valid cards
-        for i in range(len(encode_state.values)):
+        for i in range(len(encode_state_copy.values)):
             if i < begin or i >= end:
-                if encode_state.values[i] < 5:
-                    encode_state.values[i] = encode_state.values[i] * (-1)
-        return encode_state.current_player, encode_state
+                if encode_state_copy.values[i] < 5:
+                    encode_state_copy.values[i] = encode_state_copy.values[i] * (-1)
+        return self.current_player(), encode_state_copy
 
     """def check_update_score(self, string):
         if string == "moon":
