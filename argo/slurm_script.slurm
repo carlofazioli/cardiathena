@@ -15,7 +15,7 @@
 
 ## Slurm can send you updates via email
 #SBATCH --mail-type=BEGIN,END,FAIL         # ALL,NONE,BEGIN,END,FAIL,REQUEUE,..
-#SBATCH --mail-user=$USER5@gmu.edu     # Put your GMU email address here
+#SBATCH --mail-user=dha5@gmu.edu     # Put your GMU email address here
 
 ## Specify how much memory your job needs. (2G is the default)
 #SBATCH --mem=1G        # Total memory needed per task (units: K,M,G,T)
@@ -27,15 +27,15 @@
 ##SBATCH --ntasks=32
 
 ## Specify number of nodes
-##SBATCH --nodes=16
+##SBATCH --nodes=8
 
 ## Specify how processes will be distributed over the nodes
-##SBATCH --ntasks-per-node=1
+##SBATCH --ntasks-per-node=2
 
 ## Specify how much time your job needs. (default: see partition above)
-#SBATCH --time=0-00:20  # Total time needed for job: Days-Hours:Minutes
+##SBATCH --time=0-00:02  # Total time needed for job: Days-Hours:Minutes
 
-#SBATCH --array=1-1000%16
+##SBATCH --array=1-30000
 
 ## Load the relevant modules needed for the job
 module load python/3.6.7
@@ -44,7 +44,6 @@ module load singularity/3.3.0
 ## Run your program or script
 
 
-python3 $SCRATCH/cardiathena/play_hearts.py 
-
+python3 $SCRATCH/cardiathena/play_hearts.py
 
  
