@@ -1,2 +1,2 @@
 #!/bin/bash
-sbatch slurm_avocado.slurm
+sbatch slurm_script.slurm
