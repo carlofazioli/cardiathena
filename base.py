@@ -2,6 +2,7 @@ from typing import List
 from copy import deepcopy
 from database import mysql_example as mysql
 import json
+from xlwt import Workbook
 
 
 class State:
@@ -105,8 +106,7 @@ class GameManager:
         self.agent_list = agent_list
         self.state_history = list()
         self.action_history = list()
-        self.state_action_history = list()
-
+        self.state_scores = list()
 
     def play_game(self):
         """
@@ -124,16 +124,16 @@ class GameManager:
             agent_index, partial_state = self.adjudicator.agent_turn()
             # Show the partial state to the current player and obtain their action.
             current_player = self.agent_list[agent_index]
-            player_action = current_player.get_action(partial_state)
+            player_action = current_player.get_action(partial_state, self.adjudicator.trick_number())
             # Record this activity in the history.
             self.state_history.append(deepcopy(state))
             self.action_history.append(deepcopy(player_action))
-            self.state_action_history.append([deepcopy(state), deepcopy(player_action)])
+
             # Adjudicate the action to receive an updated state.
             state = self.adjudicator.step_game(player_action)
         # At this point, the game is over.  Record the final state.
         self.state_history.append(state)
-        self.state_action_history.append([deepcopy(state), "None"])
+
 
     def save_game(self):
         """
@@ -143,12 +143,19 @@ class GameManager:
         """
 
         state_values = list()
+        action_values = list()
 
         for i in range(len(self.state_history) - 1):
-            state_values.append(self.state_history[i].get_statevalues().tolist())
+            state_values.append(self.state_history[i].get_state_values().tolist())
+        print(state_values)
+
+        for i in range(len(self.action_history) -1):
+            action_values.append(str(self.action_history[i]))
+
+        print(action_values)
 
         mysql.query_database(mysql.INSERT_DATA, None, json.dumps(state_values))
-        # mysql.query_database(mysql.SHOW_DATA, None, None)
+
 
 
         """
