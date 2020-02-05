@@ -141,28 +141,15 @@ class GameManager:
 
         :return:
         """
-
         state_values = list()
         action_values = list()
 
         for i in range(len(self.state_history) - 1):
             state_values.append(self.state_history[i].get_state_values().tolist())
-        print(state_values)
 
         for i in range(len(self.action_history) -1):
             action_values.append(str(self.action_history[i]))
 
-        print(action_values)
 
-        mysql.query_database(mysql.INSERT_DATA, None, json.dumps(state_values))
+        mysql.query_database(mysql.INSERT_DATA, None, json.dumps(state_values), json.dumps(action_values))
 
-
-
-        """
-        for i in range(len(self.state_history) - 1):
-            # Loop through the length of state_history minus 1 because the last entry is a new shuffled deck
-            state_values.append(self.state_history[i].get_state().tolist())
-        # print(json.dumps(state_values))
-        db.add_data(random.random(), json.dumps(state_values))
-        
-        """
