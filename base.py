@@ -153,16 +153,20 @@ class GameManager:
         action_values = list()
         score_values = list()
 
-        for i in range(len(self.state_history) - 1):
+        for i in range(len(self.state_history)):
             state_values.append(self.state_history[i].get_state_values().tolist())
 
-        for i in range(len(self.action_history) -1):
+        for i in range(len(self.action_history)):
             action_values.append(str(self.action_history[i]))
 
-        for i in range(len(self.state_scores) -1):
+        for i in range(len(self.state_scores)):
             score_values.append(str(self.state_scores[i]))
 
-        mysql.query_database(mysql.INSERT_DATA, None,
-                             json.dumps(state_values),
-                             json.dumps(action_values),
-                             json.dumps(score_values))
+        state_data = {
+            'states': state_values,
+            'actions': action_values,
+            'scores': score_values
+        }
+
+        print(state_data)
+        mysql.query_database(mysql.INSERT_DATA, None, json.dumps(state_data))
