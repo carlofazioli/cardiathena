@@ -10,6 +10,9 @@ class State:
     State data structure contains a complete snapshot of the game at any time.
     """
 
+    def get_state_scores(self):
+        pass
+
 
 class Action:
     """
@@ -118,22 +121,27 @@ class GameManager:
         """
         # Start the game.
         state = self.adjudicator.start_game()
+
         while not self.adjudicator.is_finished():
             # While the game is still in progress, inspect the current state to determine which agent should play,
             # and mask their state to hide any information.
             agent_index, partial_state = self.adjudicator.agent_turn()
+
             # Show the partial state to the current player and obtain their action.
             current_player = self.agent_list[agent_index]
             player_action = current_player.get_action(partial_state, self.adjudicator.trick_number())
+
             # Record this activity in the history.
             self.state_history.append(deepcopy(state))
             self.action_history.append(deepcopy(player_action))
-
+            self.state_scores.append(deepcopy(state.get_state_scores()))
             # Adjudicate the action to receive an updated state.
             state = self.adjudicator.step_game(player_action)
-        # At this point, the game is over.  Record the final state.
-        self.state_history.append(state)
 
+        # At this point, the game is over.  Record the final state.
+        self.state_history.append(deepcopy(state))
+        self.action_history.append(0)
+        self.state_scores.append(deepcopy(state.get_state_scores()))
 
     def save_game(self):
         """
@@ -143,6 +151,7 @@ class GameManager:
         """
         state_values = list()
         action_values = list()
+        score_values = list()
 
         for i in range(len(self.state_history) - 1):
             state_values.append(self.state_history[i].get_state_values().tolist())
@@ -150,6 +159,10 @@ class GameManager:
         for i in range(len(self.action_history) -1):
             action_values.append(str(self.action_history[i]))
 
+        for i in range(len(self.state_scores) -1):
+            score_values.append(str(self.state_scores[i]))
 
-        mysql.query_database(mysql.INSERT_DATA, None, json.dumps(state_values), json.dumps(action_values))
-
+        mysql.query_database(mysql.INSERT_DATA, None,
+                             json.dumps(state_values),
+                             json.dumps(action_values),
+                             json.dumps(score_values))
