@@ -1,6 +1,7 @@
 from typing import List
 from copy import deepcopy
 from database import mysql_example as mysql
+from database.Variables import INSERT_DATA
 import json
 from xlwt import Workbook
 
@@ -168,5 +169,4 @@ class GameManager:
             'scores': score_values
         }
 
-        print(state_data)
-        mysql.query_database(mysql.INSERT_DATA, None, json.dumps(state_data))
+        mysql.insert_to_database(INSERT_DATA, None, json.dumps(state_data))
