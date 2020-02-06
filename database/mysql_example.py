@@ -1,68 +1,25 @@
 import mysql.connector
-from mysql.connector import errorcode
 import json
+from database.Connection import Database
+from database.Variables import SELECT_ALL_DATA
+from database.Variables import STATES_LIST
+from database.Variables import ACTIONS_LIST
+from database.Variables import SCORES_LIST
 
-config = {
-    'user': 'remote_usr',
-    'password': '',
-    'host': '',
-    'port': '3306',
-    'db': 'state_db',
-    'raise_on_warnings': True
-}
-
-DB = "state_db"
-TABLE_NAME = "history"
-STATE_COLUMN = "state"
-
-ID_COLUMN = "id"
-SHOW_DATABASE = "SHOW DATABASES"
-SHOW_TABLES = "SHOW TABLES"
-SHOW_DATA = "SELECT * FROM {}".format(TABLE_NAME)
-SHOW_GAME_ID = "SELECT id FROM {}".format(TABLE_NAME)
-
-INSERT_DATA = "INSERT INTO {} ({}, {}) VALUES (%s, %s)".format(TABLE_NAME, ID_COLUMN, STATE_COLUMN)
-
-SET_INITIAL = "ALTER TABLE {} AUTO_INCREMENT=1".format(TABLE_NAME)
-CREATE_TABLE = "CREATE TABLE {}" \
-               "(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, state JSON)".format(TABLE_NAME)
-CREATE_DB = "CREATE DATABASE {}".format(DB)
-DROP_DB = "DROP DATABASE {}".format(DB)
-DROP_TABLE = "DROP TABLE {}".format(TABLE_NAME)
+bulk_data = list()
 
 
-class Database():
-
-    def __init__(self):
-        self.cnx = connect_to_database()
-
-    def get_cursor(self):
-        return self.cnx.cursor()
-
-
-def connect_to_database():
-    try:
-        cnx = mysql.connector.connect(**config)
-        return cnx
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
-
-
-def query_database(query, game_id, state):
+def insert_to_database(query, game_id, state):
+    """
+    Establishes a connection to the database, and executes an insert query. Inserts state data into MySQL database
+    :param query: predefined insert query in Variables.py
+    :param state: State history, action history, and score history from a game
+    """
     db = Database()
     my_cursor = db.get_cursor()
     try:
-        if state is None:
-            my_cursor.execute(query)
-            show_results(my_cursor)
-        else:
-            values = (game_id, state)
-            my_cursor.execute(query, values)
+        values = (game_id, state)
+        my_cursor.execute(query, values)
     except mysql.connector.Error as err:
         print("Something might be wrong: {}".format(err))
     finally:
@@ -72,6 +29,11 @@ def query_database(query, game_id, state):
 
 
 def get_bulk_data(query):
+    """
+    Retrieves bulk data from the database, returns a list of encoded json objects.
+    :param query: predefined select all query in Variables.py
+    :returns a list of encoded json objects
+    """
     db = Database()
     my_cursor = db.get_cursor()
     try:
@@ -88,21 +50,46 @@ def get_bulk_data(query):
         db.cnx.close()
 
 
-def show_results(cursor):
-    for row in cursor.fetchall():
-        print(row)
+def create_list_of_bulk_data():
+    """
+    Creates a list of decoded json objects.
+    """
+    data = get_bulk_data(SELECT_ALL_DATA)
+    for i in range(len(data)):
+        bulk_data.append(json.loads(data[i][1]))
 
 
-def initialize_db():
-    query_database(CREATE_DB, None, None)
-    query_database(CREATE_TABLE, None, None)
+def get_list(list_type):
+    """
+    Extracts the state history, action history, or score history from the list of decoded json objects, bulk_data.
+
+    :param list_type: The type of history to extract.
+    :returns a list of history dictionaries.
+    """
+    temp_list = list()
+    for i in range(len(bulk_data)):
+        temp = bulk_data[i][list_type]
+        temp_list.append(temp)
+    return temp_list
 
 
-# initialize_db()
-# query_database(DROP_DB, None, None)
+def print_lists(list):
+    """
+    Prints out the list of history dictionaries.
+    """
+    for x in range(len(list)):
+        print(list[x])
 
-# test_db()
-# query = "show variables like 'max_allowed_packet'"
-# query = "show global status like 'Max_used_connections
 
-query_database(SHOW_DATA, "TABLE_NAME", None)
+def test_get_data_example():
+    """
+    Tests retrieving history data from the database.
+    """
+    create_list_of_bulk_data()
+    state_list = get_list(STATES_LIST)
+    action_list = get_list(ACTIONS_LIST)
+    score_list = get_list(SCORES_LIST)
+
+    print_lists(state_list)
+    print_lists(action_list)
+    print_lists(score_list)
