@@ -2,6 +2,8 @@ from typing import List
 from copy import deepcopy
 from xlwt import Workbook
 
+from adjudicator.state import HeartsState
+
 
 class State:
     """
@@ -50,11 +52,13 @@ class Adjudicator:
         return self.state
 
     def step_game(self,
-                  action: Action):
+                  action: Action,
+                  state: State):
         """
         Given an action by the agent whose turn it is, step_game() updates the state according to the rules and
         returns the new state.
         :param action: the Action of the Agent whose turn it is
+        :param state: the current State of the game
         :return: the updated State
         """
         return self.state
@@ -102,6 +106,7 @@ class GameManager:
         """
         self.adjudicator = adjudicator
         self.agent_list = agent_list
+        self.state = None
         self.state_history = list()
         self.action_history = list()
         self.state_action_history = list()
@@ -115,27 +120,28 @@ class GameManager:
         :return: None
         """
         # Start the game.
-        state = self.adjudicator.start_game()
-        while not self.adjudicator.is_finished():
+        # state = self.adjudicator.start_game()
+        self.state = HeartsState()
+        while not self.adjudicator.is_finished(self.state):
             # Make an empty list to handle however many actions we receive
             player_action = []
             # While the game is still in progress, inspect the current state to determine which agent should play,
             # and mask their state to hide any information.
-            agent_index, partial_state = self.adjudicator.agent_turn()
+            agent_index, partial_state = self.adjudicator.agent_turn(self.state)
             # Show the partial state to the current player and obtain their action.
             for i in range(len(agent_index)):
                 # agent_turn will return two lists of the same size so go through them together
                 current_player = self.agent_list[agent_index[i]]
-                player_action.append(current_player.get_action(partial_state[i], self.adjudicator.trick_number()))
+                player_action.append(current_player.get_action(partial_state[i], self.adjudicator.trick_number(self.state)))
             # Record this activity in the history.
-            self.state_history.append(deepcopy(state))
+            self.state_history.append(deepcopy(self.state))
             self.action_history.append(deepcopy(player_action))
-            self.state_action_history.append([deepcopy(state), deepcopy(player_action)])
+            self.state_action_history.append([deepcopy(self.state), deepcopy(player_action)])
             # Adjudicate the action to receive an updated state.
-            state = self.adjudicator.step_game(player_action)
+            self.state = self.adjudicator.step_game(player_action, self.state)
         # At this point, the game is over.  Record the final state.
-        self.state_history.append(state)
-        self.state_action_history.append([deepcopy(state), "None"])
+        self.state_history.append(self.state)
+        self.state_action_history.append([deepcopy(self.state), "None"])
 
     def save_game(self):
         """
