@@ -132,7 +132,7 @@ class GameManager:
             for i in range(len(agent_index)):
                 # agent_turn will return two lists of the same size so go through them together
                 current_player = self.agent_list[agent_index[i]]
-                player_action.append(current_player.get_action(partial_state[i], self.adjudicator.trick_number(self.state)))
+                player_action.append(current_player.get_action(partial_state[i]))
             # Record this activity in the history.
             self.state_history.append(deepcopy(self.state))
             self.action_history.append(deepcopy(player_action))

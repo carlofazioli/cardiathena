@@ -23,8 +23,7 @@ class RandomHeartsAgent(Agent):
     """
 
     def get_action(self,
-                   partial_state: HeartsState,
-                   trick_number: int):
+                   partial_state: HeartsState):
         """
         The get_action() method inspects the state for open positions and picks one randomly.
         :param partial_state: the position vector of the game.
@@ -38,7 +37,7 @@ class RandomHeartsAgent(Agent):
                 cards_in_hand.append(i)
 
         # Agent picks 3 cards to pass
-        if trick_number == 0:
+        if partial_state.pass_type > 0:
             c1 = random.choice(cards_in_hand)
             cards_in_hand.remove(c1)
             c2 = random.choice(cards_in_hand)
