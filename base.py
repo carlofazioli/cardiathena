@@ -1,5 +1,6 @@
 from typing import List
 from copy import deepcopy
+import uuid
 from database import mysql_example as mysql
 from database.Variables import INSERT_DATA
 import json
@@ -111,6 +112,7 @@ class GameManager:
         self.state_history = list()
         self.action_history = list()
         self.state_scores = list()
+        self.game_uuid = uuid.uuid4().hex
 
     def play_game(self):
         """
@@ -153,6 +155,7 @@ class GameManager:
         state_values = list()
         action_values = list()
         score_values = list()
+        num_of_states = len(self.state_history)
 
         for i in range(len(self.state_history)):
             state_values.append(self.state_history[i].get_state_values().tolist())
@@ -163,10 +166,17 @@ class GameManager:
         for i in range(len(self.state_scores)):
             score_values.append(str(self.state_scores[i]))
 
-        state_data = {
-            'states': state_values,
-            'actions': action_values,
-            'scores': score_values
-        }
+        for i in range(num_of_states):
+            state_data = {
+                'uuid': self.game_uuid,
+                'states': state_values[i],
+                'actions': action_values[i],
+                'scores': score_values[i]
+            }
+            print(state_data)
 
-        mysql.insert_to_database(INSERT_DATA, None, json.dumps(state_data))
+        for i in range(num_of_states):
+            mysql.insert_to_database(INSERT_DATA, self.game_uuid, json.dumps(state_values[i]), json.dumps(action_values[i]), json.dumps(score_values[i]))
+
+
+
