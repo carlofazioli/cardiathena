@@ -2,7 +2,7 @@ from typing import List
 from copy import deepcopy
 from xlwt import Workbook
 
-from adjudicator.state import HeartsState
+
 
 
 class State:
@@ -90,7 +90,8 @@ class Adjudicator:
 class GameManager:
     def __init__(self,
                  agent_list: List[Agent],
-                 adjudicator: Adjudicator):
+                 adjudicator: Adjudicator,
+                 state: State):
         """
         The GameManager controls game logic and moderates interactions between Agents and the Adjudicator.  The
         adjudicator stores the current game state, and updates it based on agent actions obtained by the GameManager
@@ -106,7 +107,7 @@ class GameManager:
         """
         self.adjudicator = adjudicator
         self.agent_list = agent_list
-        self.state = None
+        self.state = state
         self.state_history = list()
         self.action_history = list()
         self.state_action_history = list()
@@ -121,7 +122,6 @@ class GameManager:
         """
         # Start the game.
         # state = self.adjudicator.start_game()
-        self.state = HeartsState()
         while not self.adjudicator.is_finished(self.state):
             # Make an empty list to handle however many actions we receive
             player_action = []

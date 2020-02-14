@@ -1,5 +1,6 @@
 from base import GameManager
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
+from adjudicator.state import HeartsState
 from agent.RandomHeartsAgent import RandomHeartsAgent
 
 
@@ -9,8 +10,10 @@ agent_2 = RandomHeartsAgent()
 agent_3 = RandomHeartsAgent()
 agent_4 = RandomHeartsAgent()
 adj = HeartsAdjudicator()
+state = HeartsState()
 game = GameManager(agent_list=[0, agent_1, agent_2, agent_3, agent_4],
-                   adjudicator=adj)
+                   adjudicator=adj,
+                   state=state)
 
 # Play a game.
 game.play_game()
