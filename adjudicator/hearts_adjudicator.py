@@ -48,6 +48,7 @@ class HeartsAdjudicator(Adjudicator):
                      state: HeartsState):
         # Returns the first player of the current trick
         trick_lead = state.values[state.values > 30]
+
         if len(trick_lead) == 0:
             return None
         return trick_lead % 10
