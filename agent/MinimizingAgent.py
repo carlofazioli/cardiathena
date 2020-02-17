@@ -41,6 +41,7 @@ class MinimizingAgent(Agent):
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
+            self.pick_trouble_card(partial_state)
             c1 = random.choice(self.cards_in_hand)
             self.cards_in_hand.remove(c1)
             c2 = random.choice(self.cards_in_hand)
@@ -116,6 +117,70 @@ class MinimizingAgent(Agent):
         if max_card_player == -1:
             max_card_player = self.cards_in_hand[0]
         return max_card_player
+
+    def sort_suits(self,
+                   partial_state: HeartsState):
+        cards = []
+        clubs = []
+        Diamond = []
+        spades = []
+        hearts = []
+        for i in range(len(partial_state.values)):
+            if 0 < partial_state.values[i] < 5:
+                cards.append(i)
+
+            """ Sort out the Cards by Suit """
+            # Clubs - Diamond - Spades - Hearts
+            for i in range(4):
+                start = i * 13
+                end = start + 13
+                for card in cards:
+                    # print("I : "+str(i)+"  Card "+str(card))
+                    if i == 0:
+                        # print("Club Enter")
+                        if start <= card < end:
+                            clubs.append(card)
+                        #   print("Club Added")
+                    elif i == 1:
+                        # print("Diamond Enter")
+                        if start <= card < end:
+                            Diamond.append(card)
+                        #  print("Diamond Added")
+                    elif i == 2:
+                        # print("Spade Enter")
+                        if start <= card < end:
+                            spades.append(card)
+                        #    print("Spade Added")
+                    elif i == 3:
+                        #  print("Hearts Enter")
+                        if start <= card < end:
+                            hearts.append(card)
+                        #   print("Hearts Added")
+
+        suits = [clubs, Diamond, spades, hearts]
+        return suits
+
+    def pick_trouble_card(self, partial_state: HeartsState):
+
+        """Choose the suit with the least amount of cards
+            and pass those starting with the highest card unimplemented so far """
+        trouble = []
+        suits = self.sort_suits(partial_state)
+        num_cards = -1
+        for s in suits:
+            print(self.average_suit_weight(s))
+            if len(s) > num_cards:
+                num_cards = len(s)
+                trouble = s
+                
+    def average_suit_weight(self,Suit_list):
+        sum = 0
+        for cards in Suit_list:
+            sum += (cards %13) +1
+        if sum == 0:
+            return 0
+        return sum / len(Suit_list)
+
 
     # def get_highest_card_from_played_cards(self,
     #                                        partial_state: HeartsState):
