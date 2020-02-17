@@ -131,30 +131,30 @@ class MinimizingAgent(Agent):
 
             """ Sort out the Cards by Suit """
             # Clubs - Diamond - Spades - Hearts
-            for i in range(4):
-                start = i * 13
-                end = start + 13
-                for card in cards:
-                    # print("I : "+str(i)+"  Card "+str(card))
-                    if i == 0:
-                        # print("Club Enter")
-                        if start <= card < end:
-                            clubs.append(card)
+        for i in range(4):
+            start = i * 13
+            end = start + 13
+            for card in cards:
+                # print("I : "+str(i)+"  Card "+str(card))
+                if i == 0:
+                    # print("Club Enter")
+                    if start <= card < end:
+                        clubs.append(card)
                         #   print("Club Added")
-                    elif i == 1:
+                elif i == 1:
                         # print("Diamond Enter")
-                        if start <= card < end:
-                            Diamond.append(card)
+                    if start <= card < end:
+                         Diamond.append(card)
                         #  print("Diamond Added")
-                    elif i == 2:
-                        # print("Spade Enter")
-                        if start <= card < end:
-                            spades.append(card)
+                elif i == 2:
+                     # print("Spade Enter")
+                    if start <= card < end:
+                        spades.append(card)
                         #    print("Spade Added")
-                    elif i == 3:
+                elif i == 3:
                         #  print("Hearts Enter")
-                        if start <= card < end:
-                            hearts.append(card)
+                    if start <= card < end:
+                        hearts.append(card)
                         #   print("Hearts Added")
 
         suits = [clubs, Diamond, spades, hearts]
@@ -169,10 +169,11 @@ class MinimizingAgent(Agent):
         num_cards = -1
         for s in suits:
             print(self.average_suit_weight(s))
+            print(s)
             if len(s) > num_cards:
                 num_cards = len(s)
                 trouble = s
-                
+
     def average_suit_weight(self,Suit_list):
         sum = 0
         for cards in Suit_list:
