@@ -1,5 +1,7 @@
 import random
 
+import numpy as np
+
 from adjudicator import hearts_adjudicator
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
@@ -53,13 +55,26 @@ class MinimizingAgent(Agent):
         # Agent picks a card to play
         # elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
         else:
-            choice = random.choice(self.cards_in_hand)
-            player_number = self.own_adj.current_player(partial_state)
-            trick_w = self.own_adj.trick_leader(partial_state)
-            print("minimizing agent is leading: " + str(self.is_lead(partial_state)))
-            print("minimizing agent is not void: " + str(self.not_void(partial_state)))
+            choice = self.select_card(partial_state)
+            # print("minimizing agent is leading: " + str(self.is_lead(partial_state)))
+            # print("minimizing agent is not void: " + str(self.not_void(partial_state)))
             self.cards_in_hand = []
             return HeartsAction(choice)
+
+    def select_card(self,
+                    partial_state: HeartsState):
+        # our player is leading, choosing a random card for now
+        if self.is_lead(partial_state):
+            choice = random.choice(self.cards_in_hand)
+        else:
+            # we're following, not leading
+            if self.not_void(partial_state):
+                # pick the lowest card compared to the highest currently played
+                choice = self.get_highest_low_card(partial_state)
+            else:
+                # just randomly play for now
+                choice = random.choice(self.cards_in_hand)
+        return choice
 
     def is_lead(self,
              partial_state: HeartsState):
@@ -79,4 +94,30 @@ class MinimizingAgent(Agent):
             if begin <= x < end:
                 return True
         return False
+
+    def get_highest_low_card(self,
+                             partial_state: HeartsState):
+        max_card_played = self.own_adj.find_max_card(partial_state)
+        max_card_player = -1
+        lead_suit = self.own_adj.lead_suit(partial_state)
+        begin = 13 * lead_suit  # beginning of range of valid cards
+        end = 13 * (lead_suit + 1)  # end of range of valid cards
+        for x in self.cards_in_hand:
+            if begin <= x < end:
+                if max_card_played > x > max_card_player:
+                    max_card_player = x
+
+        # TODO might need to do something other than "just play whatever and hope for the best"
+        # TODO if we end up with a hand where none of the cards are less than the current max
+        if max_card_player == -1:
+            max_card_player = self.cards_in_hand[0]
+        return max_card_player
+
+    # def get_highest_card_from_played_cards(self,
+    #                                        partial_state: HeartsState):
+    #     currently_played_cards = np.where(partial_state.values > 20)
+    #     lead_suit = self.own_adj.lead_suit(partial_state)
+    #     begin = 13 * lead_suit  # beginning of range of valid cards
+    #     end = 13 * (lead_suit + 1)  # end of range of valid cards
+    #     for x in currently_played_cards:
 
