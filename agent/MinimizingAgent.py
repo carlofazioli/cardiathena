@@ -41,6 +41,7 @@ class MinimizingAgent(Agent):
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
+            self.pick_trouble_card(partial_state)
             c1 = random.choice(self.cards_in_hand)
             self.cards_in_hand.remove(c1)
             c2 = random.choice(self.cards_in_hand)
@@ -167,9 +168,18 @@ class MinimizingAgent(Agent):
         suits = self.sort_suits(partial_state)
         num_cards = -1
         for s in suits:
+            print(self.average_suit_weight(s))
             if len(s) > num_cards:
                 num_cards = len(s)
                 trouble = s
+                
+    def average_suit_weight(self,Suit_list):
+        sum = 0
+        for cards in Suit_list:
+            sum += (cards %13) +1
+        if sum == 0:
+            return 0
+        return sum / len(Suit_list)
 
 
     # def get_highest_card_from_played_cards(self,
