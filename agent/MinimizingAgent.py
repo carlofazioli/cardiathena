@@ -2,7 +2,6 @@ import random
 
 import numpy as np
 
-from adjudicator import hearts_adjudicator
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from base import Action, Agent
@@ -69,9 +68,11 @@ class MinimizingAgent(Agent):
         else:
             # we're following, not leading
             if self.not_void(partial_state):
+                # Not void in the leading suit
                 # pick the lowest card compared to the highest currently played
                 choice = self.get_highest_low_card(partial_state)
             else:
+                # Void in the leading suit
                 # just randomly play for now
                 choice = random.choice(self.cards_in_hand)
         return choice
@@ -87,6 +88,7 @@ class MinimizingAgent(Agent):
 
     def not_void(self,
                  partial_state: HeartsState):
+        """Returns true if agent is not void in the leading suit"""
         lead_suit = self.own_adj.lead_suit(partial_state)
         begin = 13 * lead_suit  # beginning of range of valid cards
         end = 13 * (lead_suit + 1)  # end of range of valid cards
@@ -97,6 +99,8 @@ class MinimizingAgent(Agent):
 
     def get_highest_low_card(self,
                              partial_state: HeartsState):
+        """Find the cards that are lowest than the card currently set to win and
+        choose the highest one"""
         max_card_played = self.own_adj.find_max_card(partial_state)
         max_card_player = -1
         lead_suit = self.own_adj.lead_suit(partial_state)
