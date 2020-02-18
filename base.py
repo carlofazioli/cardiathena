@@ -1,20 +1,15 @@
+import json
+import uuid
+from database import MySQLDatabase as db
+from database.MySQLVariables import INSERT_STATE, INSERT_PLAYERS
 from typing import List
 from copy import deepcopy
-import uuid
-from database import mysql_example as mysql
-from database.Variables import INSERT_DATA
-import json
-from xlwt import Workbook
 
 
 class State:
     """
     State data structure contains a complete snapshot of the game at any time.
     """
-
-    def get_state_scores(self):
-        pass
-
 
 class Action:
     """
@@ -126,8 +121,14 @@ class GameManager:
         NOTE: this method likely does not need to be overridden in derived classes.
         :return: None
         """
-        # Start the game.
-        # state = self.adjudicator.start_game()
+        agents = list()
+        for i in range(len(self.agent_list)):
+            agents.append(str(self.agent_list[i]))
+
+        if db.insert_players(INSERT_PLAYERS, self.game_uuid, json.dumps(agents)) is False:
+            db.initialize_table()
+            db.insert_players(INSERT_PLAYERS, self.game_uuid, json.dumps(agents))
+
         while not self.adjudicator.is_finished(self.state):
             # Make an empty list to handle however many actions we receive
             player_action = []
@@ -177,10 +178,11 @@ class GameManager:
                 'actions': action_values[i],
                 'scores': score_values[i]
             }
-            print(state_data)
+            #print(state_data)
 
         for i in range(num_of_states):
-            mysql.insert_to_database(INSERT_DATA, self.game_uuid, json.dumps(state_values[i]), json.dumps(action_values[i]), json.dumps(score_values[i]))
-
-
-
+            db.insert_state(INSERT_STATE,
+                            self.game_uuid,
+                            json.dumps(state_values[i]),
+                            json.dumps(action_values[i]),
+                            json.dumps(score_values[i]))
