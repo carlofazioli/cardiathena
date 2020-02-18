@@ -19,7 +19,6 @@ class HeartsAction(Action):
         return str(self.card_index)
 
 
-
 class MinimizingAgent(Agent):
     """
     An random agent who selects from available legal moves.
@@ -27,6 +26,10 @@ class MinimizingAgent(Agent):
     def __init__(self):
         self.own_adj = HeartsAdjudicator()
         self.cards_in_hand = []
+
+    def __str__(self):
+        return "The Low Layer"
+
     def get_action(self,
                    partial_state: HeartsState):
         """

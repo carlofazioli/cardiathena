@@ -21,6 +21,8 @@ class RandomHeartsAgent(Agent):
     """
     An random agent who selects from available legal moves.
     """
+    def __str__(self):
+        return "The Random Agent"
 
     def get_action(self,
                    partial_state: HeartsState):
