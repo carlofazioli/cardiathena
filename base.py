@@ -57,11 +57,13 @@ class Adjudicator:
         return self.state
 
     def step_game(self,
-                  action: Action):
+                  action: Action,
+                  state: State):
         """
         Given an action by the agent whose turn it is, step_game() updates the state according to the rules and
         returns the new state.
         :param action: the Action of the Agent whose turn it is
+        :param state: the current State of the game
         :return: the updated State
         """
         return self.state
@@ -93,7 +95,8 @@ class Adjudicator:
 class GameManager:
     def __init__(self,
                  agent_list: List[Agent],
-                 adjudicator: Adjudicator):
+                 adjudicator: Adjudicator,
+                 state: State):
         """
         The GameManager controls game logic and moderates interactions between Agents and the Adjudicator.  The
         adjudicator stores the current game state, and updates it based on agent actions obtained by the GameManager
@@ -109,6 +112,7 @@ class GameManager:
         """
         self.adjudicator = adjudicator
         self.agent_list = agent_list
+        self.state = state
         self.state_history = list()
         self.action_history = list()
         self.state_scores = list()
@@ -123,28 +127,28 @@ class GameManager:
         :return: None
         """
         # Start the game.
-        state = self.adjudicator.start_game()
-
-        while not self.adjudicator.is_finished():
+        # state = self.adjudicator.start_game()
+        while not self.adjudicator.is_finished(self.state):
+            # Make an empty list to handle however many actions we receive
+            player_action = []
             # While the game is still in progress, inspect the current state to determine which agent should play,
             # and mask their state to hide any information.
-            agent_index, partial_state = self.adjudicator.agent_turn()
-
+            agent_index, partial_state = self.adjudicator.agent_turn(self.state)
             # Show the partial state to the current player and obtain their action.
-            current_player = self.agent_list[agent_index]
-            player_action = current_player.get_action(partial_state, self.adjudicator.trick_number())
-
+            for i in range(len(agent_index)):
+                # agent_turn will return two lists of the same size so go through them together
+                current_player = self.agent_list[agent_index[i]]
+                player_action.append(current_player.get_action(partial_state[i]))
             # Record this activity in the history.
-            self.state_history.append(deepcopy(state))
+            self.state_history.append(deepcopy(self.state))
             self.action_history.append(deepcopy(player_action))
-            self.state_scores.append(deepcopy(state.get_state_scores()))
+            self.state_scores.append(deepcopy(self.state.get_state_scores()))
             # Adjudicate the action to receive an updated state.
-            state = self.adjudicator.step_game(player_action)
-
+            self.state = self.adjudicator.step_game(player_action, self.state)
         # At this point, the game is over.  Record the final state.
-        self.state_history.append(deepcopy(state))
+        self.state_history.append(deepcopy(self.state))
         self.action_history.append(0)
-        self.state_scores.append(deepcopy(state.get_state_scores()))
+        self.state_scores.append(deepcopy(self.state.get_state_scores()))
 
     def save_game(self):
         """
