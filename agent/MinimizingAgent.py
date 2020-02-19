@@ -41,14 +41,14 @@ class MinimizingAgent(Agent):
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
-            self.pick_trouble_card(partial_state)
             c1 = random.choice(self.cards_in_hand)
             self.cards_in_hand.remove(c1)
             c2 = random.choice(self.cards_in_hand)
             self.cards_in_hand.remove(c2)
             c3 = random.choice(self.cards_in_hand)
             self.cards_in_hand.remove(c3)
-            three_cards = [c1, c2, c3]
+            #three_cards = [c1, c2, c3]
+            three_cards = self.passing_smart_sequence(partial_state)
             return HeartsAction(three_cards)
 
 
@@ -160,19 +160,41 @@ class MinimizingAgent(Agent):
         suits = [clubs, Diamond, spades, hearts]
         return suits
 
-    def pick_trouble_card(self, partial_state: HeartsState):
+    def passing_smart_sequence(self,partial_state : HeartsState):
+        cards_to_pass = []  # List of the cards that the agent will pass
+        passing_amount = 3  # Amount of Cards that will be pass
+
+        suits = self.sort_suits(partial_state)
+        num_cards = -1
+        for card in range(3):
+            choosen_one , suits = self.pick_trouble_card(suits);
+
+            cards_to_pass.append(choosen_one)
+
+        return cards_to_pass
+
+    def pick_trouble_card(self, sorted_hands):
 
         """Choose the suit with the least amount of cards
             and pass those starting with the highest card unimplemented so far """
         trouble = []
-        suits = self.sort_suits(partial_state)
+        index = 0
         num_cards = -1
-        for s in suits:
-            print(self.average_suit_weight(s))
-            print(s)
-            if len(s) > num_cards:
-                num_cards = len(s)
-                trouble = s
+        for suit in sorted_hands:
+            print(self.average_suit_weight(suit))
+            print(suit)
+            if len(suit) > num_cards:
+                num_cards = len(suit)
+                trouble = suit
+        index+=1
+
+        lost_card = sorted_hands
+        lost_card[index]= trouble
+
+        return trouble.pop(-1) , lost_card
+
+
+
 
     def average_suit_weight(self,Suit_list):
         sum = 0
