@@ -35,22 +35,28 @@ class MinimizingAgent(Agent):
         :return: an Action.
         """
         # Given the masked state, only cards in hand of agent is available
-        for i in range(len(partial_state.values)):
-            if 0 < partial_state.values[i] < 5:
-                self.cards_in_hand.append(i)
+        # for i in range(len(partial_state.values)):
+        #     if 0 < partial_state.values[i] < 5:
+        #         self.cards_in_hand.append(i)
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
-            c1 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c1)
-            c2 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c2)
-            c3 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c3)
+            # c1 = random.choice(self.cards_in_hand)
+            # self.cards_in_hand.remove(c1)
+            # c2 = random.choice(self.cards_in_hand)
+            # self.cards_in_hand.remove(c2)
+            # c3 = random.choice(self.cards_in_hand)
+            # self.cards_in_hand.remove(c3)
             #three_cards = [c1, c2, c3]
             three_cards = self.passing_smart_sequence(partial_state)
+            # for remove in three_cards:
+            #     self.cards_in_hand.remove(remove)
+            print("Cards picked out for trading "+str(three_cards))
             return HeartsAction(three_cards)
 
+        for i in range(len(partial_state.values)):
+            if 0 < partial_state.values[i] < 5:
+                self.cards_in_hand.append(i)
 
         # Agent picks a card to play
         # elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
@@ -166,32 +172,46 @@ class MinimizingAgent(Agent):
 
         suits = self.sort_suits(partial_state)
         num_cards = -1
+        counter = 0
+
         for card in range(3):
-            choosen_one , suits = self.pick_trouble_card(suits);
+          choose_one , suits = self.pick_trouble_card(suits);
+          for c in choose_one:
+              cards_to_pass.append(c)
+          if ( len(cards_to_pass) > 3):
+              break;
 
-            cards_to_pass.append(choosen_one)
 
-        return cards_to_pass
+
+        return cards_to_pass[0:3]
 
     def pick_trouble_card(self, sorted_hands):
 
         """Choose the suit with the least amount of cards
             and pass those starting with the highest card unimplemented so far """
         trouble = []
-        index = 0
+        index = -1
+        store_pos = 0
         num_cards = -1
+        cards_to_pass = []
         for suit in sorted_hands:
             print(self.average_suit_weight(suit))
             print(suit)
+            index += 1
             if len(suit) > num_cards:
                 num_cards = len(suit)
                 trouble = suit
-        index+=1
+                store_pos = index
+
+
+        for i in range(len(trouble)):
+            cards_to_pass.append(trouble[i*-1])
+            print(index)
 
         lost_card = sorted_hands
-        lost_card[index]= trouble
+        lost_card[store_pos]= trouble
 
-        return trouble.pop(-1) , lost_card
+        return cards_to_pass , lost_card
 
 
 
