@@ -1,4 +1,4 @@
-from agent.MinimizingAgent import MinimizingAgent
+from agent.LowLayer import LowLayer
 from base import GameManager
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
@@ -8,7 +8,7 @@ from agent.RandomHeartsAgent import RandomHeartsAgent
 # Create the players, the adjudicator, and the game object.
 agent_1 = RandomHeartsAgent()
 agent_2 = RandomHeartsAgent()
-agent_3 = MinimizingAgent()
+agent_3 = LowLayer()
 agent_4 = RandomHeartsAgent()
 adj = HeartsAdjudicator()
 state = HeartsState()

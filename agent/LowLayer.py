@@ -11,6 +11,7 @@ class HeartsAction(Action):
     """
     A Hearts action is the card index chosen by the agent
     """
+
     def __init__(self,
                  card_index):
         self.card_index = card_index
@@ -19,14 +20,15 @@ class HeartsAction(Action):
         return str(self.card_index)
 
 
-
-class MinimizingAgent(Agent):
+class LowLayer(Agent):
     """
     An random agent who selects from available legal moves.
     """
+
     def __init__(self):
         self.own_adj = HeartsAdjudicator()
         self.cards_in_hand = []
+
     def get_action(self,
                    partial_state: HeartsState):
         """
@@ -47,7 +49,7 @@ class MinimizingAgent(Agent):
             # self.cards_in_hand.remove(c2)
             # c3 = random.choice(self.cards_in_hand)
             # self.cards_in_hand.remove(c3)
-            #three_cards = [c1, c2, c3]
+            # three_cards = [c1, c2, c3]
             three_cards = self.passing_smart_sequence(partial_state)
             # for remove in three_cards:
             #     self.cards_in_hand.remove(remove)
@@ -84,7 +86,7 @@ class MinimizingAgent(Agent):
         return choice
 
     def is_lead(self,
-             partial_state: HeartsState):
+                partial_state: HeartsState):
         """Returns true if agent is leading currently"""
         played = partial_state.values[partial_state.values > 20]
 
@@ -147,17 +149,17 @@ class MinimizingAgent(Agent):
                         clubs.append(card)
                         #   print("Club Added")
                 elif i == 1:
-                        # print("Diamond Enter")
+                    # print("Diamond Enter")
                     if start <= card < end:
-                         Diamond.append(card)
-                        #  print("Diamond Added")
+                        Diamond.append(card)
+                    #  print("Diamond Added")
                 elif i == 2:
-                     # print("Spade Enter")
+                    # print("Spade Enter")
                     if start <= card < end:
                         spades.append(card)
                         #    print("Spade Added")
                 elif i == 3:
-                        #  print("Hearts Enter")
+                    #  print("Hearts Enter")
                     if start <= card < end:
                         hearts.append(card)
                         #   print("Hearts Added")
@@ -165,7 +167,7 @@ class MinimizingAgent(Agent):
         suits = [clubs, Diamond, spades, hearts]
         return suits
 
-    def passing_smart_sequence(self,partial_state : HeartsState):
+    def passing_smart_sequence(self, partial_state: HeartsState):
         cards_to_pass = []  # List of the cards that the agent will pass
         passing_amount = 3  # Amount of Cards that will be pass
 
@@ -174,13 +176,11 @@ class MinimizingAgent(Agent):
         counter = 0
 
         for card in range(3):
-          choose_one , suits = self.pick_trouble_card(suits);
-          for c in choose_one:
-              cards_to_pass.append(c)
-          if ( len(cards_to_pass) > 3):
-              break;
-
-
+            choose_one, suits = self.pick_trouble_card(suits);
+            for c in choose_one:
+                cards_to_pass.append(c)
+            if (len(cards_to_pass) > 3):
+                break;
 
         return cards_to_pass[0:3]
 
@@ -200,22 +200,18 @@ class MinimizingAgent(Agent):
                 trouble = suit
                 store_pos = index
 
-
         for i in range(len(trouble)):
-            cards_to_pass.append(trouble[i*-1])
+            cards_to_pass.append(trouble[i * -1])
 
         lost_card = sorted_hands
-        lost_card[store_pos]= trouble
+        lost_card[store_pos] = trouble
 
-        return cards_to_pass , lost_card
+        return cards_to_pass, lost_card
 
-
-
-
-    def average_suit_weight(self,Suit_list):
+    def average_suit_weight(self, Suit_list):
         sum = 0
         for cards in Suit_list:
-            sum += (cards %13) +1
+            sum += (cards % 13) + 1
         if sum == 0:
             return 0
         return sum / len(Suit_list)
@@ -234,7 +230,7 @@ class MinimizingAgent(Agent):
         return max_card
 
     def bad_suit(self):
-        suit_avg = [0,0,0,0]
+        suit_avg = [0, 0, 0, 0]
         counter = 0
         # count up the number of problem cards per suit
         # whichever suit has more problem cards is the one we're going to slough from
@@ -246,7 +242,7 @@ class MinimizingAgent(Agent):
                     suit_avg[x] += cards % 13
                     counter += 1
             if counter != 0:
-                suit_avg[x] = suit_avg[x]/counter
+                suit_avg[x] = suit_avg[x] / counter
             counter = 0
 
         bad_suit_index = 0
@@ -256,7 +252,6 @@ class MinimizingAgent(Agent):
 
         return bad_suit_index
 
-
     # def get_highest_card_from_played_cards(self,
     #                                        partial_state: HeartsState):
     #     currently_played_cards = np.where(partial_state.values > 20)
@@ -264,4 +259,3 @@ class MinimizingAgent(Agent):
     #     begin = 13 * lead_suit  # beginning of range of valid cards
     #     end = 13 * (lead_suit + 1)  # end of range of valid cards
     #     for x in currently_played_cards:
-
