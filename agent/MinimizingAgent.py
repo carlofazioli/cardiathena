@@ -51,7 +51,6 @@ class MinimizingAgent(Agent):
             three_cards = self.passing_smart_sequence(partial_state)
             # for remove in three_cards:
             #     self.cards_in_hand.remove(remove)
-            print("Cards picked out for trading "+str(three_cards))
             return HeartsAction(three_cards)
 
         for i in range(len(partial_state.values)):
@@ -81,7 +80,7 @@ class MinimizingAgent(Agent):
             else:
                 # Void in the leading suit
                 # just randomly play for now
-                choice = random.choice(self.cards_in_hand)
+                choice = self.sloughing(partial_state)
         return choice
 
     def is_lead(self,
@@ -195,8 +194,6 @@ class MinimizingAgent(Agent):
         num_cards = -1
         cards_to_pass = []
         for suit in sorted_hands:
-            print(self.average_suit_weight(suit))
-            print(suit)
             index += 1
             if len(suit) > num_cards:
                 num_cards = len(suit)
@@ -206,7 +203,6 @@ class MinimizingAgent(Agent):
 
         for i in range(len(trouble)):
             cards_to_pass.append(trouble[i*-1])
-            print(index)
 
         lost_card = sorted_hands
         lost_card[store_pos]= trouble
@@ -223,6 +219,42 @@ class MinimizingAgent(Agent):
         if sum == 0:
             return 0
         return sum / len(Suit_list)
+
+    def sloughing(self,
+                  partial_state: HeartsState):
+        suit_to_slough = self.bad_suit()
+        begin = 13 * suit_to_slough
+        end = 13 * (suit_to_slough + 1)
+        max_card = -1
+        for cards in self.cards_in_hand:
+            if begin <= cards < end and cards > max_card:
+                max_card = cards
+        if max_card == -1:
+            max_card = self.cards_in_hand[0]
+        return max_card
+
+    def bad_suit(self):
+        suit_avg = [0,0,0,0]
+        counter = 0
+        # count up the number of problem cards per suit
+        # whichever suit has more problem cards is the one we're going to slough from
+        for x in range(4):
+            begin = 13 * x
+            end = 13 * (x + 1)
+            for cards in range(begin, end):
+                if cards in self.cards_in_hand:
+                    suit_avg[x] += cards % 13
+                    counter += 1
+            if counter != 0:
+                suit_avg[x] = suit_avg[x]/counter
+            counter = 0
+
+        bad_suit_index = 0
+        for suit_index in range(len(suit_avg)):
+            if suit_avg[suit_index] > suit_avg[bad_suit_index]:
+                bad_suit_index = suit_index
+
+        return bad_suit_index
 
 
     # def get_highest_card_from_played_cards(self,
