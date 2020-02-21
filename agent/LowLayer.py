@@ -184,6 +184,28 @@ class LowLayer(Agent):
 
         return cards_to_pass[0:3]
 
+    def pick_trouble_card_suit(self, sorted_hands):
+        """Choose the suit with the least amount of cards
+                   and pass those starting with the highest card unimplemented so far """
+
+        index = -1  # Array index
+        store_pos = 0
+        num_cards = -1
+        for suit in sorted_hands:
+            index += 1
+            if len(suit) > num_cards:
+                num_cards = len(suit)
+                store_pos = index
+        return store_pos
+
+    def has_qs_been_played(self, partial_state: HeartsState):
+
+        pos = 0
+        for i in partial_state:
+            if (pos == 36) & (i < 20):
+                return True
+        return False
+
     def pick_trouble_card(self, sorted_hands):
 
         """Choose the suit with the least amount of cards
@@ -251,6 +273,35 @@ class LowLayer(Agent):
                 bad_suit_index = suit_index
 
         return bad_suit_index
+
+    """not holding the QS and not in spades trouble 
+       (not holding KS or AS or has enough low spades to cover for the KS or AS).
+       Lead with any spades to draw out the QS."""
+
+    def spade_lead_check(self, partial_state: HeartsState):
+        # Spade in the trouble suit
+        suits = self.sort_suits(partial_state)
+        if self.pick_trouble_card_suit(suits) == 2:
+            return False
+
+        # Spade is the trouble suit and we have to check for QS , KS , or AS
+        for i in suits[2]:
+            if i == 36 | i == 35 | i == 26:
+                return False
+
+        return True
+
+    """Has no spades or the QS has been played, lead with the lowest card of any suit.
+     Or lead with the suit that has been played the least."""
+
+    def lead_low_check(self, partial_state: HeartsState):
+        suits = self.sort_suits(partial_state)
+
+        # There are spades in the hand
+        if (self.has_qs_been_played(partial_state)) | (len(suits[2]) == 0):
+            return True
+
+        return False
 
     # def get_highest_card_from_played_cards(self,
     #                                        partial_state: HeartsState):
