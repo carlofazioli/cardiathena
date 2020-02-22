@@ -50,7 +50,9 @@ class LowLayer(Agent):
             # c3 = random.choice(self.cards_in_hand)
             # self.cards_in_hand.remove(c3)
             # three_cards = [c1, c2, c3]
-            three_cards = self.passing_smart_sequence(partial_state)
+            #three_cards = self.passing_smart_sequence(partial_state)
+            three_cards = self.passing_smart_facevalues(partial_state)
+            print("THREE CARDS ARE "+str(three_cards))
             # for remove in three_cards:
             #     self.cards_in_hand.remove(remove)
             return HeartsAction(three_cards)
@@ -153,6 +155,8 @@ class LowLayer(Agent):
 
     def sort_suits(self,
                    partial_state: HeartsState):
+        """ Sort out the Cards by Suit and return a List of the suits"""
+        # Clubs - Diamond - Spades - Hearts
         cards = []
         clubs = []
         Diamond = []
@@ -162,8 +166,7 @@ class LowLayer(Agent):
             if 0 < partial_state.values[i] < 5:
                 cards.append(i)
 
-            """ Sort out the Cards by Suit """
-            # Clubs - Diamond - Spades - Hearts
+
         for i in range(4):
             start = i * 13
             end = start + 13
@@ -193,7 +196,11 @@ class LowLayer(Agent):
         suits = [clubs, Diamond, spades, hearts]
         return suits
 
-    def passing_smart_sequence(self, partial_state: HeartsState):
+    def passing_smart_sequence(self,
+                               partial_state: HeartsState):
+        """ Method one passing : Pass highest cards in trouble suits: suits where the lowest
+        card is higher than any other lowest card in other suits.If the player becomes void,
+        then pass off the next high cards from the next trouble suit."""
         cards_to_pass = []  # List of the cards that the agent will pass
         passing_amount = 3  # Amount of Cards that will be pass
 
@@ -209,6 +216,43 @@ class LowLayer(Agent):
                 break;
 
         return cards_to_pass[0:3]
+
+    def passing_smart_facevalues(self,
+                                 partial_state:HeartsState):
+        """ Method 2: Average the face cards in each suit, and pass the highest
+         cards from the suit with the highest average. (J = 11, Q = 12, K = 13, A = 14).
+          Repeat if void. """
+        suits = self.sort_suits(partial_state)
+        suit_weights = []
+        chosen_cards = []
+
+        for s in suits:
+            suit_weights.append(self.average_suit_weight(s))
+
+        for i in range(3):      # Need to choose 3 cards
+            Max = -1
+            index = 0
+            max_index = 0
+
+            for facevalues in suit_weights:     # Find the suit with max weight
+                if Max < facevalues:
+                    Max = facevalues
+                    max_index= index
+                index += 1
+            for cards in reversed(suits[max_index]):    # Pass the Highest Cards first
+                chosen_cards.append(cards)
+            suit_weights[max_index] = 0                 # Suit is voided
+            if len(chosen_cards) > 3:                  # Found 3 or more break
+                break
+        return chosen_cards[0:3]                        # return only 3
+
+
+
+
+
+
+
+
 
     def pick_trouble_card_suit(self, sorted_hands):
         """Choose the suit with the least amount of cards
