@@ -50,9 +50,9 @@ class LowLayer(Agent):
             # c3 = random.choice(self.cards_in_hand)
             # self.cards_in_hand.remove(c3)
             # three_cards = [c1, c2, c3]
-            #three_cards = self.passing_smart_sequence(partial_state)
+            # three_cards = self.passing_smart_sequence(partial_state)
             three_cards = self.passing_smart_facevalues(partial_state)
-            print("THREE CARDS ARE "+str(three_cards))
+            print("THREE CARDS ARE " + str(three_cards))
             # for remove in three_cards:
             #     self.cards_in_hand.remove(remove)
             return HeartsAction(three_cards)
@@ -76,28 +76,23 @@ class LowLayer(Agent):
         if self.spade_lead_check(partial_state):
             suits = self.sort_suits(partial_state)
 
-
-
         if self.is_lead(partial_state):
 
-            if self.spade_lead_check(partial_state):   # Draw out the Queen
+            if self.spade_lead_check(partial_state):  # Draw out the Queen
                 suits = self.sort_suits(partial_state)
                 choice = random.choice(suits[2])
 
             elif self.lead_low_check(partial_state):  # Play safe and play low cards
                 counter = 0
-                index =[]
+                index = []
                 suits = self.sort_suits(partial_state)
                 for i in suits:
-                    if(len(i)>0):
+                    if (len(i) > 0):
                         index.append(counter)
                     counter += 1
 
                 pre_select = random.choice(index)
-               # print("SUTIS  " + str(suits))
-               # print("PRE-SELECTED " + str(pre_select))
                 selected_suit = suits[pre_select]
-                #print("selected_suit " + str(selected_suit))
                 choice = selected_suit[0]
             else:
                 choice = random.choice(self.cards_in_hand)
@@ -166,32 +161,22 @@ class LowLayer(Agent):
             if 0 < partial_state.values[i] < 5:
                 cards.append(i)
 
-
         for i in range(4):
             start = i * 13
             end = start + 13
             for card in cards:
-                # print("I : "+str(i)+"  Card "+str(card))
                 if i == 0:
-                    # print("Club Enter")
                     if start <= card < end:
                         clubs.append(card)
-                        #   print("Club Added")
                 elif i == 1:
-                    # print("Diamond Enter")
                     if start <= card < end:
                         Diamond.append(card)
-                    #  print("Diamond Added")
                 elif i == 2:
-                    # print("Spade Enter")
                     if start <= card < end:
                         spades.append(card)
-                        #    print("Spade Added")
                 elif i == 3:
-                    #  print("Hearts Enter")
                     if start <= card < end:
                         hearts.append(card)
-                        #   print("Hearts Added")
 
         suits = [clubs, Diamond, spades, hearts]
         return suits
@@ -212,13 +197,14 @@ class LowLayer(Agent):
             choose_one, suits = self.pick_trouble_card(suits);
             for c in choose_one:
                 cards_to_pass.append(c)
-            if (len(cards_to_pass) > 3):
+
+            if len(cards_to_pass) > 3:
                 break;
 
         return cards_to_pass[0:3]
 
     def passing_smart_facevalues(self,
-                                 partial_state:HeartsState):
+                                 partial_state: HeartsState):
         """ Method 2: Average the face cards in each suit, and pass the highest
          cards from the suit with the highest average. (J = 11, Q = 12, K = 13, A = 14).
           Repeat if void. """
@@ -229,30 +215,22 @@ class LowLayer(Agent):
         for s in suits:
             suit_weights.append(self.average_suit_weight(s))
 
-        for i in range(3):      # Need to choose 3 cards
+        for i in range(3):  # Need to choose 3 cards
             Max = -1
             index = 0
             max_index = 0
 
-            for facevalues in suit_weights:     # Find the suit with max weight
+            for facevalues in suit_weights:  # Find the suit with max weight
                 if Max < facevalues:
                     Max = facevalues
-                    max_index= index
+                    max_index = index
                 index += 1
-            for cards in reversed(suits[max_index]):    # Pass the Highest Cards first
+            for cards in reversed(suits[max_index]):  # Pass the Highest Cards first
                 chosen_cards.append(cards)
-            suit_weights[max_index] = 0                 # Suit is voided
-            if len(chosen_cards) > 3:                  # Found 3 or more break
+            suit_weights[max_index] = 0  # Suit is voided
+            if len(chosen_cards) > 3:  # Found 3 or more break
                 break
-        return chosen_cards[0:3]                        # return only 3
-
-
-
-
-
-
-
-
+        return chosen_cards[0:3]  # return only 3
 
     def pick_trouble_card_suit(self, sorted_hands):
         """Choose the suit with the least amount of cards
@@ -345,8 +323,6 @@ class LowLayer(Agent):
 
         return bad_suit_index
 
-
-
     def spade_lead_check(self, partial_state: HeartsState):
         """not holding the QS and not in spades trouble
               (not holding KS or AS or has enough low spades to cover for the KS or AS).
@@ -361,12 +337,10 @@ class LowLayer(Agent):
             if i == 36 | i == 35 | i == 26:
                 return False
 
-        if len(suits[2]) == 0 :
+        if len(suits[2]) == 0:
             return False
 
         return True
-
-
 
     def lead_low_check(self, partial_state: HeartsState):
         """Has no spades or the QS has been played, lead with the lowest card of any suit.
