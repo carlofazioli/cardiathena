@@ -71,8 +71,34 @@ class LowLayer(Agent):
     def select_card(self,
                     partial_state: HeartsState):
         # our player is leading, choosing a random card for now
+        if self.spade_lead_check(partial_state):
+            suits = self.sort_suits(partial_state)
+
+
+
         if self.is_lead(partial_state):
-            choice = random.choice(self.cards_in_hand)
+
+            if self.spade_lead_check(partial_state):   # Draw out the Queen
+                suits = self.sort_suits(partial_state)
+                choice = random.choice(suits[2])
+
+            elif self.lead_low_check(partial_state):  # Play safe and play low cards
+                counter = 0
+                index =[]
+                suits = self.sort_suits(partial_state)
+                for i in suits:
+                    if(len(i)>0):
+                        index.append(counter)
+                    counter += 1
+
+                pre_select = random.choice(index)
+               # print("SUTIS  " + str(suits))
+               # print("PRE-SELECTED " + str(pre_select))
+                selected_suit = suits[pre_select]
+                #print("selected_suit " + str(selected_suit))
+                choice = selected_suit[0]
+            else:
+                choice = random.choice(self.cards_in_hand)
         else:
             # we're following, not leading
             if self.not_void(partial_state):
@@ -186,7 +212,7 @@ class LowLayer(Agent):
 
     def pick_trouble_card_suit(self, sorted_hands):
         """Choose the suit with the least amount of cards
-                   and pass those starting with the highest card unimplemented so far """
+                    """
 
         index = -1  # Array index
         store_pos = 0
@@ -199,10 +225,10 @@ class LowLayer(Agent):
         return store_pos
 
     def has_qs_been_played(self, partial_state: HeartsState):
-
+        """ Return True if the queen has been play and false otherwise """
         pos = 0
-        for i in partial_state:
-            if (pos == 36) & (i < 20):
+        for i in range(len(partial_state.values)):
+            if (partial_state.values[i] == 36) & (partial_state.values[i] < 20):
                 return True
         return False
 
@@ -231,6 +257,7 @@ class LowLayer(Agent):
         return cards_to_pass, lost_card
 
     def average_suit_weight(self, Suit_list):
+        """ Uses the face card values in order to calculate the average """
         sum = 0
         for cards in Suit_list:
             sum += (cards % 13) + 1
@@ -274,11 +301,12 @@ class LowLayer(Agent):
 
         return bad_suit_index
 
-    """not holding the QS and not in spades trouble 
-       (not holding KS or AS or has enough low spades to cover for the KS or AS).
-       Lead with any spades to draw out the QS."""
+
 
     def spade_lead_check(self, partial_state: HeartsState):
+        """not holding the QS and not in spades trouble
+              (not holding KS or AS or has enough low spades to cover for the KS or AS).
+              Lead with any spades to draw out the QS."""
         # Spade in the trouble suit
         suits = self.sort_suits(partial_state)
         if self.pick_trouble_card_suit(suits) == 2:
@@ -289,12 +317,16 @@ class LowLayer(Agent):
             if i == 36 | i == 35 | i == 26:
                 return False
 
+        if len(suits[2]) == 0 :
+            return False
+
         return True
 
-    """Has no spades or the QS has been played, lead with the lowest card of any suit.
-     Or lead with the suit that has been played the least."""
+
 
     def lead_low_check(self, partial_state: HeartsState):
+        """Has no spades or the QS has been played, lead with the lowest card of any suit.
+            Or lead with the suit that has been played the least."""
         suits = self.sort_suits(partial_state)
 
         # There are spades in the hand
