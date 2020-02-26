@@ -52,7 +52,7 @@ class LowLayer(Agent):
             # three_cards = [c1, c2, c3]
             # three_cards = self.passing_smart_sequence(partial_state)
             three_cards = self.passing_smart_facevalues(partial_state)
-            print("THREE CARDS ARE " + str(three_cards))
+            # print("THREE CARDS ARE " + str(three_cards))
             # for remove in three_cards:
             #     self.cards_in_hand.remove(remove)
             return HeartsAction(three_cards)
