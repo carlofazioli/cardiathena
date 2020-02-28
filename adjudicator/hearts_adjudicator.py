@@ -161,6 +161,7 @@ class HeartsAdjudicator(Adjudicator):
         state_copy = deepcopy(state)
         # Check if game is finished
         if self.is_finished(state_copy):
+            print("original is finished check")
             return self.state_copy
         else:
             # Loop through the list of actions
@@ -273,8 +274,13 @@ class HeartsAdjudicator(Adjudicator):
         print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1,
               " Points: ", self.points(state))
         
-        # New round, shuffle cards, and Pass cards
+        # Update the score
         self.update_score(state)
+        if self.is_finished(state):
+            # Do not shuffle if game is over
+            return
+        
+        # New round, shuffle cards, and Pass cards
         state.shuffle()
         
         # Make the value positive to show that we will be passing (unless zero because 0 * -1 is 0)
