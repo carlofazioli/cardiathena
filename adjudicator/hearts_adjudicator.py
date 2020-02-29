@@ -99,8 +99,8 @@ class HeartsAdjudicator(Adjudicator):
         # A function that returns whether the players are currently passing
 
         if state.pass_type > 0:
-            return True  # The players should pass
-        return False  # negative or 0 which represents not passing
+            return True # The players should pass
+        return False # negative or 0 which represents not passing
 
     def points(self,
                state: HeartsState):
@@ -110,12 +110,12 @@ class HeartsAdjudicator(Adjudicator):
         points = [0, 0, 0, 0]
         for i in range(4):
             # Loop through the four players to find the cards they own
-            owned = state.values == 11 + i  # Returns True for all the cards owned by the player
+            owned = state.values == 11 + i # Returns True for all the cards owned by the player
             if owned[36] == True:
-                points[i] += 13  # 13 points for the queen of spades
+                points[i] += 13 # 13 points for the queen of spades
             for j in range(39, 52, 1):
                 if owned[j] == True:
-                    points[i] += 1  # Add one point for each heart which are found in the range 39-52
+                    points[i] += 1 # Add one point for each heart which are found in the range 39-52
         return points
 
     def update_score(self,
@@ -127,7 +127,7 @@ class HeartsAdjudicator(Adjudicator):
             # If anyone has 26, they got all the points and successfully shot for the moon
             winner = points.index(26)  # Only find the index of 26 if it exists
             for i in range(4):
-                if i != winner:  # The winner does not get 26 added to their score
+                if i != winner: # The winner does not get 26 added to their score
                     state.score[i] += 26
         else:
             # No players successfuly shot for the moon so points are added normally
@@ -178,12 +178,10 @@ class HeartsAdjudicator(Adjudicator):
                     # Update state with encoding for played in current trick
                     if self.trick_leader(state_copy) is None:
                         # check if leading and make 31-34 for leader
-                        state_copy.values[actions[act_num].card_index] = (
-                                    30 + state_copy.values[actions[act_num].card_index])
+                        state_copy.values[actions[act_num].card_index] = (30 + state_copy.values[actions[act_num].card_index])
                     else:
                         # regular plays that are not leading are 21-24
-                        state_copy.values[actions[act_num].card_index] = (
-                                    20 + state_copy.values[actions[act_num].card_index])
+                        state_copy.values[actions[act_num].card_index] = (20 + state_copy.values[actions[act_num].card_index])
                     #
                     # Check if new round, update score and deal new cards if so
                     if self.is_round_over(state_copy):

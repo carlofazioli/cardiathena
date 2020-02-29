@@ -54,4 +54,5 @@ class RandomHeartsAgent(Agent):
         #elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
         else:
             choice = random.choice(cards_in_hand)
+<<<<<<< HEAD
             return HeartsAction(choice)

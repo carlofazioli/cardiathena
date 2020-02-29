@@ -11,6 +11,7 @@ class State:
     State data structure contains a complete snapshot of the game at any time.
     """
 
+
 class Action:
     """
     Action data structure contains a specification of the behavior of an agent.
@@ -121,14 +122,8 @@ class GameManager:
         NOTE: this method likely does not need to be overridden in derived classes.
         :return: None
         """
-        agents = list()
-        for i in range(len(self.agent_list)):
-            agents.append(str(self.agent_list[i]))
-
-        if db.insert_players(INSERT_PLAYERS, self.game_uuid, json.dumps(agents)) is False:
-            db.initialize_table()
-            db.insert_players(INSERT_PLAYERS, self.game_uuid, json.dumps(agents))
-
+        # Start the game.
+        # state = self.adjudicator.start_game()
         while not self.adjudicator.is_finished(self.state):
             # Make an empty list to handle however many actions we receive
             player_action = []
@@ -186,3 +181,22 @@ class GameManager:
                             json.dumps(state_values[i]),
                             json.dumps(action_values[i]),
                             json.dumps(score_values[i]))
+
+
+        """
+        # No longer need to save to an excel sheet
+        # wb = Workbook()
+        # sheet1 = wb.add_sheet("Sheet 1")
+
+        # strings = self.state_history[0].store_strings()
+        # for j in range(len(strings)): #write the classifications at the top
+            # sheet1.write(0, j, strings[j])
+
+        # for i in range(len(self.state_history)):
+            # values = self.state_history[i].store_values()
+            # for j in range(len(values)):
+                # sheet1.write(i+1, j, str(values[j]))
+            # sheet1.write(i+1, len(values), str(self.state_action_history[i][1]))
+
+        # wb.save("HeartsGame.xls")
+        # pass
