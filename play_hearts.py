@@ -21,4 +21,4 @@ game.play_game()
 game.save_game()
 
 # Put a debug point here to inspect the game object.
-input()
+#input()
