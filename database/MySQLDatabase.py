@@ -98,28 +98,18 @@ def show_results(cursor):
         print(row)
 
 
-def insert_state(query, game_uuid, state, action, score):
-    """
-    Establishes a connection to the database, and executes an insert query. Inserts state data into MySQL database
-
-    :param query: predefined insert query in MySQLVariables.py
-    :param game_uuid: is the game uuid passed in as a hex and saved as binary
-    :param state: state is the state for a trick
-    :param action: action is the action for a trick
-    :param score: is the current score for a trick
-    """
+def insert(file):
     db = MySQLDatabase()
     my_cursor = db.get_cursor()
     try:
-        values = (None, game_uuid, state, action, score)
-        my_cursor.execute(query, values)
-        return True
+        query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
+                "ENCLOSED BY '\"' " \
+                "LINES TERMINATED BY '\n'" \
+                "IGNORE 1 LINES" \
+                "(game_uuid, state, action, score)".format(file, STATE_TABLE)
+        my_cursor.execute(query)
     except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_NO_SUCH_TABLE:
-            return False
-        else:
-            print(err)
-        print("Something might be wrong: {}".format(err))
+        print(err)
     finally:
         db.cnx.commit()
         my_cursor.close()
@@ -242,3 +232,4 @@ def test_get_data_example():
 #query_database(SHOW_TABLES)
 #query_database(SELECT_ALL_FROM_PLAYER_TABLE)
 #query_database(SELECT_ALL_FROM_STATE_TABLE)
+#test_get_data_example()
