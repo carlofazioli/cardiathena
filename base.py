@@ -1,10 +1,5 @@
-import json
-import uuid
-from database import MySQLDatabase as db
-from database.MySQLVariables import INSERT_STATE, INSERT_PLAYERS
 from typing import List
 from copy import deepcopy
-
 
 class State:
     """
