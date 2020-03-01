@@ -163,10 +163,7 @@ def get_data_by_key(id_key):
     my_cursor = db.get_cursor()
 
     try:
-        query= "SELECT {} FROM {} WHERE {}={}".format("*",
-                                                      STATE_TABLE,
-                                                      ID_COLUMN,
-                                                      id_key)
+        query= "SELECT {} FROM {} WHERE {}={}".format("*", STATE_TABLE, ID_COLUMN, id_key)
         my_cursor.execute(query)
         data = my_cursor.fetchall()
         return data
