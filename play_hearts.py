@@ -1,17 +1,15 @@
 import json
 import uuid
-
-from agent.LowLayer import LowLayer
+import csv
 from base import GameManager
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from agent.RandomHeartsAgent import RandomHeartsAgent
+from agent.LowLayer import LowLayer
 from database import MySQLDatabase as db
-from database.MySQLVariables import INSERT_STATE, INSERT_PLAYERS
+from database.MySQLVariables import INSERT_PLAYERS, CSV_DIR
 
 # Create the players, the adjudicator, and the game object.
-from database.MySQLVariables import INSERT_STATE
-
 game_uuid = uuid.uuid4().hex
 agent_1 = RandomHeartsAgent()
 agent_2 = RandomHeartsAgent()
@@ -49,18 +47,25 @@ def process_state_data():
     The process_state_data() method processes the state data to be stored in the MySQL database. The state data includes
     location of the cards: deck (numPy array converted to a python list), player actions: action, scores, and a game
     uuid. The method calls save_game() from the game manager which returns a list of dictionaries which contains
-    deck, action, and score. Deck, action, and score are converted into json and inserted into the database.
+    deck, action, and score. In order to reduce overhead with multiple insertions, game state data is writen to a
+    csv file which is then inserted into the database.
 
     """
     # Get state_data, list of dictionaries, from game manager's save_game()
     state_data = game.save_game()
 
     # Process state_data, insert into database
-    for data in state_data:
-        deck = data["deck"].tolist()
-        action = data["actions"]
-        score = data["scores"]
-        db.insert_state(INSERT_STATE, game_uuid, json.dumps(deck), json.dumps(action), json.dumps(score))
+    directory = CSV_DIR + "{}.csv".format(game_uuid)
+    with open(directory, 'w') as file:
+        writer = csv.writer(file, lineterminator='\n',)
+        writer.writerow(["game_uuid", "deck", "action", "score"])
+        for data in state_data:
+            deck = data["deck"].tolist()
+            action = data["actions"]
+            score = data["scores"]
+            writer.writerow([game_uuid, deck, action, score])
+    db.insert(directory)
+    print(game_uuid)
 
 # Insert the agent types that played this game into the database
 save_agents()
