@@ -1,6 +1,7 @@
 import json
 import uuid
 import csv
+from datetime import datetime
 from base import GameManager
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
@@ -64,17 +65,19 @@ def process_state_data():
             action = data["actions"]
             score = data["scores"]
             writer.writerow([game_uuid, deck, action, score])
-    db.insert(directory)
-    print(game_uuid)
+    db.insert_state(directory)
+
 
 # Insert the agent types that played this game into the database
-save_agents()
+#save_agents()
+
+db.initialize_table()
 
 # Play a game.
 game.play_game()
 
 # The game is over, save the states of the game into the database.
-process_state_data()
+#process_state_data()
 
 # Put a debug point here to inspect the game object.
 #input()
