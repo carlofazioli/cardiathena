@@ -1,13 +1,12 @@
 import mysql.connector
 import json
 from mysql.connector import errorcode
-from database.MySQLVariables import CREATE_DB
-from database.MySQLVariables import CREATE_PLAYERS_TABLE
+from database.MySQLVariables import CREATE_DB, CREATE_GAME_TABLE, CREATE_AGENT_TABLE, INSERT_PLAYERS, HEARTS_AGENTS, \
+    INSERT_AGENT
 from database.MySQLVariables import STATE_TABLE
 from database.MySQLVariables import ID_COLUMN
 from database.MySQLVariables import SELECT_ALL_FROM_PLAYER_TABLE
 from database.MySQLVariables import SELECT_ALL_FROM_STATE_TABLE
-from database.MySQLVariables import CREATE_STATE_TABLE
 from database.MySQLVariables import DROP_TABLE
 from database.MySQLVariables import DROP_DB
 from database.MySQLVariables import SELECT_GAME_ID
@@ -15,6 +14,7 @@ from database.MySQLVariables import SHOW_TABLES
 from database.MySQLVariables import SHOW_DATABASE
 from database.MySQLVariables import CONFIG_INITIALIZE
 from database.MySQLVariables import CONFIG2
+
 
 
 class MySQLDatabase:
@@ -68,8 +68,40 @@ def initialize_db():
 
 
 def initialize_table():
-    query_database(CREATE_PLAYERS_TABLE)
-    query_database(CREATE_STATE_TABLE)
+    query_database(CREATE_AGENT_TABLE)
+
+    for agent, attributes in HEARTS_AGENTS.items():
+        name = attributes["name"]
+        version = attributes["version"]
+        insert_players(INSERT_AGENT, name, version)
+    #query_database(CREATE_GAME_TABLE)
+    #query_database(CREATE_STATE_TABLE)
+
+
+def insert_players(query, name, version):
+    """
+    Establishes a connection to the database, and executes an insert query. Inserts state data into MySQL database
+
+    :param query: predefined insert query in MySQLVariables.py
+    :param game_uuid: is the game uuid passed in as a hex and saved as binary
+    :param players: is the players that participated in a game
+    """
+    db = MySQLDatabase()
+    my_cursor = db.get_cursor()
+    try:
+        values = (None, name, version)
+        my_cursor.execute(query, values)
+        return True
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_NO_SUCH_TABLE:
+            return False
+        else:
+            print(err)
+        print("Something might be wrong: {}".format(err))
+    finally:
+        db.cnx.commit()
+        my_cursor.close()
+        db.cnx.close()
 
 
 def query_database(query):
@@ -98,7 +130,7 @@ def show_results(cursor):
         print(row)
 
 
-def insert(file):
+def insert_state(file):
     db = MySQLDatabase()
     my_cursor = db.get_cursor()
     try:
@@ -106,36 +138,10 @@ def insert(file):
                 "ENCLOSED BY '\"' " \
                 "LINES TERMINATED BY '\n'" \
                 "IGNORE 1 LINES" \
-                "(game_uuid, state, action, score)".format(file, STATE_TABLE)
+                "(state, action, score)".format(file, STATE_TABLE)
         my_cursor.execute(query)
     except mysql.connector.Error as err:
         print(err)
-    finally:
-        db.cnx.commit()
-        my_cursor.close()
-        db.cnx.close()
-
-
-def insert_players(query, game_uuid, players):
-    """
-    Establishes a connection to the database, and executes an insert query. Inserts state data into MySQL database
-
-    :param query: predefined insert query in MySQLVariables.py
-    :param game_uuid: is the game uuid passed in as a hex and saved as binary
-    :param players: is the players that participated in a game
-    """
-    db = MySQLDatabase()
-    my_cursor = db.get_cursor()
-    try:
-        values = (game_uuid, players)
-        my_cursor.execute(query, values)
-        return True
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_NO_SUCH_TABLE:
-            return False
-        else:
-            print(err)
-        print("Something might be wrong: {}".format(err))
     finally:
         db.cnx.commit()
         my_cursor.close()
