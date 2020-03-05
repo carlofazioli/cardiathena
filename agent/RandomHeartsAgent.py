@@ -1,5 +1,4 @@
 import random
-
 from adjudicator.state import HeartsState
 from base import Action, Agent
 
@@ -16,13 +15,20 @@ class HeartsAction(Action):
         return str(self.card_index)
 
 
-
 class RandomHeartsAgent(Agent):
     """
     An random agent who selects from available legal moves.
     """
+    def __init__(self):
+        self.id = 1
+        self.agent_name = "The Random Agent"
+        self.version = 1.0
+
+    def __repr__(self):
+        return {"id": self.id, "name": self.agent_name, "version": self.version}
+
     def __str__(self):
-        return "The Random Agent"
+        return self.agent_name
 
     def get_action(self,
                    partial_state: HeartsState):
