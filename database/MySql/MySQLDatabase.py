@@ -1,9 +1,8 @@
 import mysql.connector
 import json
 from mysql.connector import errorcode
-from database.MySQLVariables import STATE_TABLE, GAME_ID_COLUMN
-from database.MySQLVariables import SELECT_GAME_ID
-from database.MySQLVariables import CONFIG
+from database.MySql.MySQLVariables import STATE_TABLE, GAME_ID_COLUMN
+from database.MySql.MySQLVariables import CONFIG
 
 
 class MySQLDatabase:
