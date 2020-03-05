@@ -1,7 +1,4 @@
 import random
-
-import numpy as np
-
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from base import Action, Agent
@@ -28,9 +25,15 @@ class LowLayer(Agent):
     def __init__(self):
         self.own_adj = HeartsAdjudicator()
         self.cards_in_hand = []
+        self.id = 2
+        self.agent_name = "The Low Layer"
+        self.version = 1.0
+
+    def __repr__(self):
+        return {"id": self.id, "name": self.agent_name, "version": self.version}
 
     def __str__(self):
-        return "The Low Layer"
+        return self.agent_name
 
     def get_action(self,
                    partial_state: HeartsState):
