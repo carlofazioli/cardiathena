@@ -1,46 +1,49 @@
-import json
-import uuid
 import csv
+import uuid
 from datetime import datetime
-from base import GameManager
+
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
-from agent.RandomHeartsAgent import RandomHeartsAgent
 from agent.LowLayer import LowLayer
+from agent.RandomHeartsAgent import RandomHeartsAgent
+from base import GameManager
 from database import MySQLDatabase as db
-from database.MySQLVariables import INSERT_PLAYERS, CSV_DIR
+from database.MySQLVariables import CSV_DIR, INSERT_GAME
 
 # Create the players, the adjudicator, and the game object.
 game_uuid = uuid.uuid4().hex
+adj = HeartsAdjudicator()
+state = HeartsState()
 agent_1 = RandomHeartsAgent()
 agent_2 = RandomHeartsAgent()
 agent_3 = LowLayer()
 agent_4 = RandomHeartsAgent()
-adj = HeartsAdjudicator()
-state = HeartsState()
 agent_list = [0, agent_1, agent_2, agent_3, agent_4]
-json_agent_list = list()
+
 game = GameManager(agent_list,
                    adjudicator=adj,
                    state=state)
 
 
-def save_agents():
+def save_game():
     """
-    The save_agents() method saves the agent types ie Random Hearts Agent to the players table. It attempts to insert
-    into the database. However if insert_players method returns false, the table has not been initialized. It will then
-    initialize the tables and insert the agent types.
+    The save_game() method saves information about the game before it starts. Information that is saved includes the game
+    uuid to uniquely identify each game, the date and time a game starts, agent_types that will participate in the game.
 
     """
-    # Remove 0 from agent_list
+    time_stamp = datetime.now()
+    id_list = list()
+
+    # Gets the id of each agent type ie The Random Agent's id is 1 and appends to a list
     for agent in agent_list:
         if agent is not 0:
-            json_agent_list.append(str(agent))
+            id = agent.__dict__.get("id")
+            id_list.append(id)
 
-    # Insert agents to the players table. Initialize tables if not already initialized.
-    if db.insert_players(INSERT_PLAYERS, game_uuid, json.dumps(json_agent_list)) is False:
-        db.initialize_table()
-        db.insert_players(INSERT_PLAYERS, game_uuid, json.dumps(json_agent_list))
+    # values is the data that will be saved
+    values = (None, time_stamp, id_list[0], id_list[1], id_list[2], id_list[3], game_uuid)
+    # Insert the game data into the database
+    db.query_database(INSERT_GAME, values)
 
 
 def process_state_data():
@@ -59,25 +62,23 @@ def process_state_data():
     directory = CSV_DIR + "{}.csv".format(game_uuid)
     with open(directory, 'w') as file:
         writer = csv.writer(file, lineterminator='\n',)
-        writer.writerow(["game_uuid", "deck", "action", "score"])
+        writer.writerow(["deck", "action", "score", "game_uuid"])
         for data in state_data:
             deck = data["deck"].tolist()
             action = data["actions"]
             score = data["scores"]
-            writer.writerow([game_uuid, deck, action, score])
+            writer.writerow([deck, action, score, game_uuid])
     db.insert_state(directory)
 
 
-# Insert the agent types that played this game into the database
-#save_agents()
-
-db.initialize_table()
+# Save starting game information
+save_game()
 
 # Play a game.
 game.play_game()
 
 # The game is over, save the states of the game into the database.
-#process_state_data()
+process_state_data()
 
 # Put a debug point here to inspect the game object.
 #input()
