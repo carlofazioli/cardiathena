@@ -1,4 +1,6 @@
 # Hearts State
+Derived from [State](https://github.com/c-to-the-fazzy/cardiathena/wiki/State)
+
 The state is comprised of the following components.
 
 ## Card Deck
