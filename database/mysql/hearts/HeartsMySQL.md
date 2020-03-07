@@ -1,4 +1,5 @@
 ## General Information
+[Database Document](https://github.com/c-to-the-fazzy/cardiathena/wiki/Database-Design-Document)
 
 The gameplay database should hold records of game states and player actions.  Additionally, the records should hold information on game outcomes; e.g. the final scores.  
 
