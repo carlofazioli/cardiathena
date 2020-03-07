@@ -1,3 +1,5 @@
+## General Information
+
 The gameplay database should hold records of game states and player actions.  Additionally, the records should hold information on game outcomes; e.g. the final scores.  
 
 * As detailed in the [card deck](https://github.com/c-to-the-fazzy/cardiathena/wiki/Game-Adjudicator-Class-Design-Document#card-deck) section, the location of each card at any point in time can be encoded by a 52-vector.
