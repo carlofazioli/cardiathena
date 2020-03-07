@@ -1,12 +1,8 @@
 ## Page Links
 [Install singularity on a local linux machine](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#installing-singularity-on-a-local-linux-machine)
-<br></br>
 [MySQL server on ARGO](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#mysql-server-on-argo)
-<br></br> 
 [MySQL server in singularity container](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#mysql-server-within-singularity)
-<br></br> 
 [MySQL connector for python](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#mysql-connector-for-python)
-<br></br>
 [Running the games on Argo](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#running-the-games-on-argo)
 
 
@@ -29,7 +25,11 @@ Parallel processes: Allows multiple programs to communicate with each other thro
 Two options: Home directory(on the head node) can store up to 50GB with no time limit. %SCRATCH directory available with unlimited storage however a 120 day time limit is imposed. Compute nodes, and jobs running on compute nodes, do not have permissions to write to the home directory.
 
 ## Containers
-Singularity containers is installed on Argo. Singularity is able to run and pull images from docker hub.
+Singularity 3.3.0 containers is installed on Argo. Singularity is able to run and pull images from docker hub.
+
+
+## Architecture
+![Architecture](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/Distributed-Computing-Architecture.png)
 
 ## Installing Singularity on a local Windows machine
 Currently not recommended as Singularity is only available up to version 2.4 via Vagrant.
