@@ -7,8 +7,8 @@ from adjudicator.state import HeartsState
 from agent.LowLayer import LowLayer
 from agent.RandomHeartsAgent import RandomHeartsAgent
 from base import GameManager
-from database.MySql import MySQLDatabase as db
-from database.MySql.MySQLVariables import CSV_DIR, INSERT_GAME
+from database.mysql.hearts import HeartsMySQLDatabase as db
+from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, INSERT_GAME
 
 # Create the players, the adjudicator, and the game object.
 game_uuid = uuid.uuid4().hex

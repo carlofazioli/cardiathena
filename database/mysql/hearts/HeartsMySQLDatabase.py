@@ -1,8 +1,8 @@
 import mysql.connector
 import json
 from mysql.connector import errorcode
-from database.MySql.MySQLVariables import STATE_TABLE, GAME_ID_COLUMN
-from database.MySql.MySQLVariables import CONFIG
+from database.mysql.hearts.HeartsMySQLVariables import STATE_TABLE, GAME_ID_COLUMN
+from database.mysql.hearts.HeartsMySQLVariables import CONFIG
 
 
 class MySQLDatabase:
@@ -36,7 +36,7 @@ def get_connection():
 
 def query_database(query, values):
     """
-    Used to execute predefined basic queries, in MySQLVariables.py, without any values. Prints the results to console.
+    Used to execute predefined basic queries, in HeartsMySQLVariables.py, without any values. Prints the results to console.
     IE 'SHOW_DATABASE' will show all the databases on the server.
     """
     db = MySQLDatabase()
