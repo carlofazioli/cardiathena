@@ -12,7 +12,7 @@ The gameplay database should hold records of game states and player actions.  Ad
     * 
 
 ## Database
-DBMS: MySQL
+DBMS: MySQL 5.7.21
 
 ### Database Schema
 
