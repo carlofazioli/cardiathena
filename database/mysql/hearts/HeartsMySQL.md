@@ -1,43 +1,41 @@
 The gameplay database should hold records of game states and player actions.  Additionally, the records should hold information on game outcomes; e.g. the final scores.  
 
 * As detailed in the [card deck](https://github.com/c-to-the-fazzy/cardiathena/wiki/Game-Adjudicator-Class-Design-Document#card-deck) section, the location of each card at any point in time can be encoded by a 52-vector.
-* Scoring information:
-    * A 4-vector of current scores
-    * A 4-vector of end-of-round scores
-    * A 4-vector of end-of-game scores  
-* There may be some game logic information required, but we need to think this through:
+
+* State information:
+    * deck : the location of every card in the deck.see ()
+    * action : the card that was selected by the agent for the trick.
+    * score : the current score.
+* Inferred State information:
     * The led-suit for a trick can be inferred from cards already in the trick
     * Whether hearts have been broken can be inferred from cards already won in previous tricks
-    * Basically, is there any game logic that cannot be inferred from the state of the card deck?
-* There may be some history-tracking data required; for example, a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) shared by all states from a given game
-* We may with to track the players that participated in a given game
-    * This would probably imply the existence of a database of players?  How would we structure this?
+    * 
 
 ## Database
 DBMS: MySQL
 
 ### Database Schema
 
-![EER Diagram](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/cardiathena_eer_diagram.png)
+![EER Diagram](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/DbSchemav3.png)
 
 ### Tables
-* `history_table`: A table that contains game state data. This includes a uuid to link state data to a game. The current state of the game (ie in the game of hearts, the location of all the cards), the action(s) taken by the agent, and scoring information for each state of the game. 
+* `game_table`: A table that uses integer indices for the game id. A time stamp is also recorded to the database at the start of the game. Agent ids for the four agents participating in the game is also recorded as foreign keys. The foreign keys reference the agent table. Also recorded to the database is a uuid to uniquely identify the game.
 
-![](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/state_table.png)
+![game_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/game_table.png)
 
-* `player_table`: A table that contains the agents that participated in the game and the game_uuid to the game.
+* `state_table`: A table that contains game state data. This includes a uuid to link state data to a game. The current state of the game (ie in the game of hearts, the location of all the cards), the action(s) taken by the agent, and scoring information for each state of the game. 
+
+![state_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/state_table.png)
+
+* `player_table`: A table that contains the agents that participated in the game and the game_uuid to the game. Also included is the string representation of the agent type, and the version number.
 
 ![player_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/player_table.png)
 
 ### Functions
 * `get_connection(): cnx` Returns a MySQL connection object.
-* `initialize_db()`: Creates a new database, `state_db`.
-* `initialize_table()`: Creates a new tables, `history_table` and `player_table`.
-* `insert_state(string: query, string: game_uuid, json: state, json: action, json:score)`: Inserts state data into the MySQL database. Game_uuid is converted into a hex string from python's uuid4(), and saved as varbinary data in the database. State(vector), action(vector/int), and score(vector) are converted into python json and saved into the database.
-* `insert_players(string: query, string: game_uuid, json: players):` Game_uuid is converted into a hex string from python's uuid4(), and saved as varbinary data in the database. Players is the list of agent types that participated in the game. Players is converted into python json.
+* `query_database(string: query, list: values)`: General query execution to the database. 
+* `insert_state(string: file)`: File is the path to write to a .csv file. The csv file is then loaded into the database. This can be significantly faster than regular insert statements. see [load data](https://dev.mysql.com/doc/refman/5.7/en/insert-optimization.html). Inserts state data into the MySQL database. Game_uuid is converted into a hex string from python's uuid4(), and saved as varbinary data in the database.  State(vector), action(vector/int), and score(vector) are converted into python json and saved into the database.
 * `get_data_by_key(int: id_key) : state_data` Fetches individual states using the incrementing key.
-* `get_data_by_uuid(string: game_uuid): state_data` Fetches an individual state using a game's uuid.
-* `get_players_by_uuid(string: game_uuid): state_data` Fetches players using a game's uuid.
 * `extract_uuid(list: game_state): uuid` Decodes binary uuid into utf-8 and returns the uuid.
 * `extract_state(list: game_state): state` Decodes json into a list and returns state.
 * `extract_action(list: game_state): action` Decodes json into a list and returns action(s).
