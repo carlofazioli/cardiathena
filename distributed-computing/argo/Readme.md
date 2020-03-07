@@ -1,8 +1,12 @@
 ## Page Links
 [Install singularity on a local linux machine](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#installing-singularity-on-a-local-linux-machine)
+
 [MySQL server on ARGO](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#mysql-server-on-argo)
+
 [MySQL server in singularity container](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#mysql-server-within-singularity)
+
 [MySQL connector for python](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#mysql-connector-for-python)
+
 [Running the games on Argo](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#running-the-games-on-argo)
 
 
