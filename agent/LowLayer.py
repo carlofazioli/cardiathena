@@ -1,4 +1,5 @@
 import random
+import sys
 
 import numpy as np
 
@@ -156,13 +157,18 @@ class LowLayer(Agent):
         """
 
         cards_to_pass = []  # List of the cards that the agent will pass
-        suits = self.sort_suits(partial_state)
+        sorted_cards_in_hand = self.sort_suits(partial_state)
+        #trouble_suit = self.pick_trouble_card(sorted_cards_in_hand)
+        #print(trouble_suit)
+
+
         for card in range(3):
-            choose_one, suits = self.pick_trouble_card(suits);
+            choose_one, suits = self.pick_trouble_card(sorted_cards_in_hand);
             for c in choose_one:
                 cards_to_pass.append(c)
             if len(cards_to_pass) > 3:
                 break;
+
         return cards_to_pass[0:3]
 
     def passing_smart_facevalues(self, partial_state: HeartsState):
@@ -218,6 +224,16 @@ class LowLayer(Agent):
         return False
 
     def pick_trouble_card(self, sorted_hands):
+        """
+        Choose the suit where the lowest card is higher than the lowest card in any other suit, and pass those
+        starting with the highest card. If the trouble suit becomes void, then pick the next highest card from
+        the next trouble suit.
+        """
+        """
+        cards_to_pass = []
+        trouble_suit = [self.mod_13(suit) for suit in sorted_hands]
+        lowest_high_card = -1
+        lowest_high_card_index = -1
 
         for index, suit in enumerate(trouble_suit):
             if suit[0] > lowest_high_card:
@@ -245,6 +261,11 @@ class LowLayer(Agent):
         lost_card[store_pos] = trouble
 
         return cards_to_pass, lost_card
+    def mod_13(self, suits_in_hand):
+        """ """
+
+        return [card % 13 for card in suits_in_hand]
+
 
     def average_suit_weight(self, suit_list):
         """ Uses the face card values in order to calculate the average """
