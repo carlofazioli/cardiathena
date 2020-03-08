@@ -142,7 +142,7 @@ class LowLayer(Agent):
 
         # Clubs - Diamond - Spades - Hearts
         cards_in_hand = [index for index, card in enumerate(partial_state.values) if 0 < card < 5]
-        clubs = [card for card in cards_in_hand if card < 13]
+        clubs = [card for card in cards_in_hand if 0 <= card < 13]
         diamond = [card for card in cards_in_hand if 13 <= card < 26]
         spades = [card for card in cards_in_hand if 26 <= card < 39]
         hearts = [card for card in cards_in_hand if 39 <= card < 52]
@@ -219,8 +219,13 @@ class LowLayer(Agent):
 
     def pick_trouble_card(self, sorted_hands):
 
-        """Choose the suit with the least amount of cards
-            and pass those starting with the highest card unimplemented so far """
+        for index, suit in enumerate(trouble_suit):
+            if suit[0] > lowest_high_card:
+                lowest_high_card = suit[0]
+                highest_card_in_suit_index = len(sorted_hands[index])
+                cards_to_pass.append(sorted_hands[index][highest_card_in_suit_index])
+                sorted_hands[index].remove(highest_card_in_suit_index)
+        """
         trouble = []
         index = -1
         store_pos = 0
