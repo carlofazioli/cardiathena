@@ -57,9 +57,10 @@ class LowLayer(Agent):
             #     self.cards_in_hand.remove(remove)
             return HeartsAction(three_cards)
 
-        for i in range(len(partial_state.values)):
-            if 0 < partial_state.values[i] < 5:
-                self.cards_in_hand.append(i)
+        # Creates a list of the available cards that a player can play.
+        for index, card in enumerate(partial_state.values):
+            if 0 < card < 5:
+                self.cards_in_hand.append(index)
 
         # Agent picks a card to play
         # elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
@@ -157,9 +158,10 @@ class LowLayer(Agent):
         Diamond = []
         spades = []
         hearts = []
-        for i in range(len(partial_state.values)):
-            if 0 < partial_state.values[i] < 5:
-                cards.append(i)
+
+        for index, card in enumerate(partial_state.values):
+            if 0 < card < 5:
+                cards.append(index)
 
         for i in range(4):
             start = i * 13
@@ -248,9 +250,10 @@ class LowLayer(Agent):
 
     def has_qs_been_played(self, partial_state: HeartsState):
         """ Return True if the queen has been play and false otherwise """
-        pos = 0
-        for i in range(len(partial_state.values)):
-            if (partial_state.values[i] == 36) & (partial_state.values[i] < 20):
+        # Queen of spades deck location is at index 36, card is the values encoding
+        for index, card in enumerate(partial_state.values):
+            if (index == 36) and (card < 25):
+                print(index, card)
                 return True
         return False
 
