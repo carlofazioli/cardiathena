@@ -1,5 +1,7 @@
 import random
 
+import numpy as np
+
 from adjudicator.state import HeartsState
 from base import Action, Agent
 
@@ -16,7 +18,6 @@ class HeartsAction(Action):
         return str(self.card_index)
 
 
-
 class RandomHeartsAgent(Agent):
     """
     An random agent who selects from available legal moves.
@@ -30,22 +31,17 @@ class RandomHeartsAgent(Agent):
         :return: an Action.
         """
         # Given the masked state, only cards in hand of agent is available
-        cards_in_hand = []
+        cards_in_hand = list()
 
-        #print("partial_state.values: " + str(partial_state.values))
-        for i in range(len(partial_state.values)):
-            if 0 < partial_state.values[i] < 5:
-                cards_in_hand.append(i)
+        # Creates a list of the available cards that a player can play.
+        for index, card in enumerate(partial_state.values):
+            if 0 < card < 5:
+                cards_in_hand.append(index)
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
-            c1 = random.choice(cards_in_hand)
-            cards_in_hand.remove(c1)
-            c2 = random.choice(cards_in_hand)
-            cards_in_hand.remove(c2)
-            c3 = random.choice(cards_in_hand)
-            cards_in_hand.remove(c3)
-            three_cards = [c1, c2, c3]
+            # Random sampling of the cards in hand without replacement.
+            three_cards = random.sample(cards_in_hand,3)
             return HeartsAction(three_cards)
 
         # Agent picks a card to play
