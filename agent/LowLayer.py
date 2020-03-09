@@ -1,6 +1,7 @@
 import random
 
 import numpy as np
+import pandas as pd
 
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
@@ -28,6 +29,8 @@ class LowLayer(Agent):
     def __init__(self):
         self.own_adj = HeartsAdjudicator()
         self.cards_in_hand = []
+        self.records = pd.DataFrame(columns=['Round|Trick ', 'Passing_Cards', 'Hands', 'Chosen Card', 'Lead'])
+        self.game_number = 0
 
     def get_action(self,
                    partial_state: HeartsState):
@@ -42,6 +45,12 @@ class LowLayer(Agent):
         #         self.cards_in_hand.append(i)
 
         # Agent picks 3 cards to pass
+        #record_new_row = [-1, -1, -1, -1]
+        record_new_row = {'Round|Trick ': self.game_number,
+                          'Passing_Cards' : -1 ,
+                          'Hands': -1,
+                          'Chosen Card' : -1 ,
+                          'Lead': False }
         if partial_state.pass_type > 0:
             # c1 = random.choice(self.cards_in_hand)
             # self.cards_in_hand.remove(c1)
@@ -55,19 +64,28 @@ class LowLayer(Agent):
             # print("THREE CARDS ARE " + str(three_cards))
             # for remove in three_cards:
             #     self.cards_in_hand.remove(remove)
+            record_new_row["Passing_cards"] = three_cards
+            self.records = self.records.append(record_new_row,ignore_index=True)
             return HeartsAction(three_cards)
 
         for i in range(len(partial_state.values)):
             if 0 < partial_state.values[i] < 5:
                 self.cards_in_hand.append(i)
 
+
+
         # Agent picks a card to play
         # elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
         else:
+            record_new_row["Hands"] = self.cards_in_hand
             choice = self.select_card(partial_state)
             # print("minimizing agent is leading: " + str(self.is_lead(partial_state)))
             # print("minimizing agent is not void: " + str(self.not_void(partial_state)))
             self.cards_in_hand = []
+            record_new_row["Chosen Card"] = choice
+            self.records = self.records.append(record_new_row,ignore_index=True)
+            self.game_number += 1
+            self.records.to_csv(" Game.csv")
             return HeartsAction(choice)
 
     def select_card(self,
@@ -191,7 +209,6 @@ class LowLayer(Agent):
         sorted_cards_in_hand = self.sort_suits(partial_state)
         return self.pick_trouble_card(sorted_cards_in_hand)
 
-
     def passing_smart_facevalues(self,
                                  partial_state: HeartsState):
         """ Method 2: Average the face cards in each suit, and pass the highest
@@ -284,7 +301,6 @@ class LowLayer(Agent):
             sorted_hands[suit_index].__delitem__(len(sorted_hands[suit_index]) - 1)
             trouble_suit[suit_index].__delitem__(len(trouble_suit[suit_index]) - 1)
         return cards_to_pass
-
 
     def average_suit_weight(self, Suit_list):
         """ Uses the face card values in order to calculate the average """
