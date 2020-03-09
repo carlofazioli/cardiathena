@@ -7,7 +7,7 @@ from agent.RandomHeartsAgent import RandomHeartsAgent
 
 
 # Create the players, the adjudicator, and the game object.
-agent_1 = EqualizerAgent()
+agent_1 = RandomHeartsAgent() #EqualizerAgent()
 agent_2 = RandomHeartsAgent()
 agent_3 = LowLayer()
 agent_4 = RandomHeartsAgent()
