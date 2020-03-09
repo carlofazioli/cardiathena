@@ -1,8 +1,4 @@
 import random
-import sys
-
-import numpy as np
-
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from base import Action, Agent
@@ -63,13 +59,10 @@ class LowLayer(Agent):
         # our player is leading, choosing a random card for now
         if self.spade_lead_check(partial_state):
             suits = self.sort_suits(partial_state)
-
         if self.is_lead(partial_state):
-
             if self.spade_lead_check(partial_state):  # Draw out the Queen
                 suits = self.sort_suits(partial_state)
                 choice = random.choice(suits[2])
-
             elif self.lead_low_check(partial_state):  # Play safe and play low cards
                 counter = 0
                 index = []
@@ -78,7 +71,6 @@ class LowLayer(Agent):
                     if (len(i) > 0):
                         index.append(counter)
                     counter += 1
-
                 pre_select = random.choice(index)
                 selected_suit = suits[pre_select]
                 choice = selected_suit[0]
@@ -93,14 +85,14 @@ class LowLayer(Agent):
             else:
                 # Void in the leading suit
                 # just randomly play for now
-                choice = self.sloughing(partial_state)
+                choice = self.sloughing()
         return choice
 
+    @staticmethod
     def is_lead(self,  partial_state: HeartsState):
         """Returns true if agent is leading currently"""
 
         played = partial_state.values[partial_state.values > 20]
-
         if len(played) >= 4:
             return True
         return False
@@ -138,7 +130,8 @@ class LowLayer(Agent):
             max_card_player = self.cards_in_hand[0]
         return max_card_player
 
-    def sort_suits(self, partial_state: HeartsState):
+    @staticmethod
+    def sort_suits(partial_state: HeartsState):
         """ Sort out the Cards by Suit and return a List of the suits"""
 
         # Clubs - Diamond - Spades - Hearts
@@ -149,23 +142,23 @@ class LowLayer(Agent):
         hearts = [card for card in cards_in_hand if 39 <= card < 52]
         return [clubs, diamond, spades, hearts]
 
-    def passing_smart_sequence(self, partial_state: HeartsState):
-        """
-        Method one passing : Pass highest cards in trouble suits: suits where the lowest
-        card is higher than any other lowest card in other suits. If the player becomes void,
-        then pass off the next high cards from the next trouble suit.
-        """
-
+    def passing_smart_sequence(self,
+                               partial_state: HeartsState):
+        """ Method one passing : Pass highest cards in trouble suits: suits where the lowest
+        card is higher than any other lowest card in other suits.If the player becomes void,
+        then pass off the next high cards from the next trouble suit."""
         cards_to_pass = []  # List of the cards that the agent will pass
-        sorted_cards_in_hand = self.sort_suits(partial_state)
-        #trouble_suit = self.pick_trouble_card(sorted_cards_in_hand)
-        #print(trouble_suit)
+        passing_amount = 3  # Amount of Cards that will be pass
 
+        suits = self.sort_suits(partial_state)
+        num_cards = -1
+        counter = 0
 
         for card in range(3):
-            choose_one, suits = self.pick_trouble_card(sorted_cards_in_hand);
+            choose_one, suits = self.pick_trouble_card(suits);
             for c in choose_one:
                 cards_to_pass.append(c)
+
             if len(cards_to_pass) > 3:
                 break;
 
@@ -175,7 +168,7 @@ class LowLayer(Agent):
         """
         Method 2: Average the face cards in each suit, and pass the highest cards from the suit with the highest
         average. (J = 11, Q = 12, K = 13, A = 14). Repeat if void.
-          """
+        """
 
         suits = self.sort_suits(partial_state)
         suit_weights = []
@@ -201,8 +194,14 @@ class LowLayer(Agent):
                 break
         return chosen_cards[0:3]  # return only 3
 
-    def pick_trouble_card_suit(self, sorted_hands):
-        """ Choose the suit with the least amount of cards """
+    @staticmethod
+    def pick_trouble_card_suit(sorted_hands):
+        """
+        Choose the suit with the least amount of cards
+
+        :param sorted_hands: sort_hands is a list of lists. Each list in sorted_hands contains the cards in hand for a
+        particular suit. [ C[0, 1, 4], D[13, 15], ... etc.]
+        """
 
         index = -1  # Array index
         store_pos = 0
@@ -214,34 +213,21 @@ class LowLayer(Agent):
                 store_pos = index
         return store_pos
 
-    def has_qs_been_played(self, partial_state: HeartsState):
+    @staticmethod
+    def has_qs_been_played(partial_state: HeartsState):
         """ Return True if the queen has been play and false otherwise """
 
         # Queen of spades deck location is at index 36, card is the values encoding
+        # The encoded value of the card must also be played 11-14 or played in the current trick 21-24.
         for index, card in enumerate(partial_state.values):
             if (index == 36) and (card < 25):
                 return True
         return False
 
     def pick_trouble_card(self, sorted_hands):
-        """
-        Choose the suit where the lowest card is higher than the lowest card in any other suit, and pass those
-        starting with the highest card. If the trouble suit becomes void, then pick the next highest card from
-        the next trouble suit.
-        """
-        """
-        cards_to_pass = []
-        trouble_suit = [self.mod_13(suit) for suit in sorted_hands]
-        lowest_high_card = -1
-        lowest_high_card_index = -1
 
-        for index, suit in enumerate(trouble_suit):
-            if suit[0] > lowest_high_card:
-                lowest_high_card = suit[0]
-                highest_card_in_suit_index = len(sorted_hands[index])
-                cards_to_pass.append(sorted_hands[index][highest_card_in_suit_index])
-                sorted_hands[index].remove(highest_card_in_suit_index)
-        """
+        """Choose the suit with the least amount of cards
+            and pass those starting with the highest card unimplemented so far """
         trouble = []
         index = -1
         store_pos = 0
@@ -261,13 +247,9 @@ class LowLayer(Agent):
         lost_card[store_pos] = trouble
 
         return cards_to_pass, lost_card
-    def mod_13(self, suits_in_hand):
-        """ """
 
-        return [card % 13 for card in suits_in_hand]
-
-
-    def average_suit_weight(self, suit_list):
+    @staticmethod
+    def average_suit_weight(suit_list):
         """ Uses the face card values in order to calculate the average """
 
         sum = 0
@@ -277,7 +259,7 @@ class LowLayer(Agent):
             return 0
         return sum / len(suit_list)
 
-    def sloughing(self, partial_state: HeartsState):
+    def sloughing(self):
         suit_to_slough = self.bad_suit()
         begin = 13 * suit_to_slough
         end = 13 * (suit_to_slough + 1)
