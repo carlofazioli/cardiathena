@@ -181,27 +181,16 @@ class LowLayer(Agent):
         suits = [clubs, Diamond, spades, hearts]
         return suits
 
-    def passing_smart_sequence(self,
-                               partial_state: HeartsState):
-        """ Method one passing : Pass highest cards in trouble suits: suits where the lowest
-        card is higher than any other lowest card in other suits.If the player becomes void,
-        then pass off the next high cards from the next trouble suit."""
-        cards_to_pass = []  # List of the cards that the agent will pass
-        passing_amount = 3  # Amount of Cards that will be pass
+    def passing_smart_sequence(self, partial_state: HeartsState):
+        """
+        Method one passing : Pass highest cards in trouble suits: suits where the lowest
+        card is higher than any other lowest card in other suits. If the player becomes void,
+        then pass off the next high cards from the next trouble suit.
+        """
 
-        suits = self.sort_suits(partial_state)
-        num_cards = -1
-        counter = 0
+        sorted_cards_in_hand = self.sort_suits(partial_state)
+        return self.pick_trouble_card(sorted_cards_in_hand)
 
-        for card in range(3):
-            choose_one, suits = self.pick_trouble_card(suits);
-            for c in choose_one:
-                cards_to_pass.append(c)
-
-            if len(cards_to_pass) > 3:
-                break;
-
-        return cards_to_pass[0:3]
 
     def passing_smart_facevalues(self,
                                  partial_state: HeartsState):
@@ -255,28 +244,47 @@ class LowLayer(Agent):
         return False
 
     def pick_trouble_card(self, sorted_hands):
+        """
+        Choose the suit where the lowest card is higher than the lowest card in any other suit, and pass those
+        starting with the highest card. If the trouble suit becomes void, then pick the next highest card from
+        the next trouble suit.
 
-        """Choose the suit with the least amount of cards
-            and pass those starting with the highest card unimplemented so far """
-        trouble = []
-        index = -1
-        store_pos = 0
-        num_cards = -1
+        :param sorted_hands: sort_hands is a list of lists. Each list in sorted_hands contains the cards in hand for a
+        particular suit. [ C[0, 1, 4], D[13, 15], ... etc.]
+        :return cards_to_pass: Cards_to_pass is a list of the 3 cards to pass following the strategy stated above.
+        """
+
         cards_to_pass = []
-        for suit in sorted_hands:
-            index += 1
-            if len(suit) > num_cards:
-                num_cards = len(suit)
-                trouble = suit
-                store_pos = index
+        # Remove empty suits/empty lists on the off chance that an agent is void a suit at the start of the game.
+        # This prevents issues with zip() and empty lists.
+        if not all(sorted_hands):
+            for suit in sorted_hands:
+                if not suit:
+                    sorted_hands.remove(suit)
+        # Mod 13 each value of each suit in order to find the lo/hi cards.
+        trouble_suit = [self.mod_13(suit) for suit in sorted_hands]
+        for i in range(3):
+            # Remove voided suits (empty lists) from sorted_hands and trouble_suit.
+            # This prevents zip() issues with empty lists.
+            for suit, t_suit in zip(sorted_hands, trouble_suit):
+                # Suit is void, remove empty suit list from sorted_hands and trouble_suit.
+                if not suit:
+                    sorted_hands.remove(suit)
+                    trouble_suit.remove(t_suit)
+            # Stores the value of the first indices of each suit to list: lowest_cards_in_each_suit.
+            lowest_cards_in_each_suit = list(zip(*trouble_suit))[0]
+            # Calculate the highest card out of the lowest cards.
+            lowest_high_card = max(lowest_cards_in_each_suit)
+            # Get the suit index of lowest_high_card. C = 0, D = 1, S = 2, H = 3.
+            suit_index = lowest_cards_in_each_suit.index(lowest_high_card)
+            # Get the value of the highest card in the trouble suit.
+            highest_card_in_trouble_suit = sorted_hands[suit_index].__getitem__(len(sorted_hands[suit_index]) - 1)
+            cards_to_pass.append(highest_card_in_trouble_suit)
+            # Remove chosen card from the lists to account for future calculations.
+            sorted_hands[suit_index].__delitem__(len(sorted_hands[suit_index]) - 1)
+            trouble_suit[suit_index].__delitem__(len(trouble_suit[suit_index]) - 1)
+        return cards_to_pass
 
-        for i in range(len(trouble)):
-            cards_to_pass.append(trouble[i * -1])
-
-        lost_card = sorted_hands
-        lost_card[store_pos] = trouble
-
-        return cards_to_pass, lost_card
 
     def average_suit_weight(self, Suit_list):
         """ Uses the face card values in order to calculate the average """
