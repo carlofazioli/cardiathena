@@ -128,11 +128,13 @@ class GameManager:
             # While the game is still in progress, inspect the current state to determine which agent should play,
             # and mask their state to hide any information.
             agent_index, partial_state = self.adjudicator.agent_turn(self.state)
+
             # Show the partial state to the current player and obtain their action.
-            for i in range(len(agent_index)):
+            for index, agent in enumerate(agent_index):
                 # agent_turn will return two lists of the same size so go through them together
-                current_player = self.agent_list[agent_index[i]]
-                player_action.append(current_player.get_action(partial_state[i]))
+                current_player = self.agent_list[agent]
+                player_action.append(current_player.get_action(partial_state[index]))
+
             # Record this activity in the history.
             self.state_history.append(deepcopy(self.state))
             self.action_history.append(deepcopy(player_action))

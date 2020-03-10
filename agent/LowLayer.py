@@ -89,7 +89,7 @@ class LowLayer(Agent):
         return choice
 
     @staticmethod
-    def is_lead(self,  partial_state: HeartsState):
+    def is_lead(partial_state: HeartsState):
         """Returns true if agent is leading currently"""
 
         played = partial_state.values[partial_state.values > 20]
