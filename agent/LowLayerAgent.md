@@ -1,6 +1,6 @@
 # Low Layer Agent
 
-`get_action(partial_state : State) : Action` creates an action with the mindset of attempting to avoid taking the trick.
+`get_action(partial_state : State) : Action` creates an action with the mindset of attempting to avoid taking the trick. The low-layer plays defensively, and wants to minimize points.
 
 ## Passing
 Find trouble suits by averaging the cards in each suit and choosing the highest cards from the suit with the hightest average.
