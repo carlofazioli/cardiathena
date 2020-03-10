@@ -1,7 +1,4 @@
 import random
-
-import numpy as np
-
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from base import Action, Agent
