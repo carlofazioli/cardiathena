@@ -50,8 +50,8 @@ class LowLayer(Agent):
             # c3 = random.choice(self.cards_in_hand)
             # self.cards_in_hand.remove(c3)
             # three_cards = [c1, c2, c3]
-            # three_cards = self.passing_smart_sequence(partial_state)
-            three_cards = self.passing_smart_facevalues(partial_state)
+            three_cards = self.passing_smart_sequence(partial_state)
+            # three_cards = self.passing_smart_facevalues(partial_state)
             # print("THREE CARDS ARE " + str(three_cards))
             # for remove in three_cards:
             #     self.cards_in_hand.remove(remove)
@@ -285,6 +285,9 @@ class LowLayer(Agent):
             trouble_suit[suit_index].__delitem__(len(trouble_suit[suit_index]) - 1)
         return cards_to_pass
 
+    @staticmethod
+    def mod_13(sorted_hands):
+        return [suit % 13 for suit in sorted_hands]
 
     def average_suit_weight(self, Suit_list):
         """ Uses the face card values in order to calculate the average """
