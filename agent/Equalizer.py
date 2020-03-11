@@ -20,7 +20,7 @@ class HeartsAction(Action):
 
 class EqualizerAgent(Agent):
     """
-    An random agent who selects from available legal moves.
+    An agent who selects an action with the mindset of trying to inflict as many points as possible on the other players.
     """
 
     def __init__(self):
@@ -33,7 +33,8 @@ class EqualizerAgent(Agent):
     def get_action(self,
                    partial_state: HeartsState):
         """
-        The get_action() method inspects the state for open positions and picks one randomly.
+        The get_action() method inspects the state for open positions and picks one that will allow it to
+        inflict points on other players.
         :param partial_state: the position vector of the game.
         :return: an Action.
         """
@@ -77,6 +78,7 @@ class EqualizerAgent(Agent):
 
     def select_card(self,
                     partial_state: HeartsState):
+        """The main selection routine for if the agent is leading or following a trick."""
         # our player is leading, choosing a random card for now
         if self.is_lead(partial_state):
 
@@ -91,37 +93,33 @@ class EqualizerAgent(Agent):
 
     def void_out_suits(self,
                        partial_state: HeartsState):
-        """ This function selects the suit we want to try and void, the idea is to start with """
+        """ This function selects the suit we want to try and void, the idea is to start with voiding either Clubs
+        or Diamonds (whichever is shortest) followed by Hearts and then Spades."""
         # start by sorting out all of the clubs
         suits = self.sort_suits(partial_state)
         # the suit that we wish to pick a card from
         suit_to_void = []
 
-        # todo right now leading is for when hearts has not been broken. may need to change strategy in future
+        # todo right now leading is for when hearts has not been broken. may want to change strategy in future
+        # note that this nested if-else block can handle both cases of whether the agent is:
+        # - void in the suit the trick leader has
+        # - able to follow suit
         if len(suits[1]) != 0 or len(suits[0]) != 0:
             # neither diamonds or clubs have been voided, lead from one of these
             if len(suits[1]) == 0 or len(suits[1]) > len(suits[0]) != 0:
                 # we want to void clubs first
                 suit_to_void = suits[0]
-                if len(suit_to_void) == 0:
-                    print("hi-lead")
             else:
                 # we want to void diamonds first
                 suit_to_void = suits[1]
-                if len(suit_to_void) == 0:
-                    print("hi-lead")
         else:
             # clubs and diamonds are both void, lead with spades or hearts
             if len(suits[3]) != 0:
                 # leading with hearts if we can
                 suit_to_void = suits[3]
-                if len(suit_to_void) == 0:
-                    print("hi-lead")
             else:
                 # no choice but to lead with spades
                 suit_to_void = suits[2]
-                if len(suit_to_void) == 0:
-                    print("hi-lead")
 
         # we now have our suit to pick a card from, want to lead with a low card
         choice = self.get_low_card(suit_to_void)
@@ -129,6 +127,8 @@ class EqualizerAgent(Agent):
 
     def following_suit(self,
                        partial_state: HeartsState):
+        """ This function will still attempt to void Clubs or Diamonds if it can, it may also try and play
+        the highest card in its suit, if it thinks it can afford to take on potential points."""
         # depending on the suit we want to follow in different ways
         suits = self.sort_suits(partial_state)
 
@@ -149,14 +149,10 @@ class EqualizerAgent(Agent):
             # clubs or diamonds have been played, follow with our high card (if we can)
             # we care less here about which to pick if we're void, so just go with the suit
             # thats the smallest
-            if len(suits[1]) > len(suits[0]):
-                if len(suits[1]) == 0:
-                    print("hi-follow")
-                choice = self.get_highest_safe_card(suits[1], partial_state)
-            else:
-                if len(suits[0]) == 0:
-                    print("hi-follow")
+            if len(suits[1]) == 0 or len(suits[1]) > len(suits[0]) != 0:
                 choice = self.get_highest_safe_card(suits[0], partial_state)
+            else:
+                choice = self.get_highest_safe_card(suits[1], partial_state)
         return choice
 
     def sort_suits(self,
@@ -208,7 +204,7 @@ class EqualizerAgent(Agent):
 
     def get_low_card(self,
                      suit_to_choose_from: list):
-        # want to pick the lowest card from this suit
+        """In this function we want to want to pick the lowest card from this suit"""
         suit_to_choose_from.sort()
         choice = suit_to_choose_from[0]
         return choice
@@ -232,7 +228,7 @@ class EqualizerAgent(Agent):
         if queen_played or partial_state.points[self.player_position] >= 10:
             choice = suit_to_choose_from[0]
         else:
-            # todo if our agent has the queen we may want some different behavior here
+            # todo if our agent has the queen we may want some different behavior
             # the queen hasnt been played and we haven't racked up a bunch of points
             # so this agent is going to be risky and play its highest card (that isn't the queen)
             choice = suit_to_choose_from[-1]
