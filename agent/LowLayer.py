@@ -1,7 +1,4 @@
 import random
-
-import numpy as np
-
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from base import Action, Agent
@@ -43,18 +40,8 @@ class LowLayer(Agent):
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
-            # c1 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c1)
-            # c2 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c2)
-            # c3 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c3)
-            # three_cards = [c1, c2, c3]
-            three_cards = self.passing_smart_sequence(partial_state)
-            # three_cards = self.passing_smart_facevalues(partial_state)
-            # print("THREE CARDS ARE " + str(three_cards))
-            # for remove in three_cards:
-            #     self.cards_in_hand.remove(remove)
+            # three_cards = self.passing_smart_sequence(partial_state)
+            three_cards = self.passing_smart_face_values(partial_state)
             return HeartsAction(three_cards)
 
         for i in range(len(partial_state.values)):
@@ -191,35 +178,46 @@ class LowLayer(Agent):
         sorted_cards_in_hand = self.sort_suits(partial_state)
         return self.pick_trouble_card(sorted_cards_in_hand)
 
-
-    def passing_smart_facevalues(self,
+    def passing_smart_face_values(self,
                                  partial_state: HeartsState):
-        """ Method 2: Average the face cards in each suit, and pass the highest
-         cards from the suit with the highest average. (J = 11, Q = 12, K = 13, A = 14).
-          Repeat if void. """
-        suits = self.sort_suits(partial_state)
-        suit_weights = []
-        chosen_cards = []
+        """
+        Method 2: Average the face cards in each suit, and pass the highest cards from the suit with the
+        highest average. (J = 9, Q = 10, K = 11, A = 12). Repeat if void.
+        """
 
-        for s in suits:
-            suit_weights.append(self.average_suit_weight(s))
+        sorted_hands = self.sort_suits(partial_state)
+        # Face_value_cards is a sorted by suits list of only face cards.
+        face_value_cards = [[card for card in suit if 8 < (card % 13) < 13] for suit in sorted_hands]
+        # Face_value_cards modulo 13 for average calculations.
+        modded_face_value_cards = [self.mod_13(suit) for suit in face_value_cards]
+        # Avg_face_value is a list of averaged face value cards.
+        avg_face_value = [self.average_cards(suit) for suit in modded_face_value_cards]
 
-        for i in range(3):  # Need to choose 3 cards
-            Max = -1
-            index = 0
-            max_index = 0
+        cards_to_pass = [0, 0, 0]
 
-            for facevalues in suit_weights:  # Find the suit with max weight
-                if Max < facevalues:
-                    Max = facevalues
-                    max_index = index
-                index += 1
-            for cards in reversed(suits[max_index]):  # Pass the Highest Cards first
-                chosen_cards.append(cards)
-            suit_weights[max_index] = 0  # Suit is voided
-            if len(chosen_cards) > 3:  # Found 3 or more break
-                break
-        return chosen_cards[0:3]  # return only 3
+        for index, card in enumerate(cards_to_pass):
+            highest_average = max(avg_face_value)
+            suit_index = avg_face_value.index(highest_average)
+
+            if sorted_hands[suit_index]:
+                # Index of the highest card in sorted_hands.
+                highest_card_index = len(sorted_hands[suit_index]) - 1
+                # Value of the highest card in sorted_hands.
+                highest_card = sorted_hands[suit_index][highest_card_index]
+                # Add to cards_to_pass.
+                cards_to_pass[index] = highest_card
+                sorted_hands[suit_index].remove(highest_card)
+
+            # Suit is now void, remove averaged value for future calculations.
+            if not sorted_hands[suit_index]:
+                avg_face_value[suit_index] = 0
+        return cards_to_pass
+
+    @staticmethod
+    def average_cards(hand):
+        if not hand:
+            return 0
+        return sum(hand) / len(hand)
 
     def pick_trouble_card_suit(self, sorted_hands):
         """Choose the suit with the least amount of cards
