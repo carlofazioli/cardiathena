@@ -105,7 +105,7 @@ class HeartsAdjudicator(Adjudicator):
     def points(self,
                state: HeartsState):
         # Returns a list of the points for each player in the current round
-
+        
         # store the points here to return them
         points = [0, 0, 0, 0]
         for i in range(4):
@@ -122,10 +122,10 @@ class HeartsAdjudicator(Adjudicator):
                      state: HeartsState):
         # Updates the scores of all the players by using the points and determining if anyone shot for the moon
         points = self.points(state)
-
+        
         if points.count(26) > 0:
             # If anyone has 26, they got all the points and successfully shot for the moon
-            winner = points.index(26)  # Only find the index of 26 if it exists
+            winner = points.index(26) # Only find the index of 26 if it exists
             for i in range(4):
                 if i != winner: # The winner does not get 26 added to their score
                     state.score[i] += 26
@@ -161,6 +161,7 @@ class HeartsAdjudicator(Adjudicator):
         state_copy = deepcopy(state)
         # Check if game is finished
         if self.is_finished(state_copy):
+            print("original is finished check")
             return self.state_copy
         else:
             # Loop through the list of actions
@@ -268,23 +269,28 @@ class HeartsAdjudicator(Adjudicator):
         trick_winner = self.trick_winner(state)
         for card in self.cards_of_trick(state):
             state.values[card] = trick_winner + 10
-
+        
         # Print final results
-        #print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1,
-         #     " Points: ", self.points(state))
+        print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1,
+              " Points: ", self.points(state))
+        
+        # Update the score
+        self.update_score(state)
+        if self.is_finished(state):
+            # Do not shuffle if game is over
+            return
 
         # New round, shuffle cards, and Pass cards
-        self.update_score(state)
         state.shuffle()
-
+        
         # Make the value positive to show that we will be passing (unless zero because 0 * -1 is 0)
         if state.pass_type < 0:
             state.pass_type = state.pass_type * -1
-
+            
         state.pass_type += 1
         if state.pass_type > 3:
             state.pass_type = 0
-
+    
     def get_state(self):
         """
         :return: the current state
