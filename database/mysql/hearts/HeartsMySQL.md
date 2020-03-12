@@ -32,7 +32,7 @@ DBMS: MySQL 5.7.21
 
 * `player_table`: A table that contains the agents that participated in the game and the game_uuid to the game. Also included is the string representation of the agent type, and the version number.
 
-![player_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/player_table.png)
+![agent_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/player_table.png)
 
 ### Functions
 * `get_connection(): cnx` Returns a MySQL connection object.
