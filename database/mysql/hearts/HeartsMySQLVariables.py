@@ -5,7 +5,7 @@ HOME_DIR = os.environ['HOME']
 PWD_DIR = os.environ['PWD']
 
 CSV_DIR = '{}/Argo/mysql/var/lib/mysql-files/'.format(HOME_DIR)
-ARGO_DIR = '/scratch/$USER/mysql/var/lib/mysql-files/'
+ARGO_DIR = '/scratch/$USER/mysql-files/'
 
 """ Database variables """
 DB = "cardiathena_db"
