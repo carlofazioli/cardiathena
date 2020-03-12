@@ -3,7 +3,6 @@ Currently not recommended as Singularity is only available up to version 2.4 via
 Argo currently does not support Singularity version 2.4.
 
 ## Installing Singularity on a local Linux machine
-(Optional but can be helpful for testing, skip to [MySQL server on ARGO](https://github.com/c-to-the-fazzy/cardiathena/wiki/Distributed-Computing-Document#mysql-server-on-argo) if running only on Argo)
 
 ### Install Go
 
