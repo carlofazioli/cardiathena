@@ -52,15 +52,10 @@ Download the config files, and edit the relevant password fields in .mysqlrootpw
 <br></br>
 `curl https://raw.githubusercontent.com/davidjha/mysql/master/mysqlrootpw > ${PWD}/.mysqlrootpw`
 <br></br>
-On Argo symlinks need to be created:
-<br></br>
-`ln -s /scratch/$USER/.my.cnf /home/$USER/.my.cnf`
-<br></br>
-`ln -s /scratch/$USER/.mysqlrootpw /home/$USER/.mysqlrootpw`
 
 Create the necessary directories (from within the scratch directory if on ARGO or the same directory the container .sif or .simg container image is in) needed by MySQL:
 <br></br>
-`mkdir -p $SCRATCH/mysql/var/lib/mysql $SCRATCH/mysql/run/mysqld`
+`mkdir -p $SCRATCH/mysql/var/lib/mysql $SCRATCH/mysql/run/mysqld $SCRATCH/mysql-files`
 
 If on Argo run salloc, which will reserve a node:
 <br></br>
@@ -110,7 +105,6 @@ Some required packages may need to be installed (only for local machines):
 `sudo apt-get install python3-pip python3-distutils python3-setuptools`
 
 ### Install mysql-connector-python
-<br></br>
 `pip3 install mysql-connector-python`
 
 ## Running the games on Argo
