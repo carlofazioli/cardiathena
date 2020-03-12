@@ -92,7 +92,6 @@ Start the singularity instance of the mysql container:
 <br></br>
 `singularity instance start -e -c --bind ${PWD}/mysql/var/lib/mysql/:/var/lib/mysql --bind ${PWD}/mysql/run/mysqld:/run/mysqld mysql_latest.sif mysql_container`
 
-
 Next run the instance, this command runs the the MySQL server program, mysqld in the container:
 <br></br>
 `singularity run instance://mysql_container`
@@ -115,3 +114,4 @@ To check running Singularity instances:
 `singularity instance list`
 
 *When you stop the instance or an error occurs its best to check if the lock on the socket has been released. Delete ./mysql/run/mysqld/mysqld.sock.lock
+*You may also need to delete the instance directory in ~/.singularity/instances/sing/os/user_name/instance_name
