@@ -35,10 +35,8 @@ def get_connection():
 
 
 def query_database(query, values):
-    """
-    Used to execute predefined basic queries, in HeartsMySQLVariables.py, without any values. Prints the results to console.
-    IE 'SHOW_DATABASE' will show all the databases on the server.
-    """
+    """ Executes basic queries """
+    
     db = MySQLDatabase()
     my_cursor = db.get_cursor()
     try:
@@ -52,6 +50,13 @@ def query_database(query, values):
 
 
 def insert_state(file):
+    """
+    The method insert_state() loads a csv file into the state table. Load data local loads the csv file that resides on the same machine
+    as the mysql server. This method of inserting data is typically much faster than multiple insertions.
+    
+    :param string:file: file is the path to the csv file. 
+    """
+    
     db = MySQLDatabase()
     my_cursor = db.get_cursor()
     try:
@@ -138,9 +143,10 @@ def print_lists(list):
 
 def test_get_data_example():
     """
-    Tests retrieving history data from the database.
+    Tests retrieving state data from the database.
     """
-    game_state = get_data_by_key(10)
+    
+    game_state = get_data_by_key(0)
     uuid = extract_uuid(game_state)
     state = extract_state(game_state)
     action = extract_action(game_state)
@@ -150,8 +156,3 @@ def test_get_data_example():
     print(state)
     print(action)
     print(score)
-
-
-#query_database(SELECT_ALL_FROM_PLAYER_TABLE)
-#query_database(SELECT_ALL_FROM_STATE_TABLE)
-#test_get_data_example()
