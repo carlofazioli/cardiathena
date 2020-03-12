@@ -42,8 +42,6 @@ module load python/3.6.7
 module load singularity/3.3.0
 
 ## Run your program or script
-
-
 python3 $SCRATCH/cardiathena/play_hearts.py
 
  

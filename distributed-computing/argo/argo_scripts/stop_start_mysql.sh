@@ -1,5 +1,5 @@
 #!/bin/bash
 
-singularity instance stop mysql_container
-singularity instance start -e -c --bind ${SCRATCH}/mysql/var/lib/mysql/:/var/lib/mysql --bind ${SCRATCH}/mysql/run/mysqld:/run/mysqld mysql_latest.sif mysql_container
-singularity run instance://mysql_container
+singularity instance stop mysqlheart
+singularity instance start -e -c --bind ${SCRATCH}/mysql/var/lib/mysql/:/var/lib/mysql --bind ${SCRATCH}/mysql/run/mysqld:/run/mysqld mysql_latest.sif mysqlheart
+singularity run instance://mysqlheart
