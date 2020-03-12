@@ -81,8 +81,7 @@ Download the config files, and edit the relevant password fields in .mysqlrootpw
 `curl https://raw.githubusercontent.com/davidjha/mysql/master/my.cnf > ${PWD}/.my.cnf`
 <br></br>
 `curl https://raw.githubusercontent.com/davidjha/mysql/master/mysqlrootpw > ${PWD}/.mysqlrootpw`
-<br></br>`
-
+<br></br>
 Create the necessary directories (from within the scratch directory if on ARGO or the same directory the container .sif or .simg container image is in) needed by MySQL:
 <br></br>
 `mkdir -p ${PWD}/mysql/var/lib/mysql ${PWD}/mysql/run/mysqld`
@@ -113,5 +112,5 @@ To check running Singularity instances:
 <br></br>
 `singularity instance list`
 
-*When you stop the instance or an error occurs its best to check if the lock on the socket has been released. Delete ./mysql/run/mysqld/mysqld.sock.lock
-*You may also need to delete the instance directory in ~/.singularity/instances/sing/os/user_name/instance_name
+*When you stop the instance or an error occurs its best to check if the lock on the socket has been released. Delete ./mysql/run/mysqld/mysqld.sock.lock.
+*You may also need to delete the instance directory in ~/.singularity/instances/sing/os/user_name/instance_name.
