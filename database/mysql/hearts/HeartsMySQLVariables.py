@@ -34,13 +34,13 @@ SCORE_COLUMN = "score"
 
 """ Insert queries """
 INSERT_GAME = "INSERT INTO {} ({}, {}, {}, {}, {}, {}, {}) VALUES (%s, %s, %s, %s, %s, %s, %s)".format(GAME_TABLE,
-                                                                                                        GAME_ID_COLUMN,
-                                                                                                        TIME_COLUMN,
-                                                                                                        AGENT1_COLUMN,
-                                                                                                        AGENT2_COLUMN,
-                                                                                                        AGENT3_COLUMN,
-                                                                                                        AGENT4_COLUMN,
-                                                                                                        GAME_UUID_COLUMN)
+                                                                                                       GAME_ID_COLUMN,
+                                                                                                       TIME_COLUMN,
+                                                                                                       AGENT1_COLUMN,
+                                                                                                       AGENT2_COLUMN,
+                                                                                                       AGENT3_COLUMN,
+                                                                                                       AGENT4_COLUMN,
+                                                                                                       GAME_UUID_COLUMN)
 
 INSERT_AGENT = "INSERT INTO {} ({},{},{}) VALUES (%s, %s, %s)".format(AGENT_TABLE,
                                                                       AGENT_ID_COLUMN,
@@ -54,13 +54,11 @@ INSERT_STATE = "INSERT INTO {} ({}, {}, {}, {}, {}) VALUES(%s, %s, %s, %s, %s,)"
                                                                                         SCORE_COLUMN,
                                                                                         GAME_UUID_COLUMN)
 
-
 """ Selection queries """
 SELECT_GAME_ID = "SELECT {} FROM {} WHERE {}=".format(GAME_ID_COLUMN, GAME_TABLE, GAME_ID_COLUMN)
 
-
 """ Connection Config details """
-CONFIG ={
+CONFIG = {
     'user': 'remote_usr',
     'password': '',
     'host': 'NODE0',
@@ -69,6 +67,3 @@ CONFIG ={
     'raise_on_warnings': True,
     'allow_local_infile': True
 }
-
-
-
