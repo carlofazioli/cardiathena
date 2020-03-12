@@ -113,3 +113,6 @@ To check running Singularity instances:
 
 *When you stop the instance or an error occurs its best to check if the lock on the socket has been released. Delete ./mysql/run/mysqld/mysqld.sock.lock.
 *You may also need to delete the instance directory in ~/.singularity/instances/sing/os/user_name/instance_name.
+
+Reference:
+[Singularity 3.3.0](https://sylabs.io/guides/3.3/user-guide/)
