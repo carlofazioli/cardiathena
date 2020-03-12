@@ -78,14 +78,14 @@ Start and run MySQL container script to create a remote user:
 
 Create a remote user. A random password will be generated to allow log-ins remotely. Record this password.
 <br></br>
-`singularity exec instance://mysql_container create_remote_admin_user.sh`
+`singularity exec instance://mysql create_remote_admin_user.sh`
 
 Now connections can be made to the MySQL container.
 
 ### Stop singularity instance:
 To stop the singularity instance:
 <br></br>
-`singularity instance stop mysql_container`
+`singularity instance stop mysqlheart`
 <br></br>
 To check running Singularity instances:
 <br></br>
