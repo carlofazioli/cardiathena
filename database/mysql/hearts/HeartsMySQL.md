@@ -1,7 +1,7 @@
 ## General Information
 The gameplay database should hold records of game states and player actions.  Additionally, the records should hold information on game outcomes; e.g. the final scores.  
 
-* As detailed in the [card deck](cardiathena/adjudicator/HeartsState.md) section, the location of each card at any point in time can be encoded by a 52-vector.
+* As detailed in the [card deck](https://github.com/c-to-the-fazzy/cardiathena/blob/mysql-on-argo/adjudicator/HeartsState.md) section, the location of each card at any point in time can be encoded by a 52-vector.
 
 * State information:
     * deck : the location of every card in the deck.see ()
