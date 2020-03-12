@@ -14,8 +14,8 @@ Agents
 
 Distributed-Computing
 * [Argo](distributed-computing/argo/README.md)
-    *[MySQLHeartOnArgo](distributed-computing/argo/MySQLHeartOnArgo.md)
-    *[SingularityOnLinux](distributed-computing/argo/SingularityOnLinux.md)
+    * [MySQLHeartOnArgo](distributed-computing/argo/MySQLHeartOnArgo.md)
+    * [SingularityOnLinux](distributed-computing/argo/SingularityOnLinux.md)
     
 Database
-*[Hearts MySQL](database/mysql/hearts/HeartsMySQL.md)
+* [Hearts MySQL](database/mysql/hearts/HeartsMySQL.md)
