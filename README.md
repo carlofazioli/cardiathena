@@ -16,6 +16,7 @@ Distributed-Computing
 * [Argo](distributed-computing/argo/README.md)
     * [MySQLHeartOnArgo](distributed-computing/argo/MySQLHeartOnArgo.md)
     * [SingularityOnLinux](distributed-computing/argo/SingularityOnLinux.md)
+    * [Slurm Scheduler](distributed-computing/argo/Slurm.md)
     
 Database
 * [Hearts MySQL](database/mysql/hearts/HeartsMySQL.md)
