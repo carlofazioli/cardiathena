@@ -56,7 +56,7 @@ Extract the tarball:
 Add /usr/local/go/bin to the environment variable PATH:
 <br/><br/>
 `export PATH=$PATH:/usr/local/go/bin`
-ls -la /home/$USER/.singularity | grep “\->”
+
 ### Testing GO is installed properly
 Make a workspace directory for go and set the GOPATH environment variable:
 <br></br>
