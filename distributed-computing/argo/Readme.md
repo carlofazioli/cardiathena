@@ -154,13 +154,13 @@ Continue on to the next section.
 ## MySQL server within singularity
 Pull the the singularity image from singularity hub:
 <br></br>
-`singularity pull shub://ISU-HPC/mysql`
+`singularity pull shub://davidjha/mysql`
 <br></br>
 Download the config files, and edit the relevant password fields in .mysqlrootpw and .my.cnf to change the root password from the default:
 <br></br>
-`curl https://raw.githubusercontent.com/ISU-HPC/mysql/master/my.cnf > ${PWD}/.my.cnf`
+`curl https://raw.githubusercontent.com/davidjha/mysql/master/my.cnf > ${PWD}/.my.cnf`
 <br></br>
-`curl https://raw.githubusercontent.com/ISU-HPC/mysql/master/mysqlrootpw > ${PWD}/.mysqlrootpw`
+`curl https://raw.githubusercontent.com/davidjha/mysql/master/mysqlrootpw > ${PWD}/.mysqlrootpw`
 <br></br>
 On Argo symlinks need to be created:
 <br></br>
