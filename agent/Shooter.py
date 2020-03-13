@@ -44,13 +44,23 @@ class Shooter(Agent):
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
-            c1 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c1)
-            c2 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c2)
-            c3 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c3)
-            three_cards = [c1, c2, c3]
+            three_cards = []
+            hearts = self.get_hearts(self.cards_in_hand)
+            lowest_heart = self.get_lowest(hearts)
+            while (len(lowest_heart) > 0 and len(three_cards) < 3):
+                # We can only play a heart when we have a heart
+                chosen_card = random.choice(lowest_heart)
+                three_cards.append(chosen_card)
+                # Remove from lists so it does not get chosen again
+                hearts.remove(chosen_card)
+                self.cards_in_hand.remove(chosen_card)
+                # Find our next lowest cards to pass on
+                lowest_heart = self.get_lowest(hearts)
+            # We either have all three cards as hearts cards or we need more
+            while (len(three_cards) < 3):
+                lowest = random.choice(self.get_lowest(self.cards_in_hand))
+                three_cards.append(lowest)
+                self.cards_in_hand.remove(lowest)
             return HeartsAction(three_cards)
 
         # Agent picks a card to play
@@ -83,7 +93,6 @@ class Shooter(Agent):
                 # Later in the game so try to take tricks from players
                 # TODO we should be checking if we can even follow suit to know
                 # if we are capable of taking the trick
-                # TODO check if we are playing last so we can do bare minimum
                 if (self.is_last):
                     # We know the trick is over after this action so do the bare minimum to win
                     lowest_high = self.lowest_high(partial_state, self.cards_in_hand)
@@ -178,3 +187,12 @@ class Shooter(Agent):
             return lowest_high
         # Only here when the player is not capable of taking the trick so go with lowest card
         return self.get_lowest(cards)
+
+    def get_hearts(self,
+                   cards : list):
+        """Takes a list of cards and returns a list that only holds hearts cards"""
+        hearts = []
+        for i in cards:
+            if (38 < i <52):
+                hearts.append(i)
+        return hearts
