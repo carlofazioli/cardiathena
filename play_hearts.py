@@ -8,7 +8,6 @@ from agent.Shooter import Shooter
 
 
 # Create the players, the adjudicator, and the game object.
-random.seed(42)
 agent_1 = RandomHeartsAgent()
 agent_2 = RandomHeartsAgent()
 agent_3 = LowLayer()

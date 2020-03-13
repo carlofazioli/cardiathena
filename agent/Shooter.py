@@ -26,7 +26,6 @@ class Shooter(Agent):
     def __init__(self):
         self.own_adj = HeartsAdjudicator()
         self.cards_in_hand = []
-        random.seed(42)
     
     def get_action(self,
                    partial_state: HeartsState):

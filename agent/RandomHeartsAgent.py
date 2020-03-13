@@ -29,7 +29,6 @@ class RandomHeartsAgent(Agent):
         :param partial_state: the position vector of the game.
         :return: an Action.
         """
-        random.seed(42)
         # Given the masked state, only cards in hand of agent is available
         cards_in_hand = []
 
