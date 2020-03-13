@@ -1,3 +1,4 @@
+import random
 from agent.LowLayer import LowLayer
 from base import GameManager
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
