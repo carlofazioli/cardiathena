@@ -83,8 +83,15 @@ class Shooter(Agent):
                 # Later in the game so try to take tricks from players
                 # TODO we should be checking if we can even follow suit to know
                 # if we are capable of taking the trick
-                lowest_high = self.lowest_high(partial_state, self.cards_in_hand)
-                return random.choice(lowest_high)
+                # TODO check if we are playing last so we can do bare minimum
+                if (self.is_last):
+                    # We know the trick is over after this action so do the bare minimum to win
+                    lowest_high = self.lowest_high(partial_state, self.cards_in_hand)
+                    return random.choice(lowest_high)
+                else:
+                    # Not last so be safe and play highest
+                    highest = self.get_highest(self.cards_in_hand)
+                    return random.choice(highest)
             return random.choice(self.cards_in_hand)
 
     def is_lead(self,
@@ -105,6 +112,14 @@ class Shooter(Agent):
             # We are in the early half of the game if less than half the cards have been played
             return True
         # We are in the later half of the game if more than half the cards are remaining
+        return False
+
+    def is_last(self,
+                partial_state: HeartsState):
+        """Returns true if the player is the last to play in a trick."""
+        if (len(partial_state.values[partial_state.values > 20]) == 3):
+            # Four players so this player is last when the other three have played
+            return True
         return False
 
     def get_lowest(self,
