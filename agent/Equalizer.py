@@ -49,13 +49,15 @@ class EqualizerAgent(Agent):
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
-            c1 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c1)
-            c2 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c2)
-            c3 = random.choice(self.cards_in_hand)
-            self.cards_in_hand.remove(c3)
-            three_cards = [c1, c2, c3]
+            # c1 = random.choice(self.cards_in_hand)
+            # self.cards_in_hand.remove(c1)
+            # c2 = random.choice(self.cards_in_hand)
+            # self.cards_in_hand.remove(c2)
+            # c3 = random.choice(self.cards_in_hand)
+            # self.cards_in_hand.remove(c3)
+            # three_cards = [c1, c2, c3]
+
+            three_cards = self.passing(partial_state)
             return HeartsAction(three_cards)
 
         # Agent picks a card to play
@@ -208,6 +210,35 @@ class EqualizerAgent(Agent):
         suit_to_choose_from.sort()
         choice = suit_to_choose_from[0]
         return choice
+    def passing(self, partial_state: HeartsState):
+        hand = self.sort_suits(partial_state)
+        # We want to void out Clubs - Diamonds - Spades - Hearts
+        pirority = [ 0 , 1, 2 ,3 ]
+        # Reference to all the amount of cards in each suit
+        suit_map = {
+                "D":len(hand[1]),
+                "C":len(hand[0]),
+                "S":len(hand[2]),
+                "H":len(hand[3])
+        }
+
+        cards_to_pass = []
+        suit_counter = 0
+        # Follows the order of priority to void suits.
+        for  suit in hand:
+            # Clubs first since they are the first suit played
+            if len(suit) > 0 :
+                suit.reverse()
+                for card in suit:
+                    # Avoid giving away the queen of spades
+                    if (suit_counter != 2) & (card != 36):
+                        cards_to_pass.append(card)
+            if len(cards_to_pass) > 3:          # There is enough cards to pass
+                break
+            suit_counter += 1
+            # rinse and repeat the first part but with other suits
+        return  cards_to_pass[0:3]
+
 
     def get_highest_safe_card(self,
                               suit_to_choose_from: list,
