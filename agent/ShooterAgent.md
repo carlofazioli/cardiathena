@@ -29,6 +29,9 @@ This is because the last state has finished when all four players have played an
 that it is early in the game when less than half the deck has been played and it is late in the game when more than half the deck
 has been played.
 
+`is_last(partial_state : HeartsState) : Boolean` Check if the player is the last one to play in the current trick so they can know
+whether they need to play safely or not.
+
 `get_lowest(cards : List) : List` Take a list of cards and find the cards with the lowest value.
 In order to find the value, you use mod thirteen because there are thirteen cards in a suit.
 If there is more than one card that shares the lowest value, they all get to remain in the list so the player can choose
@@ -43,3 +46,5 @@ If any cards that match that criteria were found, return a list of them.
 If no cards were found that match that criteria, return the lowest cards.
 This function is useful for when the player is playing at the end of the trick because they know if they can take it and they want
 to save their high cards for future tricks.
+
+`get_hearts(cards : List) : List` Look through the received cards and return a list of all the hearts cards.
