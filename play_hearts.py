@@ -7,7 +7,7 @@ from agent.LowLayer import LowLayer
 from agent.RandomHeartsAgent import RandomHeartsAgent
 from base import GameManager
 from database.mysql.hearts import HeartsMySQLDatabase as db
-from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, ARGO_DIR
+from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR
 
 # Create the players, the adjudicator, and the game object.
 game_uuid = uuid.uuid4().hex
@@ -58,7 +58,7 @@ def process_state_data():
     state_data = game.save_game()
 
     # Process state_data, insert into database
-    directory = ARGO_DIR + "{}.csv".format(game_uuid)
+    directory = CSV_DIR + "{}.csv".format(game_uuid)
     with open(directory, 'w') as file:
         writer = csv.writer(file, lineterminator='\n',)
         writer.writerow(["deck", "action", "score", "game_uuid"])
