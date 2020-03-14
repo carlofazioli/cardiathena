@@ -13,8 +13,12 @@ except:
     CSV_DIR = '{}/mysql_hearts/mysql-files/'.format(HOME_DIR)
     os.makedirs(CSV_DIR)
 
-with open("/scratch/$USER/mysql_hostname", "r") as file:
-    HOSTNAME = file.readline()
+# Get the host name of the compute node that hosts the mysql container.
+if SCRATCH_DIR:
+    with open(SCRATCH_DIR+"/{}".format("mysql_hostname"), 'r') as file:
+        HOSTNAME = file.readline()
+else:
+    HOSTNAME = "localhost"
 
 """ Database variables """
 DB = "cardiathena_db"
