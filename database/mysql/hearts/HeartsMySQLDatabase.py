@@ -54,7 +54,7 @@ def insert_state(file):
     The method insert_state() loads a csv file into the state table. Load data local loads the csv file that resides on the same machine
     as the mysql server. This method of inserting data is typically much faster than multiple insertions.
     
-    :param string:file: file is the path to the csv file. 
+    :param file: file is the path to the csv file.
     """
     
     db = MySQLDatabase()
