@@ -3,10 +3,15 @@ import os
 """ Environment variables """
 HOME_DIR = os.environ['HOME']
 PWD_DIR = os.environ['PWD']
-SCRATCH_DIR = os.environ['SCRATCH']
 
-CSV_DIR = '{}/Argo/mysql/var/lib/mysql-files/'.format(HOME_DIR)
-ARGO_DIR = '{}/mysql-files/'.format(SCRATCH_DIR)
+# Assign CSV path for Argo.
+try:
+    SCRATCH_DIR = os.environ['SCRATCH']
+    CSV_DIR = '{}/mysql-files/'.format(SCRATCH_DIR)
+# Assign CSV path for local linux machine.
+except:
+    CSV_DIR = '{}/mysql_hearts/mysql-files/'.format(HOME_DIR)
+    os.makedirs(CSV_DIR)
 
 """ Database variables """
 DB = "cardiathena_db"
