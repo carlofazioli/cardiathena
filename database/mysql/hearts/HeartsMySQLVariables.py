@@ -13,6 +13,9 @@ except:
     CSV_DIR = '{}/mysql_hearts/mysql-files/'.format(HOME_DIR)
     os.makedirs(CSV_DIR)
 
+with open("/scratch/$USER/mysql_hostname", "r") as file:
+    HOSTNAME = file.readline()
+
 """ Database variables """
 DB = "cardiathena_db"
 
@@ -66,7 +69,7 @@ SELECT_GAME_ID = "SELECT {} FROM {} WHERE {}=".format(GAME_ID_COLUMN, GAME_TABLE
 CONFIG = {
     'user': 'remote_usr',
     'password': '',
-    'host': 'NODE0',
+    'host': HOSTNAME,
     'port': '3306',
     'db': 'cardiathena_db',
     'raise_on_warnings': True,
