@@ -2,7 +2,7 @@
 `get_action(partial_state : State) : Action` creates an action with the mindset of trying to inflict as many points as possible on the other players.
 
 ## Passing
-TODO
+This agent passes the highest cards three cards it can from Clubs, Diamonds, Spades (excludes the queen), and finally Hearts.
 ## Leading
 This agent leads by first attempting to void out its Clubs and Diamonds suits (whichever one is smaller.)
 It does this through the function `void_out_suits(self, partial_state: HeartsState):`, which sorts

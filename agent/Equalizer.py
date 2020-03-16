@@ -225,7 +225,7 @@ class EqualizerAgent(Agent):
         cards_to_pass = []
         suit_counter = 0
         # Follows the order of priority to void suits.
-        for  suit in hand:
+        for suit in hand:
             # Clubs first since they are the first suit played
             if len(suit) > 0 :
                 suit.reverse()
