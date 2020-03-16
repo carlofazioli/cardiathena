@@ -1,8 +1,5 @@
 import random
-
-import numpy as np
-import pandas as pd
-
+# import pandas as pd
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from base import Action, Agent
@@ -29,8 +26,8 @@ class LowLayer(Agent):
     def __init__(self):
         self.own_adj = HeartsAdjudicator()
         self.cards_in_hand = []
-        self.records = pd.DataFrame(columns=['Round|Trick ', 'Passing_Cards', 'Hands', 'Chosen Card', 'Lead'])
-        self.game_number = 0
+        # self.records = pd.DataFrame(columns=['Round|Trick ', 'Passing_Cards', 'Hands', 'Chosen Card', 'Lead'])
+        # self.game_number = 0
 
     def get_action(self,
                    partial_state: HeartsState):
@@ -46,26 +43,19 @@ class LowLayer(Agent):
 
         # Agent picks 3 cards to pass
         #record_new_row = [-1, -1, -1, -1]
-        record_new_row = {'Round|Trick ': self.game_number,
-                          'Passing_Cards' : -1 ,
-                          'Hands': -1,
-                          'Chosen Card' : -1 ,
-                          'Lead': False }
+        # record_new_row = {'Round|Trick ': self.game_number,
+        #                   'Passing_Cards' : -1 ,
+        #                  'Hands': -1,
+        #                  'Chosen Card' : -1 ,
+        #                  'Lead': False }
         if partial_state.pass_type > 0:
-            # c1 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c1)
-            # c2 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c2)
-            # c3 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c3)
-            # three_cards = [c1, c2, c3]
             # three_cards = self.passing_smart_sequence(partial_state)
-            three_cards = self.passing_smart_facevalues(partial_state)
+            three_cards = self.passing_smart_face_values(partial_state)
             # print("THREE CARDS ARE " + str(three_cards))
             # for remove in three_cards:
             #     self.cards_in_hand.remove(remove)
-            record_new_row["Passing_cards"] = three_cards
-            self.records = self.records.append(record_new_row,ignore_index=True)
+            # record_new_row["Passing_cards"] = three_cards
+            # self.records = self.records.append(record_new_row,ignore_index=True)
             return HeartsAction(three_cards)
 
         for i in range(len(partial_state.values)):
@@ -77,15 +67,15 @@ class LowLayer(Agent):
         # Agent picks a card to play
         # elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
         else:
-            record_new_row["Hands"] = self.cards_in_hand
+            # record_new_row["Hands"] = self.cards_in_hand
             choice = self.select_card(partial_state)
             # print("minimizing agent is leading: " + str(self.is_lead(partial_state)))
             # print("minimizing agent is not void: " + str(self.not_void(partial_state)))
             self.cards_in_hand = []
-            record_new_row["Chosen Card"] = choice
-            self.records = self.records.append(record_new_row,ignore_index=True)
-            self.game_number += 1
-            self.records.to_csv(" Game.csv")
+            # record_new_row["Chosen Card"] = choice
+            # self.records = self.records.append(record_new_row,ignore_index=True)
+            # self.game_number += 1
+            # self.records.to_csv(" Game.csv")
             return HeartsAction(choice)
 
     def select_card(self,
@@ -209,34 +199,53 @@ class LowLayer(Agent):
         sorted_cards_in_hand = self.sort_suits(partial_state)
         return self.pick_trouble_card(sorted_cards_in_hand)
 
-    def passing_smart_facevalues(self,
+    def passing_smart_face_values(self,
                                  partial_state: HeartsState):
-        """ Method 2: Average the face cards in each suit, and pass the highest
-         cards from the suit with the highest average. (J = 11, Q = 12, K = 13, A = 14).
-          Repeat if void. """
-        suits = self.sort_suits(partial_state)
-        suit_weights = []
-        chosen_cards = []
+        """
+        Method 2: Average the face cards in each suit, and pass the highest cards from the suit with the
+        highest average. (J = 9, Q = 10, K = 11, A = 12). Repeat if void.
+        """
 
-        for s in suits:
-            suit_weights.append(self.average_suit_weight(s))
+        sorted_hands = self.sort_suits(partial_state)
 
-        for i in range(3):  # Need to choose 3 cards
-            Max = -1
-            index = 0
-            max_index = 0
+        cards_to_pass = []
 
-            for facevalues in suit_weights:  # Find the suit with max weight
-                if Max < facevalues:
-                    Max = facevalues
-                    max_index = index
-                index += 1
-            for cards in reversed(suits[max_index]):  # Pass the Highest Cards first
-                chosen_cards.append(cards)
-            suit_weights[max_index] = 0  # Suit is voided
-            if len(chosen_cards) > 3:  # Found 3 or more break
-                break
-        return chosen_cards[0:3]  # return only 3
+        for card in range(3):
+            # Face_value_cards is a sorted by suits list of only face cards.
+            face_value_cards = [[card for card in suit if 8 < (card % 13) < 13] for suit in sorted_hands]
+            # Face_value_cards modulo 13 for average calculations.
+            modded_face_value_cards = [self.mod_13(suit) for suit in face_value_cards]
+            # Avg_face_value is a list of averaged face value cards.
+            avg_face_value = [self.average_cards(suit) for suit in modded_face_value_cards]
+
+            # Calculate suit_index for first check if suit is void
+            highest_average = max(avg_face_value)
+            suit_index = avg_face_value.index(highest_average)
+
+            # Check if the player has any face cards to begin with
+            if (avg_face_value == [0,0,0,0]):
+                # There are no face cards so move on to method1 which does not rely on that
+                method1 = self.pick_trouble_card(sorted_hands)
+                while (len(cards_to_pass) < 3):
+                    cards_to_pass.append(method1.pop(0))
+                return cards_to_pass
+
+            if sorted_hands[suit_index]:
+                # Index of the highest card in sorted_hands.
+                highest_card_index = len(sorted_hands[suit_index]) - 1
+                # Value of the highest card in sorted_hands.
+                highest_card = sorted_hands[suit_index][highest_card_index]
+                # Add to cards_to_pass.
+                cards_to_pass.append(highest_card)
+                sorted_hands[suit_index].remove(highest_card)
+
+        return cards_to_pass
+
+    @staticmethod
+    def average_cards(hand):
+        if not hand:
+            return 0
+        return sum(hand) / len(hand)
 
     def pick_trouble_card_suit(self, sorted_hands):
         """Choose the suit with the least amount of cards
@@ -301,6 +310,10 @@ class LowLayer(Agent):
             sorted_hands[suit_index].__delitem__(len(sorted_hands[suit_index]) - 1)
             trouble_suit[suit_index].__delitem__(len(trouble_suit[suit_index]) - 1)
         return cards_to_pass
+
+    @staticmethod
+    def mod_13(sorted_hands):
+        return [suit % 13 for suit in sorted_hands]
 
     def average_suit_weight(self, Suit_list):
         """ Uses the face card values in order to calculate the average """
