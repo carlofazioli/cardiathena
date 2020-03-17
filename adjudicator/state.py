@@ -42,7 +42,7 @@ class HeartsState(State):
         #self.trick_winner = 0
         self.pass_type = 1
         #self.cards_of_trick = []
-        #self.points = [0, 0, 0, 0] #points for a round rather than a game
+        self.points = [0, 0, 0, 0] #points for a round rather than a game
 
 
         #What we are defining as points for the game. Here we have the indices for all the hearts as well as the
