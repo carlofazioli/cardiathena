@@ -21,8 +21,6 @@ agent_3 = LowLayer()
 agent_4 = Shooter()
 adj = HeartsAdjudicator()
 state = HeartsState()
-game = GameManager(agent_list=[0, agent_1, agent_2, agent_3, agent_4],
-agent_4 = RandomHeartsAgent()
 agent_list = [0, agent_1, agent_2, agent_3, agent_4]
 
 game = GameManager(agent_list,
