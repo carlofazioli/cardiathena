@@ -7,7 +7,7 @@ from agent.LowLayer import LowLayer
 from agent.RandomHeartsAgent import RandomHeartsAgent
 from base import GameManager
 from database.mysql.hearts import HeartsMySQLDatabase as db
-from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR
+from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYSQL_SERVER
 
 # Create the players, the adjudicator, and the game object.
 game_uuid = uuid.uuid4().hex
@@ -70,14 +70,13 @@ def process_state_data():
     db.insert_state(directory)
 
 
-# Save starting game information
-save_game()
+if MYSQL_SERVER:
+    # Save starting game information
+    save_game()
+    # Play a game.
+    game.play_game()
+    # The game is over, save the states of the game into the database.
+    process_state_data()
 
-# Play a game.
-game.play_game()
-
-# The game is over, save the states of the game into the database.
-process_state_data()
-
-# Put a debug point here to inspect the game object.
-#input()
+else:
+    game.play_game()
