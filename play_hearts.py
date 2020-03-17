@@ -8,6 +8,8 @@ from agent.RandomHeartsAgent import RandomHeartsAgent
 from base import GameManager
 from database.mysql.hearts import HeartsMySQLDatabase as db
 from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYSQL_SERVER
+from agent.Shooter import Shooter
+
 
 # Create the players, the adjudicator, and the game object.
 game_uuid = uuid.uuid4().hex
@@ -16,6 +18,10 @@ state = HeartsState()
 agent_1 = RandomHeartsAgent()
 agent_2 = RandomHeartsAgent()
 agent_3 = LowLayer()
+agent_4 = Shooter()
+adj = HeartsAdjudicator()
+state = HeartsState()
+game = GameManager(agent_list=[0, agent_1, agent_2, agent_3, agent_4],
 agent_4 = RandomHeartsAgent()
 agent_list = [0, agent_1, agent_2, agent_3, agent_4]
 

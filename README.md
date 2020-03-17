@@ -11,6 +11,7 @@ Agents
 * [Random Hearts Agent](agent/RandomHeartsAgent.md)
 * [Low Layer Agent](agent/LowLayerAgent.md)
 * [Equalizer Agent](agent/EqualizerAgent.md)
+* [Shooter Agent](agent/ShooterAgent.md)
 
 Distributed-Computing
 * [Argo](distributed-computing/argo/README.md)

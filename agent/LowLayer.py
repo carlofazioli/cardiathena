@@ -195,18 +195,28 @@ class LowLayer(Agent):
         """
 
         sorted_hands = self.sort_suits(partial_state)
-        # Face_value_cards is a sorted by suits list of only face cards.
-        face_value_cards = [[card for card in suit if 8 < (card % 13) < 13] for suit in sorted_hands]
-        # Face_value_cards modulo 13 for average calculations.
-        modded_face_value_cards = [self.mod_13(suit) for suit in face_value_cards]
-        # Avg_face_value is a list of averaged face value cards.
-        avg_face_value = [self.average_cards(suit) for suit in modded_face_value_cards]
+        
+        cards_to_pass = []
 
-        cards_to_pass = [0, 0, 0]
-
-        for index, card in enumerate(cards_to_pass):
+        for card in range(3):
+            # Face_value_cards is a sorted by suits list of only face cards.
+            face_value_cards = [[card for card in suit if 8 < (card % 13) < 13] for suit in sorted_hands]
+            # Face_value_cards modulo 13 for average calculations.
+            modded_face_value_cards = [self.mod_13(suit) for suit in face_value_cards]
+            # Avg_face_value is a list of averaged face value cards.
+            avg_face_value = [self.average_cards(suit) for suit in modded_face_value_cards]
+            
+            # Calculate suit_index for first check if suit is void
             highest_average = max(avg_face_value)
             suit_index = avg_face_value.index(highest_average)
+
+            # Check if the player has any face cards to begin with
+            if (avg_face_value == [0,0,0,0]):
+                # There are no face cards so move on to method1 which does not rely on that
+                method1 = self.pick_trouble_card(sorted_hands)
+                while (len(cards_to_pass) < 3):
+                    cards_to_pass.append(method1.pop(0))
+                return cards_to_pass
 
             if sorted_hands[suit_index]:
                 # Index of the highest card in sorted_hands.
@@ -214,12 +224,9 @@ class LowLayer(Agent):
                 # Value of the highest card in sorted_hands.
                 highest_card = sorted_hands[suit_index][highest_card_index]
                 # Add to cards_to_pass.
-                cards_to_pass[index] = highest_card
+                cards_to_pass.append(highest_card)
                 sorted_hands[suit_index].remove(highest_card)
 
-            # Suit is now void, remove averaged value for future calculations.
-            if not sorted_hands[suit_index]:
-                avg_face_value[suit_index] = 0
         return cards_to_pass
 
     @staticmethod
