@@ -3,22 +3,31 @@ import os
 """ Environment variables """
 HOME_DIR = os.environ['HOME']
 PWD_DIR = os.environ['PWD']
+ON_ARGO = False
+MYSQL_SERVER = True
 
 # Assign CSV path for Argo.
 try:
     SCRATCH_DIR = os.environ['SCRATCH']
     CSV_DIR = '{}/mysql-files/'.format(SCRATCH_DIR)
+    ON_ARGO = True
 # Assign CSV path for local linux machine.
 except:
+    SCRATCH_DIR = None
     CSV_DIR = '{}/mysql_hearts/mysql-files/'.format(HOME_DIR)
-    os.makedirs(CSV_DIR)
+    os.makedirs(CSV_DIR, exist_ok=True)
 
-# Get the host name of the compute node that hosts the mysql container.
-if SCRATCH_DIR:
-    with open(SCRATCH_DIR+"/{}".format("mysql_hostname"), 'r') as file:
-        HOSTNAME = file.readline()
-else:
-    HOSTNAME = "localhost"
+
+def get_host_name(SCRATCH_DIR):
+    # Get the host name of the compute node that hosts the mysql container.
+    if ON_ARGO:
+        with open(SCRATCH_DIR + "/{}".format("mysql_hostname"), 'r') as file:
+            host_name = file.readline()
+        file.close()
+        return host_name
+    else:
+        return "localhost"
+
 
 """ Database variables """
 DB = "cardiathena_db"
@@ -73,7 +82,7 @@ SELECT_GAME_ID = "SELECT {} FROM {} WHERE {}=".format(GAME_ID_COLUMN, GAME_TABLE
 CONFIG = {
     'user': 'remote_usr',
     'password': '',
-    'host': HOSTNAME,
+    'host': get_host_name(SCRATCH_DIR),
     'port': '3306',
     'db': 'cardiathena_db',
     'raise_on_warnings': True,
