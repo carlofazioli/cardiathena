@@ -253,8 +253,7 @@ class EqualizerAgent(Agent):
                 queen_played = True
         # if the queen has been played or our points are over 10, this
         # agent is going to play the lowest card it can
-        points = self.own_adj.points(partial_state)
-        if queen_played or points[self.player_position - 1] >= 10:
+        if queen_played or partial_state.score[self.player_position - 1] >= 10:
             choice = suit_to_choose_from[0]
         else:
             # todo if our agent has the queen we may want some different behavior
