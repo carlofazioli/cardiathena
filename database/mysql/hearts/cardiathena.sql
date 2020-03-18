@@ -39,7 +39,7 @@ CREATE TABLE `agent` (
 
 LOCK TABLES `agent` WRITE;
 /*!40000 ALTER TABLE `agent` DISABLE KEYS */;
-INSERT INTO `agent` VALUES (1,'The Random Agent',1),(2,'The Low Layer',1);
+INSERT INTO `agent` VALUES (1,'The Random Agent',1),(2,'The Low Layer',1),(3,'The Equalizer',1),(4,'The Shooter',1);
 /*!40000 ALTER TABLE `agent` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -117,4 +117,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-03-05  8:42:34
+-- Dump completed on 2020-03-17 12:51:01
