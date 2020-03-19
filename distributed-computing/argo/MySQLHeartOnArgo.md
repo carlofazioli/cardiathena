@@ -107,6 +107,9 @@ Some required packages may need to be installed (only for local machines):
 ### Install mysql-connector-python
 `pip3 install mysql-connector-python`
 
+## Getting the database on Argo
+A database needs to be created on the MySQL server. See [MySQL Workbench](https://github.com/c-to-the-fazzy/cardiathena/blob/mysql-on-argo/distributed-computing/argo/MySQLWorkbench.md)
+
 ## Running the games on Argo
 Log onto Argo on another terminal.
 
@@ -124,7 +127,8 @@ Download the slurm script:
 <br></br>
 `cp /cardiathena/distributed-computing/argo/slurm_script.slurm $SCRATCH`
 
-Edit the slurm script as needed.
+Edit the slurm script as needed. Default is set to run 1 game.
+To run more game, edit the line `##SBATCH --array=1-3000` in slurm_script.slurm to `#SBATCH --array=1-30000%16`. This will run 30000 games at 16 at a time. This will typically run in about 1-2 hours. 
 
 Run:
 <br></br>
