@@ -49,18 +49,39 @@ class Shooter(Agent):
             lowest_heart = self.get_lowest(hearts)
             while (len(lowest_heart) > 0 and len(three_cards) < 3):
                 # We can only play a heart when we have a heart
-                chosen_card = random.choice(lowest_heart)
-                three_cards.append(chosen_card)
-                # Remove from lists so it does not get chosen again
-                hearts.remove(chosen_card)
-                self.cards_in_hand.remove(chosen_card)
-                # Find our next lowest cards to pass on
-                lowest_heart = self.get_lowest(hearts)
+                # First we get the lowest heart and the lowest card
+                chosen_heart = lowest_heart[0]
+                heart_value = chosen_heart % 13
+                lowest = random.choice(self.get_lowest(self.cards_in_hand))
+                lowest_value = lowest % 13
+                # We know lowest heart can not be lower than lowest card so we do not have to check that
+                if (chosen_heart == lowest):
+                    # The lowest card is a heart
+                    three_cards.append(chosen_heart)
+                    # Remove from lists so it does not get chosen again
+                    hearts.remove(chosen_heart)
+                    self.cards_in_hand.remove(chosen_heart)
+                    # Find our next lowest cards to pass on
+                    lowest_heart = self.get_lowest(hearts)
+                elif ((lowest_value - 2) <= heart_value <= (lowest_value + 2)):
+                    # Heart is slightly higher than lowest but play it anyways
+                    three_cards.append(chosen_heart)
+                    # Remove from lists so it does not get chosen again
+                    hearts.remove(chosen_heart)
+                    self.cards_in_hand.remove(chosen_heart)
+                    # Find our next lowest cards to pass on
+                    lowest_heart = self.get_lowest(hearts)
+                else:
+                    # Should only be in here if lowest card is significantly lower than lowest heart
+                    three_cards.append(lowest)
+                    # Only remove from cards in hand since it is not a heart
+                    self.cards_in_hand.remove(lowest)
             # We either have all three cards as hearts cards or we need more
             while (len(three_cards) < 3):
                 lowest = random.choice(self.get_lowest(self.cards_in_hand))
                 three_cards.append(lowest)
                 self.cards_in_hand.remove(lowest)
+            print("Passing cards: " + str(three_cards))
             return HeartsAction(three_cards)
 
         # Agent picks a card to play
@@ -115,7 +136,10 @@ class Shooter(Agent):
     def is_early(self,
                  partial_state: HeartsState):
         """Returns true if it is still early in the game.
-        Start with the basic strategy of checking if half the hand remains"""
+        Check if points have been broken. If they have not, check if half the deck remains."""
+        if (self.points_broken(partial_state)):
+            # Points have been broken so it is no longer early in the game
+            return False
         if (len(partial_state.values[partial_state.values > 10]) < 52/2):
             # A deck starts with 52 cards
             # We are in the early half of the game if less than half the cards have been played
@@ -196,3 +220,20 @@ class Shooter(Agent):
             if (38 < i <52):
                 hearts.append(i)
         return hearts
+
+    def points_broken(self,
+                      partial_state: HeartsState):
+        """Check to see if points have been broken"""
+        played_cards = np.where(partial_state.values >= 10)[0]
+        # Get the hearts cards (the where does not really matter, we just need a count of them)
+        points = np.where(played_cards > 38)[0]
+        if (len(points) > 0):
+            # At least one heart has been played so points are broken
+            return True
+        # Check if the queen of spades has been played
+        points = np.where(played_cards == 36)[0]
+        if (len(points) > 0):
+            # The queen was played
+            return True
+        # None of the points cards have been played
+        return False
