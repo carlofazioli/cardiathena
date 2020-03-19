@@ -87,6 +87,36 @@ class EqualizerAgent(Agent):
             return True
         return False
 
+    def passing(self, partial_state: HeartsState):
+        """Want to void out first Clubs, Diamonds, Spades, and lastly Hearts"""
+        hand = self.sort_suits(partial_state)
+        # We want to void out Clubs - Diamonds - Spades - Hearts
+        # priority = [ 0 , 1, 2 ,3 ]
+        # Reference to all the amount of cards in each suit
+        # suit_map = {
+        #        "D":len(hand[1]),
+        #        "C":len(hand[0]),
+        #        "S":len(hand[2]),
+        #        "H":len(hand[3])
+        # }
+
+        cards_to_pass = []
+        suit_counter = 0
+        # Follows the order of priority to void suits.
+        for suit in hand:
+            # Clubs first since they are the first suit played
+            if len(suit) > 0 :
+                suit.reverse()
+                for card in suit:
+                    # Avoid giving away the queen of spades
+                    if (suit_counter != 2) & (card != 36):
+                        cards_to_pass.append(card)
+            if len(cards_to_pass) > 3:          # There is enough cards to pass
+                break
+            suit_counter += 1
+            # rinse and repeat the first part but with other suits
+        return cards_to_pass[0:3]
+
     def select_card(self,
                     partial_state: HeartsState):
         """The main selection routine for if the agent is leading or following a trick."""
@@ -149,12 +179,8 @@ class EqualizerAgent(Agent):
             # if we're void in the suit we're trying to follow, want to avoid playing spades
             # going to play and potentially break hearts if we can
             if len(suits[3]) != 0:
-                if len(suits[3]) == 0:
-                    print("hi-follow")
                 choice = self.get_low_card(suits[3])
             else:
-                if len(suits[2]) == 0:
-                    print("hi-follow")
                 choice = self.get_low_card(suits[2])
         else:
             # clubs or diamonds have been played, follow with our high card (if we can)
@@ -219,35 +245,6 @@ class EqualizerAgent(Agent):
         suit_to_choose_from.sort()
         choice = suit_to_choose_from[0]
         return choice
-    def passing(self, partial_state: HeartsState):
-        hand = self.sort_suits(partial_state)
-        # We want to void out Clubs - Diamonds - Spades - Hearts
-        pirority = [ 0 , 1, 2 ,3 ]
-        # Reference to all the amount of cards in each suit
-        suit_map = {
-                "D":len(hand[1]),
-                "C":len(hand[0]),
-                "S":len(hand[2]),
-                "H":len(hand[3])
-        }
-
-        cards_to_pass = []
-        suit_counter = 0
-        # Follows the order of priority to void suits.
-        for suit in hand:
-            # Clubs first since they are the first suit played
-            if len(suit) > 0 :
-                suit.reverse()
-                for card in suit:
-                    # Avoid giving away the queen of spades
-                    if (suit_counter != 2) & (card != 36):
-                        cards_to_pass.append(card)
-            if len(cards_to_pass) > 3:          # There is enough cards to pass
-                break
-            suit_counter += 1
-            # rinse and repeat the first part but with other suits
-        return  cards_to_pass[0:3]
-
 
     def get_highest_safe_card(self,
                               suit_to_choose_from: list,
@@ -265,8 +262,7 @@ class EqualizerAgent(Agent):
                 queen_played = True
         # if the queen has been played or our points are over 10, this
         # agent is going to play the lowest card it can
-        points = self.own_adj.points(partial_state)
-        if queen_played or points[self.player_position - 1] >= 10:
+        if queen_played or partial_state.score[self.player_position - 1] >= 10:
             choice = suit_to_choose_from[0]
         else:
             # todo if our agent has the queen we may want some different behavior
