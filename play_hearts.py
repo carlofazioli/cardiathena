@@ -12,7 +12,6 @@ from database.mysql.hearts import HeartsMySQLDatabase as db
 from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYSQL_SERVER
 
 
-
 # Create the players, the adjudicator, and the game object.
 game_uuid = uuid.uuid4().hex
 adj = HeartsAdjudicator()
@@ -24,7 +23,6 @@ agent_4 = Shooter()
 adj = HeartsAdjudicator()
 state = HeartsState()
 agent_list = [0, agent_1, agent_2, agent_3, agent_4]
-
 game = GameManager(agent_list,
                    adjudicator=adj,
                    state=state)
