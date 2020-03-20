@@ -139,8 +139,11 @@ Download the slurm script:
 `cp /cardiathena/distributed-computing/argo/slurm_script.slurm $SCRATCH`
 
 Edit the slurm script as needed. Default is set to run 1 game.
-To run more game, edit the line `##SBATCH --array=1-3000` in slurm_script.slurm to `#SBATCH --array=1-30000%16`. This will run 30000 games at 16 at a time. This will typically run in about 1-2 hours. 
-
+<br></br>
+To run more game, edit the line `##SBATCH --array=1-3000` in slurm_script.slurm to `#SBATCH --array=1-30000%16`. 
+<br></br>
+This will run 30000 games at 16 at a time. This will typically run in about 1-2 hours. 
+<br></br>
 Run:
 <br></br>
 `sbatch slurm_script.slurm`
