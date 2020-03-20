@@ -15,6 +15,15 @@ Clone the project to the scratch directory:
 `git clone https://github.com/c-to-the-fazzy/cardiathena.git`
 <br></br>
 
+For fast setup, download the setup script to the scratch directory.
+<br></br>
+`wget https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/distributed-computing/argo/argo_scripts/setup.sh`
+<br></br>
+Skip to [Start the Container](https://github.com/c-to-the-fazzy/cardiathena/blob/mysql-on-argo/distributed-computing/argo/MySQLHeartOnArgo.md#Start-the-container)
+<br></br>
+For a step by step guide, continue:
+
+# Step by step setup
 Create error and output logs directory:
 <br></br>
 `mkdir -p /scratch/$USER/logs_argo/out/ /scratch/$USER/logs_argo/err/`
@@ -57,6 +66,8 @@ Create the necessary directories (from within the scratch directory if on ARGO o
 <br></br>
 `mkdir -p $SCRATCH/mysql/var/lib/mysql $SCRATCH/mysql/run/mysqld $SCRATCH/mysql-files`
 
+
+## Start the container
 If on Argo run salloc, which will reserve a node:
 <br></br>
 `./alloc_mysql_node.sh`
