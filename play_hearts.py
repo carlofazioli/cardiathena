@@ -5,20 +5,24 @@ from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from agent.LowLayer import LowLayer
 from agent.RandomHeartsAgent import RandomHeartsAgent
+from agent.Equalizer import EqualizerAgent
+from agent.Shooter import Shooter
 from base import GameManager
 from database.mysql.hearts import HeartsMySQLDatabase as db
-from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR
+from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYSQL_SERVER
+
 
 # Create the players, the adjudicator, and the game object.
 game_uuid = uuid.uuid4().hex
 adj = HeartsAdjudicator()
 state = HeartsState()
 agent_1 = RandomHeartsAgent()
-agent_2 = RandomHeartsAgent()
+agent_2 = EqualizerAgent()
 agent_3 = LowLayer()
-agent_4 = RandomHeartsAgent()
+agent_4 = Shooter()
+adj = HeartsAdjudicator()
+state = HeartsState()
 agent_list = [0, agent_1, agent_2, agent_3, agent_4]
-
 game = GameManager(agent_list,
                    adjudicator=adj,
                    state=state)
@@ -70,14 +74,13 @@ def process_state_data():
     db.insert_state(directory)
 
 
-# Save starting game information
-save_game()
+if MYSQL_SERVER:
+    # Save starting game information
+    save_game()
+    # Play a game.
+    game.play_game()
+    # The game is over, save the states of the game into the database.
+    process_state_data()
 
-# Play a game.
-game.play_game()
-
-# The game is over, save the states of the game into the database.
-process_state_data()
-
-# Put a debug point here to inspect the game object.
-#input()
+else:
+    game.play_game()
