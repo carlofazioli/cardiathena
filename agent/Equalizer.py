@@ -29,6 +29,15 @@ class EqualizerAgent(Agent):
         # and played cards is available
         self.cards_in_hand = []
         self.player_position = -1
+        self.id = 3
+        self.agent_name = "The Equalizer"
+        self.version = 1.0
+
+    def __repr__(self):
+        return {"id": self.id, "name": self.agent_name, "version": self.version}
+
+    def __str__(self):
+        return self.agent_name
 
     def get_action(self,
                    partial_state: HeartsState):

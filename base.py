@@ -1,9 +1,5 @@
 from typing import List
 from copy import deepcopy
-# from xlwt import Workbook
-
-
-
 
 class State:
     """
@@ -108,9 +104,7 @@ class GameManager:
         self.adjudicator = adjudicator
         self.agent_list = agent_list
         self.state = state
-        self.state_history = list()
-        self.action_history = list()
-        self.state_action_history = list()
+        self.state_data = list()
 
     def play_game(self):
         """
@@ -133,34 +127,17 @@ class GameManager:
                 # agent_turn will return two lists of the same size so go through them together
                 current_player = self.agent_list[agent_index[i]]
                 player_action.append(current_player.get_action(partial_state[i]))
-            # Record this activity in the history.
-            self.state_history.append(deepcopy(self.state))
-            self.action_history.append(deepcopy(player_action))
-            self.state_action_history.append([deepcopy(self.state), deepcopy(player_action)])
+                # Record this activity in the history.
+                self.state_data.append(self.state.save_state(str(current_player.get_action(partial_state[i]))))
             # Adjudicate the action to receive an updated state.
             self.state = self.adjudicator.step_game(player_action, self.state)
         # At this point, the game is over.  Record the final state.
-        self.state_history.append(self.state)
-        self.state_action_history.append([deepcopy(self.state), "None"])
+        self.state_data.append(self.state.save_state(0))
 
     def save_game(self):
         """
         The save_game() method should process the state/action histories for the DB.
+
         :return:
         """
-        # No longer need to save to an excel sheet
-        # wb = Workbook()
-        # sheet1 = wb.add_sheet("Sheet 1")
-
-        # strings = self.state_history[0].store_strings()
-        # for j in range(len(strings)): #write the classifications at the top
-            # sheet1.write(0, j, strings[j])
-
-        # for i in range(len(self.state_history)):
-            # values = self.state_history[i].store_values()
-            # for j in range(len(values)):
-                # sheet1.write(i+1, j, str(values[j]))
-            # sheet1.write(i+1, len(values), str(self.state_action_history[i][1]))
-
-        # wb.save("HeartsGame.xls")
-        # pass
+        return self.state_data

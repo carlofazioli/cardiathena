@@ -254,7 +254,7 @@ class HeartsAdjudicator(Adjudicator):
         # All of these cards belong to the trick winner (tricks won)
         for card in self.cards_of_trick(state):
             state.values[card] = trick_winner + 10
-        
+
         print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1, "  High card: ",
               max_card, " Points: ", self.points(state))
 
@@ -279,7 +279,7 @@ class HeartsAdjudicator(Adjudicator):
         if self.is_finished(state):
             # Do not shuffle if game is over
             return
-        
+
         # New round, shuffle cards, and Pass cards
         state.shuffle()
         
@@ -306,10 +306,11 @@ class HeartsAdjudicator(Adjudicator):
         """
         for i in range(0, 4):
             if state.score[i] >= 100:
+
                 print("P1: ", state.score[0],
-                      " P2: ", state.score[1],
-                      " P3: ", state.score[2],
-                      " P4: ", state.score[3])
+                  " P2: ", state.score[1],
+                  " P3: ", state.score[2],
+                  " P4: ", state.score[3])
                 return True
         return False
 

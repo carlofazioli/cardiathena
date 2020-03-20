@@ -26,7 +26,16 @@ class Shooter(Agent):
     def __init__(self):
         self.own_adj = HeartsAdjudicator()
         self.cards_in_hand = []
-    
+        self.id = 4
+        self.agent_name = "The Shooter"
+        self.version = 1.0
+
+    def __repr__(self):
+        return {"id": self.id, "name": self.agent_name, "version": self.version}
+
+    def __str__(self):
+        return self.agent_name
+
     def get_action(self,
                    partial_state: HeartsState):
         """

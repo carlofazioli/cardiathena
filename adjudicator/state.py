@@ -1,7 +1,7 @@
 import numpy as np
 from itertools import product
 from random import shuffle
-
+from base import State
 # definitions for the card values and suit values in a 52 card deck
 cards = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 suits = ['C', 'D', 'S', 'H']
@@ -13,13 +13,14 @@ player_current = [21, 22, 23, 24]
 trick_leader = [31, 32, 33, 34]
 unknown = 0
 
-
+"""
 class State:
 
     def __init__(self):
         # Probably want to change values to something else to reflect Adjudicator doc (Card deck?)
         self.values = None
         self.score = [0, 0, 0, 0]
+"""
 
 
 class HeartsState(State):
@@ -32,14 +33,15 @@ class HeartsState(State):
         inits the state and randomly assigns player
 
         """
-
         super().__init__()
+        self.values = None
+        self.score = [0, 0, 0, 0]
         self.shuffle()
         # Game Logic
-        self.current_player = 1
-        self.trick_winner = 0
+        #self.current_player = 1
+        #self.trick_winner = 0
         self.pass_type = 1
-        self.cards_of_trick = []
+        #self.cards_of_trick = []
         self.points = [0, 0, 0, 0] #points for a round rather than a game
 
 
@@ -58,6 +60,14 @@ class HeartsState(State):
             [f'{x:3}' for x in self.values])
 
         return out
+
+    def get_state_values(self):
+        return self.values
+
+    def get_state_scores(self):
+        return self.score
+
+
     """I will change the name lol just thought i would throw a hunter x hunter reference :p
         This function is aim to only allow players play cards from the lead suit(First card played)
         ;param Domain - The Suit that the players must play e.g Heart,Club,Diamond, and Spade
@@ -196,8 +206,23 @@ class HeartsState(State):
         played_cards = self.values > 10
         return np.where(held_cards+played_cards, self.values, np.zeros(52, dtype=int))
 
-    def store_values(self):
+    def save_state(self, player_action):
+        """
+        The save_state(player_action) method is called from the GameManager's play_game(). At any point the state of
+        the game changes via player actions, this method returns a snapshot of the state. The method returns a
+        dictionary: state_data, which contains the location of the cards: deck, player actions, and the score.
 
+        :param player_action: player_action is a value (if one card is played) or a vector (if passing cards)
+        :return state_data: a dictionary containing state information.
+        """
+        state_data = {
+            'deck': self.values,
+            'actions': player_action,
+            'scores': self.score
+        }
+        return state_data
+
+    def store_values(self):
         store_value = list(self.values)
         store_value = store_value + self.score
         store_value.append(self.current_player)
@@ -209,7 +234,6 @@ class HeartsState(State):
         return store_value
 
     def store_strings(self):
-
         store_string = []
         # label indices for storage of values
         for i in range(52):
@@ -222,8 +246,9 @@ class HeartsState(State):
             game_logic.append("Points of " + str(i))
         store_string = store_string + game_logic
         store_string.append("Action")
-
         return store_string
+
+
     @property
     def card_position(self):
         """
