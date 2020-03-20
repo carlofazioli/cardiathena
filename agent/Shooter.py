@@ -37,7 +37,6 @@ class Shooter(Agent):
         # Given the masked state, only cards in hand of agent is available
         self.cards_in_hand = []
 
-        #print("partial_state.values: " + str(partial_state.values))
         for i in range(len(partial_state.values)):
             if 0 < partial_state.values[i] < 5:
                 self.cards_in_hand.append(i)
@@ -81,7 +80,6 @@ class Shooter(Agent):
                 lowest = random.choice(self.get_lowest(self.cards_in_hand))
                 three_cards.append(lowest)
                 self.cards_in_hand.remove(lowest)
-            print("Passing cards: " + str(three_cards))
             return HeartsAction(three_cards)
 
         # Agent picks a card to play
@@ -106,23 +104,29 @@ class Shooter(Agent):
         else:
             # We are following a trick
             if self.is_early(partial_state):
-                # TODO is_early most likely counts too much time when it comes to whether
-                # we should follow with low cards or not so we can update it later
                 lowest = self.get_lowest(self.cards_in_hand)
                 return random.choice(lowest)
             else:
                 # Later in the game so try to take tricks from players
-                # TODO we should be checking if we can even follow suit to know
                 # if we are capable of taking the trick
                 if (self.is_last):
                     # We know the trick is over after this action so do the bare minimum to win
-                    lowest_high = self.lowest_high(partial_state, self.cards_in_hand)
-                    return random.choice(lowest_high)
+                    if self.following_lead(partial_state, self.cards_in_hand):
+                        # We can follow suit so take it
+                        lowest_high = self.lowest_high(partial_state, self.cards_in_hand)
+                        return random.choice(lowest_high)
+                    else:
+                        # We could not follow suit so do not bother trying to win
+                        lowest = self.get_lowest(self.cards_in_hand)
                 else:
                     # Not last so be safe and play highest
-                    highest = self.get_highest(self.cards_in_hand)
-                    return random.choice(highest)
-            return random.choice(self.cards_in_hand)
+                    if self.following_lead(partial_state, self.cards_in_hand):
+                        # We could possibly take it so try to
+                        highest = self.get_highest(self.cards_in_hand)
+                        return random.choice(highest)
+                    else:
+                        # We can not follow so there is no chance of taking it
+                        lowest = self.get_lowest(self.cards_in_hand)
 
     def is_lead(self,
                 partial_state: HeartsState):
@@ -192,8 +196,6 @@ class Shooter(Agent):
         """Find a card that is high enough to take the current trick but is as low as can be
         so as to save higher cards for later tricks"""
         # Find the highest card of the cards that are in play
-        # TODO This is currently finding the highest card rather than
-        # highest card following suit.
         highest_down = self.get_highest(np.where(partial_state.values > 20)[0])
         # Search for lowest high card by comparing to currently highest card
         lowest_high = []
@@ -223,7 +225,7 @@ class Shooter(Agent):
 
     def points_broken(self,
                       partial_state: HeartsState):
-        """Check to see if points have been broken"""
+        """Check to see if points have been broken."""
         played_cards = np.where(partial_state.values >= 10)[0]
         # Get the hearts cards (the where does not really matter, we just need a count of them)
         points = np.where(played_cards > 38)[0]
@@ -237,3 +239,17 @@ class Shooter(Agent):
             return True
         # None of the points cards have been played
         return False
+
+    def following_lead(self,
+                       partial_state: HeartsState,
+                       cards: list):
+        """Check if the player is capable of following suit before trying to take the trick.
+        Receives the partial state and a list representing the players hand."""
+        # Find the leading card to figure out its suit
+        lead = np.where(partial_state.values >= 30)[0][0]
+        # Divide by 13 to find the suit type
+        if ((cards[0]/13) == (lead/13)):
+            # Player has to follow if they have a card that is the same suit as the leader
+            return True
+        # Player can not follow the trick leader
+        return True
