@@ -14,11 +14,16 @@ Clone the project to the scratch directory:
 <br></br>
 `git clone https://github.com/c-to-the-fazzy/cardiathena.git`
 <br></br>
+Checkout the branch
+<br></br>
+`git checkout mysql-on-argo`
+<br></br>
 
 For fast setup, download the setup script to the scratch directory.
 <br></br>
 `wget https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/distributed-computing/argo/argo_scripts/setup.sh`
 <br></br>
+
 Skip to [Start the Container](https://github.com/c-to-the-fazzy/cardiathena/blob/mysql-on-argo/distributed-computing/argo/MySQLHeartOnArgo.md#Start-the-container)
 <br></br>
 For a step by step guide, continue:
