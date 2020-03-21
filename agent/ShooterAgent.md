@@ -48,3 +48,11 @@ This function is useful for when the player is playing at the end of the trick b
 to save their high cards for future tricks.
 
 `get_hearts(cards : List) : List` Look through the received cards and return a list of all the hearts cards.
+
+`points_broken(partial_state : HeartsState) : Boolean` Check to see if either hearts or the queen of spades have been played.
+Points have been broken if any of those cards have been played. Otherwise, points have not been broken yet.
+
+`following_lead(partial_state : HeartsState, cards: List) : Boolean` Check if the player is capable of following the trick leader.
+First, it finds the lead card (denoted by 31-34) and calculates the suit by dividing its location by 13.
+Next, it takes one of the cards in the cards list, finds the suit of that card, and compares it to the lead card.
+Since the player can either follow suit or not, the encoded state will either have only cards that are the same suit or only cards that can not follow suit. This means you can get away with only comparing one card in the hand with the lead card rather than the entire hand.
