@@ -58,13 +58,6 @@ class EqualizerAgent(Agent):
 
         # Agent picks 3 cards to pass
         if partial_state.pass_type > 0:
-            # c1 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c1)
-            # c2 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c2)
-            # c3 = random.choice(self.cards_in_hand)
-            # self.cards_in_hand.remove(c3)
-            # three_cards = [c1, c2, c3]
 
             three_cards = self.passing(partial_state)
             return HeartsAction(three_cards)
@@ -134,17 +127,13 @@ class EqualizerAgent(Agent):
 
     def void_out_suits(self,
                        partial_state: HeartsState):
-        """ This function selects the suit we want to try and void, the idea is to start with voiding either Clubs
+        """ This function selects the suit we want to try and void when leading, the idea is to start with voiding either Clubs
         or Diamonds (whichever is shortest) followed by Hearts and then Spades."""
         # start by sorting out all of the clubs
         suits = self.sort_suits(partial_state)
         # the suit that we wish to pick a card from
         suit_to_void = []
 
-        # todo right now leading is for when hearts has not been broken. may want to change strategy in future
-        # note that this nested if-else block can handle both cases of whether the agent is:
-        # - void in the suit the trick leader has
-        # - able to follow suit
         if len(suits[1]) != 0 or len(suits[0]) != 0:
             # neither diamonds or clubs have been voided, lead from one of these
             if len(suits[1]) == 0 or len(suits[1]) > len(suits[0]) != 0:
@@ -173,23 +162,46 @@ class EqualizerAgent(Agent):
         # depending on the suit we want to follow in different ways
         suits = self.sort_suits(partial_state)
 
-        # so my idea is that if the suit we're following with is Hearts or Spades
-        # we will want to go with our lowest card
-        if len(suits[2]) != 0 or len(suits[3]) != 0:
-            # if we're void in the suit we're trying to follow, want to avoid playing spades
-            # going to play and potentially break hearts if we can
-            if len(suits[3]) != 0:
-                choice = self.get_low_card(suits[3])
+        # see if we're void in the suit we need to follow, we are void if we have 2 or more suits that are non-empty
+        # inside of the suits list
+        counter = 0
+        for suit in suits:
+            if len(suit) != 0:
+                counter = counter + 1
+                # only need this for the else portion, if counter == 1 then that means this agent isn't void, so using
+                # this variable will work
+                valid_suit = suit
+
+        # redid the logic. if we're void in the suit we need to follow: we want to stick the queen on the trick
+        # winner (if we have it) or play our highest hearts cards
+
+        # if the counter is greater than 1, we are void in the trick leader's suit
+        if counter > 1:
+            # if we have the queen of spades, want to play it
+            queen_index = self.have_queen(suits[2])
+            if queen_index != 0:
+                choice = queen_index
+            # otherwise if we have hearts, we want to play our highest heart card (we're void so its safe to do)
+            elif len(suits[3]) != 0:
+                choice = self.get_highest_card(suits[3])
+            # dont have queen of spades, don't have hearts, want to pick highest card from clubs, then diamonds.
+            # Spades is the very last thing we want to play
             else:
-                choice = self.get_low_card(suits[2])
+                # have clubs, play the highest clubs card
+                if len(suits[0]) != 0:
+                    choice = self.get_highest_card(suits[0])
+                # have diamonds, play the highest clubs card
+                elif len(suits[1]) != 0:
+                    choice = self.get_highest_card(suits[1])
+                # have clubs, play the highest clubs card
+                else:
+                    choice = self.get_highest_card(suits[2])
+
+        # else we're not void
         else:
-            # clubs or diamonds have been played, follow with our high card (if we can)
-            # we care less here about which to pick if we're void, so just go with the suit
-            # thats the smallest
-            if len(suits[1]) == 0 or len(suits[1]) > len(suits[0]) != 0:
-                choice = self.get_highest_safe_card(suits[0], partial_state)
-            else:
-                choice = self.get_highest_safe_card(suits[1], partial_state)
+            # pick the lowest card and go.
+            choice = self.get_highest_safe_card(valid_suit, partial_state)
+
         return choice
 
     def sort_suits(self,
@@ -227,10 +239,19 @@ class EqualizerAgent(Agent):
         suits = [clubs, diamonds, spades, hearts]
         return suits
 
+    def have_queen(self,
+                   spades_suit: list):
+        """ Get and return the Queen of Spades"""
+        for card in spades_suit:
+            if card == 36:
+                # if we have the queen, return it
+                return card
+        # otherwise return 0
+        return 0
+
     def played_cards_in_trick(self,
                               partial_state: HeartsState):
         """ Get the currently played cards in the trick"""
-        # why
         trick_cards = []
         card_index = 0
         for i in partial_state.values:
@@ -246,6 +267,13 @@ class EqualizerAgent(Agent):
         choice = suit_to_choose_from[0]
         return choice
 
+    def get_highest_card(self,
+                         suit_to_choose_from: list):
+        """In this function we want to want to pick the highest card from this suit"""
+        suit_to_choose_from.sort()
+        choice = suit_to_choose_from[-1]
+        return choice
+
     def get_highest_safe_card(self,
                               suit_to_choose_from: list,
                               partial_state: HeartsState):
@@ -255,21 +283,28 @@ class EqualizerAgent(Agent):
         suit_to_choose_from.sort()
         # get the cards already played in this trick
         trick_cards = self.played_cards_in_trick(partial_state)
+        hearts_played = 0;
         queen_played = False
         for card in trick_cards:
             if card == 36:
                 # if the queen has been played, we're going to want to choose the lowest card we can
                 queen_played = True
-        # if the queen has been played or our points are over 10, this
-        # agent is going to play the lowest card it can
-        if queen_played or partial_state.score[self.player_position - 1] >= 10:
+            if 51 >= card >= 39:
+                # if the queen has been played, we're going to want to choose the lowest card we can
+                hearts_played = hearts_played + 1
+
+        # may or may not want this as part of the if: partial_state.score[self.player_position - 1] >= 5:
+        # if the queen has been played or a bunch of hearts have been played this round
+        # or if this agent is playing directly after the leader (so we don't know what comes next)
+        if queen_played or hearts_played >= 2 or len(trick_cards) <= 1:
+            # play the lowest card
             choice = suit_to_choose_from[0]
         else:
-            # todo if our agent has the queen we may want some different behavior
             # the queen hasnt been played and we haven't racked up a bunch of points
             # so this agent is going to be risky and play its highest card (that isn't the queen)
             choice = suit_to_choose_from[-1]
-            if choice == 36:
+            if choice == 36 and len(suit_to_choose_from) >= 2:
                 # making sure we're not playing the queen of spades on ourselves...
                 choice = suit_to_choose_from[-2]
         return choice
+

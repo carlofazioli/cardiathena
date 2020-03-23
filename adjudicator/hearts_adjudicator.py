@@ -334,6 +334,13 @@ class HeartsAdjudicator(Adjudicator):
             encode_state = copy.deepcopy(state)
             return self.first_trick(encode_state)
 
+        # Still starting a round, but the two of clubs has already been played.
+        # Need to make sure that the players do not play any Hearts cards or the Queen of Spades
+        # during the first trick.
+        if self.first_trick_cancel_queen_hearts(encode_state) is not None:
+            encode_state = copy.deepcopy(state)
+            return self.first_trick_cancel_queen_hearts(encode_state)
+
         # Player can play any of their cards if they lead the trick (unless starting a round)
         if self.is_trick_over(state):
             # A state with the info of the trick winner is given to determine leader
@@ -430,6 +437,26 @@ class HeartsAdjudicator(Adjudicator):
                     if encode_state_copy.values[i] < 5:
                         # Turn values negative if they are held cards but not valid to play
                         encode_state_copy.values[i] = encode_state_copy.values[i] * (-1)
+            return [player], [encode_state_copy]
+
+    def first_trick_cancel_queen_hearts(self, encode_state):
+        """
+        Masks the encoding for all of the hearts and queen of spades cards for the first trick.
+
+        :returns current player
+        :returns masked encoded state
+        """
+        encode_state_copy = copy.deepcopy(encode_state)
+        if self.trick_number(encode_state_copy) == 1:
+            player = self.current_player(encode_state)
+            encode_state_copy.values = encode_state_copy.hide_encoding(player)
+            card_index = 0
+            for _ in encode_state_copy.values:
+                if card_index == 36 or 51 >= card_index >= 39:
+                    if encode_state_copy.values[card_index] < 5:
+                        # Turn values negative if they are held cards but not valid to play
+                        encode_state_copy.values[card_index] = encode_state_copy.values[card_index] * (-1)
+                card_index = card_index + 1
             return [player], [encode_state_copy]
 
     def lead_trick(self, encode_state):

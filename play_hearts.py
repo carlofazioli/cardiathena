@@ -1,5 +1,6 @@
 import csv
 import uuid
+import random
 from datetime import datetime
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
@@ -12,16 +13,29 @@ from database.mysql.hearts import HeartsMySQLDatabase as db
 from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYSQL_SERVER
 
 
+def get_agent():
+    """ This function generates a random number between 1 and 4, and compares it against the IDs in the agents to
+    decide what to return. """
+
+    agent_type = random.randint(1, 4)
+    if agent_type == 1:
+        return RandomHeartsAgent()
+    elif agent_type == 2:
+        return LowLayer()
+    elif agent_type == 3:
+        return EqualizerAgent()
+    else:
+        return Shooter()
+
+
 # Create the players, the adjudicator, and the game object.
 game_uuid = uuid.uuid4().hex
 adj = HeartsAdjudicator()
 state = HeartsState()
-agent_1 = RandomHeartsAgent()
-agent_2 = EqualizerAgent()
-agent_3 = LowLayer()
-agent_4 = Shooter()
-adj = HeartsAdjudicator()
-state = HeartsState()
+agent_1 = get_agent()  # RandomHeartsAgent()
+agent_2 = get_agent()  # EqualizerAgent()
+agent_3 = get_agent()  # LowLayer()
+agent_4 = get_agent()  # Shooter()
 agent_list = [0, agent_1, agent_2, agent_3, agent_4]
 game = GameManager(agent_list,
                    adjudicator=adj,
@@ -64,7 +78,7 @@ def process_state_data():
     # Process state_data, insert into database
     directory = CSV_DIR + "{}.csv".format(game_uuid)
     with open(directory, 'w') as file:
-        writer = csv.writer(file, lineterminator='\n',)
+        writer = csv.writer(file, lineterminator='\n', )
         writer.writerow(["deck", "action", "score", "game_uuid"])
         for data in state_data:
             deck = data["deck"].tolist()

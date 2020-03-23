@@ -29,9 +29,13 @@ the highest card in its suit, if it thinks it can afford to take on potential po
 
 `sort_suits(self, partial_state: HeartsState):` sorts out all of the cards by suit and returns a list ordered by suit.
 
+`have_queen(self, spades_suit: list):` if the agent has the Queen of Spades, this function will find and return it.
+
 `played_cards_in_trick(self, partial_state: HeartsState):` gets all of the played cards in the current trick.
 
 `get_low_card(self, suit_to_choose_from: list):` will pick the lowest card from suit_to_choose_from.
+
+`get_highest_card(self, suit_to_choose_from: list):` will pick the highest card from suit_to_choose_from.
 
 `get_highest_safe_card(self, suit_to_choose_from: list, partial_state: HeartsState):` will pick the safest high card from the suit the agent
 needs to follow.
