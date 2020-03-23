@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import math
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from base import Action, Agent
@@ -109,7 +110,7 @@ class Shooter(Agent):
             else:
                 # Later in the game so try to take tricks from players
                 # if we are capable of taking the trick
-                if (self.is_last):
+                if (self.is_last(partial_state)):
                     # We know the trick is over after this action so do the bare minimum to win
                     if self.following_lead(partial_state, self.cards_in_hand):
                         # We can follow suit so take it
@@ -118,6 +119,7 @@ class Shooter(Agent):
                     else:
                         # We could not follow suit so do not bother trying to win
                         lowest = self.get_lowest(self.cards_in_hand)
+                        return random.choice(lowest)
                 else:
                     # Not last so be safe and play highest
                     if self.following_lead(partial_state, self.cards_in_hand):
@@ -127,6 +129,7 @@ class Shooter(Agent):
                     else:
                         # We can not follow so there is no chance of taking it
                         lowest = self.get_lowest(self.cards_in_hand)
+                        return random.choice(lowest)
 
     def is_lead(self,
                 partial_state: HeartsState):
@@ -248,8 +251,8 @@ class Shooter(Agent):
         # Find the leading card to figure out its suit
         lead = np.where(partial_state.values >= 30)[0][0]
         # Divide by 13 to find the suit type
-        if ((cards[0]/13) == (lead/13)):
+        if (math.floor((cards[0]/13)) == math.floor((lead/13))):
             # Player has to follow if they have a card that is the same suit as the leader
             return True
         # Player can not follow the trick leader
-        return True
+        return False
