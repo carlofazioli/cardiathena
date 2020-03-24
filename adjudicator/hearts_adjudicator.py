@@ -451,13 +451,24 @@ class HeartsAdjudicator(Adjudicator):
             player = self.current_player(encode_state)
             encode_state_copy.values = encode_state_copy.hide_encoding(player)
             card_index = 0
+            points_count = 0
             for _ in encode_state_copy.values:
                 if card_index == 36 or 51 >= card_index >= 39:
-                    if encode_state_copy.values[card_index] < 5:
+                    if 5 > encode_state_copy.values[card_index] > 0:
                         # Turn values negative if they are held cards but not valid to play
                         encode_state_copy.values[card_index] = encode_state_copy.values[card_index] * (-1)
+                        points_count = points_count + 1
                 card_index = card_index + 1
-            return [player], [encode_state_copy]
+
+            if points_count >= 13:
+                # have only points cards, return the original encoded state
+                encode_state_copy.values = encode_state.hide_encoding(player)
+                if 5 > encode_state_copy.values[36] > 0:
+                    encode_state_copy.values[36] = encode_state_copy.values[card_index] * (-1)
+                return [player], [encode_state_copy]
+            else:
+                # have more than just points cards, return the encoded state with all points hidden
+                return [player], [encode_state_copy]
 
     def lead_trick(self, encode_state):
         """
