@@ -283,7 +283,7 @@ class EqualizerAgent(Agent):
         suit_to_choose_from.sort()
         # get the cards already played in this trick
         trick_cards = self.played_cards_in_trick(partial_state)
-        hearts_played = 0;
+        hearts_played = 0
         queen_played = False
         for card in trick_cards:
             if card == 36:

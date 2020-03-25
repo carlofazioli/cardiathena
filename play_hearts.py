@@ -12,20 +12,22 @@ from base import GameManager
 from database.mysql.hearts import HeartsMySQLDatabase as db
 from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYSQL_SERVER
 
+agents = ["RandomHeartsAgent", "LowLayer", "EqualizerAgent", "Shooter"]
 
 def get_agent():
-    """ This function generates a random number between 1 and 4, and compares it against the IDs in the agents to
-    decide what to return. """
+    """ 
+    This function generates a random number in the range of the agents list and uses the string to make a new agent object to return.
+    
+    """
 
-    agent_type = random.randint(1, 4)
-    if agent_type == 1:
-        return RandomHeartsAgent()
-    elif agent_type == 2:
-        return LowLayer()
-    elif agent_type == 3:
-        return EqualizerAgent()
-    else:
-        return Shooter()
+    agent_type = random.randint(0, (len(agents) - 1))
+
+    try:
+        agent = globals()[agents[agent_type]]()
+    except KeyError:
+        print("String not working: " + agents[agent_type])
+
+    return agent
 
 
 # Create the players, the adjudicator, and the game object.
