@@ -34,10 +34,10 @@ def get_agent():
 game_uuid = uuid.uuid4().hex
 adj = HeartsAdjudicator()
 state = HeartsState()
-agent_1 = get_agent()  # RandomHeartsAgent()
-agent_2 = get_agent()  # EqualizerAgent()
-agent_3 = get_agent()  # LowLayer()
-agent_4 = get_agent()  # Shooter()
+agent_1 = get_agent()
+agent_2 = get_agent()
+agent_3 = get_agent()
+agent_4 = get_agent()
 agent_list = [0, agent_1, agent_2, agent_3, agent_4]
 game = GameManager(agent_list,
                    adjudicator=adj,
