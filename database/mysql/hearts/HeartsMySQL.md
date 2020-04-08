@@ -15,20 +15,20 @@ DBMS: MySQL 5.7.21
 
 ### Database Schema
 
-![EER Diagram](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/DbSchemav3.png)
+![EER Diagram](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/master/documentation/img/DbSchemav3.png)
 
 ### Tables
 * `game_table`: A table that uses integer indices for the game id. A time stamp is also recorded to the database at the start of the game. Agent ids for the four agents participating in the game is also recorded as foreign keys. The foreign keys reference the agent table. Also recorded to the database is a uuid to uniquely identify the game.
 
-![game_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/game_table.png)
+![game_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/master/documentation/img/game_table.png)
 
 * `state_table`: A table that contains game state data. This includes a uuid to link state data to a game. The current state of the game (ie in the game of hearts, the location of all the cards), the action(s) taken by the agent, and scoring information for each state of the game. 
 
-![state_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/state_table.png)
+![state_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/master/documentation/img/state_table.png)
 
 * `player_table`: A table that contains the agents that participated in the game and the game_uuid to the game. Also included is the string representation of the agent type, and the version number.
 
-![agent_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/mysql-on-argo/documentation/img/player_table.png)
+![agent_table](https://raw.githubusercontent.com/c-to-the-fazzy/cardiathena/master/documentation/img/player_table.png)
 
 ### Functions
 * `get_connection(): cnx` Returns a MySQL connection object.
