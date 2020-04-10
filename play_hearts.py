@@ -52,6 +52,7 @@ def save_game():
     """
     time_stamp = datetime.now()
     id_list = list()
+    agent_set = list(set(agent_list))
 
     # Gets the id of each agent type ie The Random Agent's id is 1 and appends to a list
     for agent in agent_list:
@@ -59,10 +60,28 @@ def save_game():
             id = agent.__dict__.get("id")
             id_list.append(id)
 
-    # values is the data that will be saved
+
+    # Values is the data that will be saved
     values = (None, time_stamp, id_list[0], id_list[1], id_list[2], id_list[3], game_uuid)
-    # Insert the game data into the database
-    db.query_database(INSERT_GAME, values)
+
+    # Save the game table data into csv
+    file_game_table = CSV_DIR + "{}_gametable.csv".format(game_uuid)
+    with open(file_game_table, 'w') as file1:
+        writer = csv.writer(file1, lineterminator='\n',)
+        writer.writerow(["time_stamp", "agent1", "agent2", "agent3", "agent4"])
+        writer.writerow([time_stamp, id_list[0], id_list[1], id_list[2], id_list[3]])
+
+    # Save the agent table data into csv
+    file_agent_table = CSV_DIR + "{}_agenttable.csv".format(game_uuid)
+    with open(file_agent_table, 'w') as file2:
+        writer = csv.writer(file2, lineterminator='\n',)
+        writer.writerow(["id", "agent_type", "version"])
+        for agent in agent_set:
+            writer.writerow([agent.__dict__.get("id"), agent.__dict__.get("agent_type"), agent.__dict__.get("version")])
+
+    if MYSQL_SERVER:
+        # Insert the game data into the database
+        db.query_database(INSERT_GAME, values)
 
 
 def process_state_data():
@@ -78,7 +97,7 @@ def process_state_data():
     state_data = game.save_game()
 
     # Process state_data, insert into database
-    directory = CSV_DIR + "{}.csv".format(game_uuid)
+    directory = CSV_DIR + "{}_statetable.csv".format(game_uuid)
     with open(directory, 'w') as file:
         writer = csv.writer(file, lineterminator='\n', )
         writer.writerow(["deck", "action", "score", "game_uuid"])
