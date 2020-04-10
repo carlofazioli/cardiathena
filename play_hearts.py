@@ -70,7 +70,7 @@ def save_game():
         writer = csv.writer(file1, lineterminator='\n',)
         writer.writerow(["time_stamp", "agent1", "agent2", "agent3", "agent4"])
         writer.writerow([time_stamp, id_list[0], id_list[1], id_list[2], id_list[3]])
-
+    file1.close()
     # Save the agent table data into csv
     file_agent_table = CSV_DIR + "{}_agenttable.csv".format(game_uuid)
     with open(file_agent_table, 'w') as file2:
@@ -78,6 +78,7 @@ def save_game():
         writer.writerow(["id", "agent_type", "version"])
         for agent in agent_set:
             writer.writerow([agent.__dict__.get("id"), agent.__dict__.get("agent_type"), agent.__dict__.get("version")])
+    file2.close()
 
     if MYSQL_SERVER:
         # Insert the game data into the database
@@ -106,6 +107,7 @@ def process_state_data():
             action = data["actions"]
             score = data["scores"]
             writer.writerow([deck, action, score, game_uuid])
+    file.close()
     if MYSQL_SERVER:
         db.insert_state(directory)
 
@@ -120,3 +122,4 @@ if ON_ARGO:
 
 else:
     game.play_game()
+
