@@ -10,7 +10,7 @@ from agent.Equalizer import EqualizerAgent
 from agent.Shooter import Shooter
 from base import GameManager
 from database.mysql.hearts import HeartsMySQLDatabase as db
-from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYSQL_SERVER
+from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYSQL_SERVER, ON_ARGO
 
 agents = ["RandomHeartsAgent", "LowLayer", "EqualizerAgent", "Shooter"]
 
@@ -110,7 +110,7 @@ def process_state_data():
         db.insert_state(directory)
 
 
-if MYSQL_SERVER:
+if ON_ARGO:
     # Save starting game information
     save_game()
     # Play a game.
