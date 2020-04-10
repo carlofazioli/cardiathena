@@ -87,7 +87,8 @@ def process_state_data():
             action = data["actions"]
             score = data["scores"]
             writer.writerow([deck, action, score, game_uuid])
-    db.insert_state(directory)
+    if MYSQL_SERVER:
+        db.insert_state(directory)
 
 
 if MYSQL_SERVER:
