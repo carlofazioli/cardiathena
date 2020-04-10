@@ -6,6 +6,7 @@ from pathlib import Path
 HOME_DIR = str(Path.home())
 ON_ARGO = True
 MYSQL_SERVER = False
+CSV_ON = True
 
 # Assign CSV path for Argo.
 try:
