@@ -68,9 +68,8 @@ def save_game():
     if CSV_ON:
         with open(file_game_table, 'w') as file1:
             writer = csv.writer(file1, lineterminator='\n',)
-            writer.writerow(["time_stamp", "agent1", "agent2", "agent3", "agent4", "game_uuid"])
+            # writer.writerow(["time_stamp", "agent1", "agent2", "agent3", "agent4", "game_uuid"])
             writer.writerow([time_stamp, id_list[0], id_list[1], id_list[2], id_list[3], game_uuid])
-        file1.close()
 
     if MYSQL_SERVER:
         # Insert the game data into the database
@@ -94,13 +93,12 @@ def process_state_data():
     if CSV_ON:
         with open(directory, 'w') as file:
             writer = csv.writer(file, lineterminator='\n', )
-            writer.writerow(["deck", "action", "score", "game_uuid"])
+            # writer.writerow(["deck", "action", "score", "game_uuid"])
             for data in state_data:
                 deck = data["deck"].tolist()
                 action = data["actions"]
                 score = data["scores"]
                 writer.writerow([deck, action, score, game_uuid])
-        file.close()
 
     if MYSQL_SERVER:
         db.insert_state(directory)
