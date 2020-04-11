@@ -4,28 +4,28 @@ from pathlib import Path
 """ Environment variables """
 
 HOME_DIR = str(Path.home())
-ON_ARGO = True
+ON_ARGO = False
 MYSQL_SERVER = False
 CSV_ON = True
+CSV_DIR = '{}/cardiathena_hearts/csv-files/'.format(HOME_DIR)
+SCRATCH_DIR = os.environ.get("SCRATCH")
+ARCHIVE_DIR = '{}/cardiathena_hearts/archive_csv/'.format(HOME_DIR)
 
-# Assign CSV path for Argo.
-try:
-    SCRATCH_DIR = os.environ['SCRATCH']
+# Assign CSV path
+if SCRATCH_DIR is not None:
     CSV_DIR = '{}/mysql-files/'.format(SCRATCH_DIR)
+    ARCHIVE_DIR = '{}/archive_csv/'.format(SCRATCH_DIR)
     ON_ARGO = True
-# Assign CSV path for local linux machine.
-except:
-    SCRATCH_DIR = None
-    CSV_DIR = '{}/mysql_hearts/mysql-files/'.format(HOME_DIR)
-    os.makedirs(CSV_DIR, exist_ok=True)
+
+os.makedirs(CSV_DIR, exist_ok=True)
+os.makedirs(ARCHIVE_DIR, exist_ok=True)
 
 
-def get_host_name(SCRATCH_DIR):
+def get_host_name():
     # Get the host name of the compute node that hosts the mysql container.
     if ON_ARGO:
         with open(SCRATCH_DIR + "/{}".format("mysql_hostname"), 'r') as file:
             host_name = file.readline()
-        file.close()
         return host_name
     else:
         return "localhost"
@@ -84,7 +84,7 @@ SELECT_GAME_ID = "SELECT {} FROM {} WHERE {}=".format(GAME_ID_COLUMN, GAME_TABLE
 CONFIG = {
     'user': 'remote_usr',
     'password': '',
-    'host': get_host_name(SCRATCH_DIR),
+    'host': get_host_name(),
     'port': '3306',
     'db': 'cardiathena_db',
     'raise_on_warnings': True,
