@@ -48,7 +48,6 @@ class EqualizerAgent(Agent):
         :return: an Action.
         """
 
-        # print("partial_state.deck: " + str(partial_state.deck))
         card_index = 0
         for i in partial_state.deck:
             if 0 < i < 5:
@@ -66,8 +65,6 @@ class EqualizerAgent(Agent):
         # elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
         else:
             choice = self.select_card(partial_state)
-            # print("minimizing agent is leading: " + str(self.is_lead(partial_state)))
-            # print("minimizing agent is not void: " + str(self.not_void(partial_state)))
             self.cards_in_hand = []
             return HeartsAction(choice)
 

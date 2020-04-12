@@ -161,7 +161,6 @@ class HeartsAdjudicator(Adjudicator):
         state_copy = deepcopy(state)
         # Check if game is finished
         if self.is_finished(state_copy):
-            print("original is finished check")
             return self.state_copy
         else:
             # Loop through the list of actions
@@ -503,7 +502,6 @@ class HeartsAdjudicator(Adjudicator):
         :returns masked encoded state
         """
         encode_state_copy = copy.deepcopy(encode_state)
-        # encode_state_copy.deck = encode_state_copy.hide_encoding(encode_state_copy.current_player)
         encode_state_copy.deck = encode_state_copy.hide_encoding(self.current_player(encode_state))
         # beginning of range of valid cards
         begin = 13 * self.lead_suit(encode_state)
