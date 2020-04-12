@@ -1,17 +1,46 @@
 import os
 import glob
 import shutil
-import mysql.connector
+import mysql
 
-from HeartsMySQLDatabase import MySQLDatabase
 from HeartsMySQLVariables import CSV_DIR
 from HeartsMySQLVariables import ARCHIVE_DIR
 from HeartsMySQLVariables import STATE_TABLE
 from HeartsMySQLVariables import GAME_TABLE
-
+from HeartsMySQLVariables import CONFIG
+from mysql.connector import errorcode
 
 game_table_files = glob.glob(os.path.join(CSV_DIR, "*_gametable.csv"))
 state_table_files = glob.glob(os.path.join(CSV_DIR, "*_statetable.csv"))
+
+
+class MySQLDatabase:
+    """
+    Database connection object
+    """
+    def __init__(self):
+        self.cnx = get_connection()
+
+    def get_cursor(self):
+        return self.cnx.cursor()
+
+
+def get_connection():
+    """
+    Returns a MySQL connection object
+
+    :returns cnx: MySQL connection object
+    """
+    try:
+        cnx = mysql.connector.connect(**CONFIG)
+        return cnx
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
 
 
 def insert_game_table():
@@ -52,4 +81,4 @@ def insert_state_table():
 
 
 insert_game_table()
-insert_state_table()
+    insert_state_table()
