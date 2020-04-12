@@ -1,8 +1,5 @@
 import os
 import glob
-import shutil
-import csv
-import pandas as pd
 import mysql.connector
 from database.mysql.hearts.HeartsMySQLDatabase import MySQLDatabase
 from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, STATE_TABLE
