@@ -81,4 +81,4 @@ def insert_state_table():
 
 
 insert_game_table()
-    insert_state_table()
+insert_state_table()
