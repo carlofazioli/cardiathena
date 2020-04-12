@@ -1,9 +1,11 @@
 import os
 import glob
+import shutil
 import mysql.connector
 
 from HeartsMySQLDatabase import MySQLDatabase
 from HeartsMySQLVariables import CSV_DIR
+from HeartsMySQLVariables import ARCHIVE_DIR
 from HeartsMySQLVariables import STATE_TABLE
 from HeartsMySQLVariables import GAME_TABLE
 
@@ -21,6 +23,7 @@ def insert_game_table():
                 "LINES TERMINATED BY '\n'" \
                 "(time, agent1, agent2, agent3, agent4, game_uuid)".format(file, GAME_TABLE)
             my_cursor.execute(query)
+            shutil.move(file, ARCHIVE_DIR)
     except mysql.connector.Error as err:
         print(err)
     finally:
@@ -39,6 +42,7 @@ def insert_state_table():
                 "LINES TERMINATED BY '\n'" \
                 "(deck, action, score, game_uuid)".format(file, STATE_TABLE)
             my_cursor.execute(query)
+            shutil.move(file, ARCHIVE_DIR)
     except mysql.connector.Error as err:
         print(err)
     finally:
