@@ -53,8 +53,8 @@ class LowLayer(Agent):
             three_cards = self.passing_smart_face_values(partial_state)
             return HeartsAction(three_cards)
 
-        for i in range(len(partial_state.values)):
-            if 0 < partial_state.values[i] < 5:
+        for i in range(len(partial_state.deck)):
+            if 0 < partial_state.deck[i] < 5:
                 self.cards_in_hand.append(i)
 
         # Agent picks a card to play
@@ -107,7 +107,7 @@ class LowLayer(Agent):
     def is_lead(self,
                 partial_state: HeartsState):
         """Returns true if agent is leading currently"""
-        played = partial_state.values[partial_state.values > 20]
+        played = partial_state.deck[partial_state.deck > 20]
 
         if len(played) >= 4:
             return True
@@ -153,8 +153,8 @@ class LowLayer(Agent):
         Diamond = []
         spades = []
         hearts = []
-        for i in range(len(partial_state.values)):
-            if 0 < partial_state.values[i] < 5:
+        for i in range(len(partial_state.deck)):
+            if 0 < partial_state.deck[i] < 5:
                 cards.append(i)
 
         for i in range(4):
@@ -252,8 +252,8 @@ class LowLayer(Agent):
     def has_qs_been_played(self, partial_state: HeartsState):
         """ Return True if the queen has been play and false otherwise """
         pos = 0
-        for i in range(len(partial_state.values)):
-            if (partial_state.values[i] == 36) & (partial_state.values[i] < 20):
+        for i in range(len(partial_state.deck)):
+            if (partial_state.deck[i] == 36) & (partial_state.deck[i] < 20):
                 return True
         return False
 
@@ -380,7 +380,7 @@ class LowLayer(Agent):
 
     # def get_highest_card_from_played_cards(self,
     #                                        partial_state: HeartsState):
-    #     currently_played_cards = np.where(partial_state.values > 20)
+    #     currently_played_cards = np.where(partial_state.deck > 20)
     #     lead_suit = self.own_adj.lead_suit(partial_state)
     #     begin = 13 * lead_suit  # beginning of range of valid cards
     #     end = 13 * (lead_suit + 1)  # end of range of valid cards

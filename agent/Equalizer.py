@@ -48,9 +48,9 @@ class EqualizerAgent(Agent):
         :return: an Action.
         """
 
-        # print("partial_state.values: " + str(partial_state.values))
+        # print("partial_state.deck: " + str(partial_state.deck))
         card_index = 0
-        for i in partial_state.values:
+        for i in partial_state.deck:
             if 0 < i < 5:
                 self.cards_in_hand.append(card_index)
                 self.player_position = i
@@ -74,7 +74,7 @@ class EqualizerAgent(Agent):
     def is_lead(self,
                 partial_state: HeartsState):
         """Returns true if agent is leading currently"""
-        played = partial_state.values[partial_state.values > 20]
+        played = partial_state.deck[partial_state.deck > 20]
 
         if len(played) >= 4:
             return True
@@ -214,7 +214,7 @@ class EqualizerAgent(Agent):
         spades = []
         hearts = []
         card_index = 0
-        for i in partial_state.values:
+        for i in partial_state.deck:
             if 0 < i < 5:
                 cards.append(card_index)
             card_index = card_index + 1
@@ -254,7 +254,7 @@ class EqualizerAgent(Agent):
         """ Get the currently played cards in the trick"""
         trick_cards = []
         card_index = 0
-        for i in partial_state.values:
+        for i in partial_state.deck:
             if 20 < i < 35:
                 trick_cards.append(card_index)
             card_index = card_index + 1

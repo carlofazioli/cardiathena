@@ -47,8 +47,8 @@ class Shooter(Agent):
         # Given the masked state, only cards in hand of agent is available
         self.cards_in_hand = []
 
-        for i in range(len(partial_state.values)):
-            if 0 < partial_state.values[i] < 5:
+        for i in range(len(partial_state.deck)):
+            if 0 < partial_state.deck[i] < 5:
                 self.cards_in_hand.append(i)
 
         # Agent picks 3 cards to pass
@@ -143,7 +143,7 @@ class Shooter(Agent):
     def is_lead(self,
                 partial_state: HeartsState):
         """Returns true if agent is leading currently"""
-        played = partial_state.values[partial_state.values > 20]
+        played = partial_state.deck[partial_state.deck > 20]
 
         if len(played) >= 4:
             return True
@@ -156,7 +156,7 @@ class Shooter(Agent):
         if (self.points_broken(partial_state)):
             # Points have been broken so it is no longer early in the game
             return False
-        if (len(partial_state.values[partial_state.values > 10]) < 52/2):
+        if (len(partial_state.deck[partial_state.deck > 10]) < 52/2):
             # A deck starts with 52 cards
             # We are in the early half of the game if less than half the cards have been played
             return True
@@ -166,7 +166,7 @@ class Shooter(Agent):
     def is_last(self,
                 partial_state: HeartsState):
         """Returns true if the player is the last to play in a trick."""
-        if (len(partial_state.values[partial_state.values > 20]) == 3):
+        if (len(partial_state.deck[partial_state.deck > 20]) == 3):
             # Four players so this player is last when the other three have played
             return True
         return False
@@ -208,7 +208,7 @@ class Shooter(Agent):
         """Find a card that is high enough to take the current trick but is as low as can be
         so as to save higher cards for later tricks"""
         # Find the highest card of the cards that are in play
-        highest_down = self.get_highest(np.where(partial_state.values > 20)[0])
+        highest_down = self.get_highest(np.where(partial_state.deck > 20)[0])
         # Search for lowest high card by comparing to currently highest card
         lowest_high = []
         for i in cards:
@@ -238,7 +238,7 @@ class Shooter(Agent):
     def points_broken(self,
                       partial_state: HeartsState):
         """Check to see if points have been broken."""
-        played_cards = np.where(partial_state.values >= 10)[0]
+        played_cards = np.where(partial_state.deck >= 10)[0]
         # Get the hearts cards (the where does not really matter, we just need a count of them)
         points = np.where(played_cards > 38)[0]
         if (len(points) > 0):
@@ -258,7 +258,7 @@ class Shooter(Agent):
         """Check if the player is capable of following suit before trying to take the trick.
         Receives the partial state and a list representing the players hand."""
         # Find the leading card to figure out its suit
-        lead = np.where(partial_state.values >= 30)[0][0]
+        lead = np.where(partial_state.deck >= 30)[0][0]
         # Divide by 13 to find the suit type
         if (math.floor((cards[0]/13)) == math.floor((lead/13))):
             # Player has to follow if they have a card that is the same suit as the leader
