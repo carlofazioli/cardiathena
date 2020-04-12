@@ -4,7 +4,7 @@ from pathlib import Path
 """ Environment variables """
 
 HOME_DIR = str(Path.home())
-ON_ARGO = False
+ON_ARGO = True
 MYSQL_SERVER = False
 CSV_ON = True
 CSV_DIR = '{}/cardiathena_hearts/csv-files/'.format(HOME_DIR)
@@ -15,7 +15,6 @@ ARCHIVE_DIR = '{}/cardiathena_hearts/archive_csv/'.format(HOME_DIR)
 if SCRATCH_DIR is not None:
     CSV_DIR = '{}/mysql-files/'.format(SCRATCH_DIR)
     ARCHIVE_DIR = '{}/archive_csv/'.format(SCRATCH_DIR)
-    ON_ARGO = True
 
 os.makedirs(CSV_DIR, exist_ok=True)
 os.makedirs(ARCHIVE_DIR, exist_ok=True)

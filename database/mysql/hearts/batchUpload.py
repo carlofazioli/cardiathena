@@ -1,10 +1,12 @@
-import glob
 import os
+import glob
+import mysql.connector
 
-import mysql
+from HeartsMySQLDatabase import MySQLDatabase
+from HeartsMySQLVariables import CSV_DIR
+from HeartsMySQLVariables import STATE_TABLE
+from HeartsMySQLVariables import GAME_TABLE
 
-from database.mysql.hearts.HeartsMySQLDatabase import MySQLDatabase
-from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, STATE_TABLE, GAME_TABLE
 
 game_table_files = glob.glob(os.path.join(CSV_DIR, "*_gametable.csv"))
 state_table_files = glob.glob(os.path.join(CSV_DIR, "*_statetable.csv"))
