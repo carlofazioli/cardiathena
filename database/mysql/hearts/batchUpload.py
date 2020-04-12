@@ -19,7 +19,6 @@ def insert_game_table():
                 "LINES TERMINATED BY '\n'" \
                 "(time, agent1, agent2, agent3, agent4, game_uuid)".format(file, GAME_TABLE)
             my_cursor.execute(query)
-            print(file)
     except mysql.connector.Error as err:
         print(err)
     finally:
