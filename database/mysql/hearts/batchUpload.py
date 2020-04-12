@@ -1,11 +1,13 @@
-import os
 import glob
-import mysql.connector
+import os
+
+import mysql
+
 from database.mysql.hearts.HeartsMySQLDatabase import MySQLDatabase
-from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, STATE_TABLE
+from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, STATE_TABLE, GAME_TABLE
 
 game_table_files = glob.glob(os.path.join(CSV_DIR, "*_gametable.csv"))
-state_table_files = glob.glob(os.path.join(CSV_DIR, "*statetable.csv"))
+state_table_files = glob.glob(os.path.join(CSV_DIR, "*_statetable.csv"))
 
 
 def insert_game_table():
@@ -14,11 +16,10 @@ def insert_game_table():
     try:
         for file in game_table_files:
             query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
-                "ENCLOSED BY '\"' " \
                 "LINES TERMINATED BY '\n'" \
-                "IGNORE 1 LINES" \
-                "(time, agent1, agent2, agent3, agent4, game_uuid)".format(file, STATE_TABLE)
+                "(time, agent1, agent2, agent3, agent4, game_uuid)".format(file, GAME_TABLE)
             my_cursor.execute(query)
+            print(file)
     except mysql.connector.Error as err:
         print(err)
     finally:
@@ -35,7 +36,6 @@ def insert_state_table():
             query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
                 "ENCLOSED BY '\"' " \
                 "LINES TERMINATED BY '\n'" \
-                "IGNORE 1 LINES" \
                 "(deck, action, score, game_uuid)".format(file, STATE_TABLE)
             my_cursor.execute(query)
     except mysql.connector.Error as err:
