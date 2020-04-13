@@ -24,7 +24,7 @@ Copy the slurm files:
 If you have an import issue with mysql-connector: ` pip3 install --user mysql-connector-python`
 
 Need to edit HeartsMySQLVariables.py in cardiathena/database/mysql/hearts/:
-In the dictionary CONFIG, edit user to `teamw`, password will given in chat, and host will change based on when server goes up.
+In the dictionary CONFIG, edit user to `teamw`, password will given in chat, and edit host, this will change based on when server goes up.
 
 Edit slurm_script job name to something slightly different.
 Edit the email field, replace user with gmu id: #SBATCH --mail-user=User@gmu.edu
