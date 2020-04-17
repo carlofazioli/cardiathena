@@ -35,13 +35,12 @@
 ## Specify how much time your job needs. (default: see partition above)
 ##SBATCH --time=0-00:02  # Total time needed for job: Days-Hours:Minutes
 
-#SBATCH --array=1-30000
+##SBATCH --array=1-30000
 
 ## Load the relevant modules needed for the job
 module load python/3.6.7
-module load singularity/3.3.0
 
 ## Run your program or script
-python3 $SCRATCH/cardiathena/play_hearts.py
+$SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/start_game.sh
 
  
