@@ -21,7 +21,7 @@ class HeartsAdjudicator(Adjudicator):
     def current_player(self,
                        state: HeartsState):
         # Gets a list of all of the players, including the trick leader
-        player_list = state.values[state.values > 20]
+        player_list = state.deck[state.deck > 20]
         # Calculate who goes next
         if 0 < len(player_list) < 4:
             # Getting the trick leader, can use this and the length of the player list to calculate current player
@@ -37,9 +37,9 @@ class HeartsAdjudicator(Adjudicator):
             current_player = current_player[0]
         else:
             # Either no one has played yet or everyone has played
-            if self.trick_number(state) == 1 and (state.values > 10).sum() == 0:
+            if self.trick_number(state) == 1 and (state.deck > 10).sum() == 0:
                 # Return the owner of the two of clubs if this is the first card of the first trick
-                return state.values[0]
+                return state.deck[0]
             return self.trick_winner(state)
         # Returns the current player
         return current_player
@@ -47,7 +47,7 @@ class HeartsAdjudicator(Adjudicator):
     def trick_leader(self,
                      state: HeartsState):
         # Returns the first player of the current trick
-        trick_lead = state.values[state.values > 30]
+        trick_lead = state.deck[state.deck > 30]
 
         if len(trick_lead) == 0:
             return None
@@ -56,7 +56,7 @@ class HeartsAdjudicator(Adjudicator):
     def lead_suit(self,
                   state: HeartsState):
         # Getting the card index of the trick leader
-        trick_leader_card = np.where(state.values > 30)
+        trick_leader_card = np.where(state.deck > 30)
         # If there is no trick leader card
         if len(trick_leader_card[0]) == 0:
             if self.trick_number(state) >= 1:
@@ -67,7 +67,7 @@ class HeartsAdjudicator(Adjudicator):
 
     def cards_of_trick(self,
                        state: HeartsState):
-        return np.where(state.values > 20)[0]
+        return np.where(state.deck > 20)[0]
 
     def trick_winner(self,
                      state: HeartsState):
@@ -81,14 +81,14 @@ class HeartsAdjudicator(Adjudicator):
         for i in played_cards:
             if (i > max_card) and (int(i / 13) == suit):
                 max_card = i
-        return state.values[max_card] % 10
+        return state.deck[max_card] % 10
 
     def trick_number(self,
                      state: HeartsState):
         # Returns the trick number in the round
         if self.is_passing(state):
             return 0
-        played_count = (state.values > 10).sum()
+        played_count = (state.deck > 10).sum()
         played_count = int(played_count / 4)
         played_count += 1
 
@@ -110,7 +110,7 @@ class HeartsAdjudicator(Adjudicator):
         points = [0, 0, 0, 0]
         for i in range(4):
             # Loop through the four players to find the cards they own
-            owned = state.values == 11 + i # Returns True for all the cards owned by the player
+            owned = state.deck == 11 + i # Returns True for all the cards owned by the player
             if owned[36] == True:
                 points[i] += 13 # 13 points for the queen of spades
             for j in range(39, 52, 1):
@@ -161,7 +161,6 @@ class HeartsAdjudicator(Adjudicator):
         state_copy = deepcopy(state)
         # Check if game is finished
         if self.is_finished(state_copy):
-            print("original is finished check")
             return self.state_copy
         else:
             # Loop through the list of actions
@@ -179,10 +178,10 @@ class HeartsAdjudicator(Adjudicator):
                     # Update state with encoding for played in current trick
                     if self.trick_leader(state_copy) is None:
                         # check if leading and make 31-34 for leader
-                        state_copy.values[actions[act_num].card_index] = (30 + state_copy.values[actions[act_num].card_index])
+                        state_copy.deck[actions[act_num].card_index] = (30 + state_copy.deck[actions[act_num].card_index])
                     else:
                         # regular plays that are not leading are 21-24
-                        state_copy.values[actions[act_num].card_index] = (20 + state_copy.values[actions[act_num].card_index])
+                        state_copy.deck[actions[act_num].card_index] = (20 + state_copy.deck[actions[act_num].card_index])
                     #
                     # Check if new round, update score and deal new cards if so
                     if self.is_round_over(state_copy):
@@ -232,7 +231,7 @@ class HeartsAdjudicator(Adjudicator):
 
         # Pass Cards
         for card_i in action.card_index:
-            state.values[card_i] = player_to_pass
+            state.deck[card_i] = player_to_pass
 
         # We know all players have passed when the fourth player has since we always start passing with the first player
         if player == 4:
@@ -253,7 +252,7 @@ class HeartsAdjudicator(Adjudicator):
 
         # All of these cards belong to the trick winner (tricks won)
         for card in self.cards_of_trick(state):
-            state.values[card] = trick_winner + 10
+            state.deck[card] = trick_winner + 10
 
         print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1, "  High card: ",
               max_card, " Points: ", self.points(state))
@@ -268,7 +267,7 @@ class HeartsAdjudicator(Adjudicator):
         # Give the trick_winner their cards before wrapping up this round
         trick_winner = self.trick_winner(state)
         for card in self.cards_of_trick(state):
-            state.values[card] = trick_winner + 10
+            state.deck[card] = trick_winner + 10
         
         # Print final results
         print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1,
@@ -354,18 +353,18 @@ class HeartsAdjudicator(Adjudicator):
     def hearts_broken(self,
                       state: HeartsState):
         for i in range(39, 52):
-            if state.values[i] > 10:
+            if state.deck[i] > 10:
                 return True
         return False
 
     def is_trick_over(self,
                       state: HeartsState):
         """
-        Checks the current state for encoded values 21 to 34 to determine if the trick is over.
+        Checks the current state deck for encoded values 21 to 34 to determine if the trick is over.
 
         :returns True if trick is over, False otherwise
         """
-        if len(list(x for x in state.values if 21 <= x <= 34)) >= 4:
+        if len(list(x for x in state.deck if 21 <= x <= 34)) >= 4:
             return True
         return False
 
@@ -409,15 +408,15 @@ class HeartsAdjudicator(Adjudicator):
         :returns masked encoded state for pass round, None otherwise
         """
         if self.trick_number(encode_state) == 0 and self.is_passing(encode_state):
-            # All the players will pass simultaneously so get their encode_values
+            # All the players will pass simultaneously so get their encoded_deck
             players = [1, 2, 3, 4]
-            encode_values = []
+            encoded_deck = []
             for player in players:
-                # Get each encode value and store it
+                # Get each encoded deck and store it
                 store_state = copy.deepcopy(encode_state)
-                store_state.values = store_state.hide_encoding(player)
-                encode_values.append(store_state)
-            return players, encode_values
+                store_state.deck = store_state.hide_encoding(player)
+                encoded_deck.append(store_state)
+            return players, encoded_deck
         else:
             return None
 
@@ -429,14 +428,14 @@ class HeartsAdjudicator(Adjudicator):
         :returns masked encoded state
         """
         encode_state_copy = copy.deepcopy(encode_state)
-        if self.trick_number(encode_state) == 1 and (encode_state.values > 10).sum() == 0:
+        if self.trick_number(encode_state) == 1 and (encode_state.deck > 10).sum() == 0:
             player = self.current_player(encode_state)
-            encode_state_copy.values = encode_state_copy.hide_encoding(player)
-            for i in range(len(encode_state_copy.values)):
+            encode_state_copy.deck = encode_state_copy.hide_encoding(player)
+            for i in range(len(encode_state_copy.deck)):
                 if i != 0:
-                    if encode_state_copy.values[i] < 5:
-                        # Turn values negative if they are held cards but not valid to play
-                        encode_state_copy.values[i] = encode_state_copy.values[i] * (-1)
+                    if encode_state_copy.deck[i] < 5:
+                        # Turn values in the deck negative if they are held cards but not valid to play
+                        encode_state_copy.deck[i] = encode_state_copy.deck[i] * (-1)
             return [player], [encode_state_copy]
 
     def first_trick_cancel_queen_hearts(self, encode_state):
@@ -449,22 +448,22 @@ class HeartsAdjudicator(Adjudicator):
         encode_state_copy = copy.deepcopy(encode_state)
         if self.trick_number(encode_state_copy) == 1:
             player = self.current_player(encode_state)
-            encode_state_copy.values = encode_state_copy.hide_encoding(player)
+            encode_state_copy.deck = encode_state_copy.hide_encoding(player)
             card_index = 0
             points_count = 0
-            for _ in encode_state_copy.values:
+            for _ in encode_state_copy.deck:
                 if card_index == 36 or 51 >= card_index >= 39:
-                    if 5 > encode_state_copy.values[card_index] > 0:
+                    if 5 > encode_state_copy.deck[card_index] > 0:
                         # Turn values negative if they are held cards but not valid to play
-                        encode_state_copy.values[card_index] = encode_state_copy.values[card_index] * (-1)
+                        encode_state_copy.deck[card_index] = encode_state_copy.deck[card_index] * (-1)
                         points_count = points_count + 1
                 card_index = card_index + 1
 
             if points_count >= 13:
                 # have only points cards, return the original encoded state
-                encode_state_copy.values = encode_state.hide_encoding(player)
-                if 5 > encode_state_copy.values[36] > 0:
-                    encode_state_copy.values[36] = encode_state_copy.values[card_index] * (-1)
+                encode_state_copy.deck = encode_state.hide_encoding(player)
+                if 5 > encode_state_copy.deck[36] > 0:
+                    encode_state_copy.deck[36] = encode_state_copy.deck[card_index] * (-1)
                 return [player], [encode_state_copy]
             else:
                 # have more than just points cards, return the encoded state with all points hidden
@@ -478,20 +477,20 @@ class HeartsAdjudicator(Adjudicator):
         :returns masked encoded state
         """
         state = copy.deepcopy(encode_state)
-        encode_state.values = encode_state.hide_encoding(self.current_player(state))
+        encode_state.deck = encode_state.hide_encoding(self.current_player(state))
         if not self.hearts_broken(state):
             # Check if player has anything other than hearts to play
             has_more_than_hearts = False
             for i in range(0, 39):
-                if encode_state.values[i] == self.current_player(state):
+                if encode_state.deck[i] == self.current_player(state):
                     has_more_than_hearts = True
                     break
                 # Player only has hearts left, and must lead with it
             if not has_more_than_hearts:
                 return [self.current_player(state)], [encode_state]
             for i in range(39, 52):
-                if encode_state.values[i] == self.current_player(state):
-                    encode_state.values[i] = encode_state.values[i] * (-1)
+                if encode_state.deck[i] == self.current_player(state):
+                    encode_state.deck[i] = encode_state.deck[i] * (-1)
             return [self.current_player(state)], [encode_state]
         return [self.current_player(state)], [encode_state]
 
@@ -503,8 +502,7 @@ class HeartsAdjudicator(Adjudicator):
         :returns masked encoded state
         """
         encode_state_copy = copy.deepcopy(encode_state)
-        # encode_state_copy.values = encode_state_copy.hide_encoding(encode_state_copy.current_player)
-        encode_state_copy.values = encode_state_copy.hide_encoding(self.current_player(encode_state))
+        encode_state_copy.deck = encode_state_copy.hide_encoding(self.current_player(encode_state))
         # beginning of range of valid cards
         begin = 13 * self.lead_suit(encode_state)
         # end of range of valid cards
@@ -512,30 +510,29 @@ class HeartsAdjudicator(Adjudicator):
 
         has_suit = False
         for i in range(begin, end):
-            if 0 < encode_state_copy.values[i] < 5:
+            if 0 < encode_state_copy.deck[i] < 5:
                 has_suit = True
         if not has_suit:
             # Player did not have suit and can play whatever
             return [self.current_player(encode_state)], [encode_state_copy]
         # Encode it if we know they have valid cards
-        for i in range(len(encode_state_copy.values)):
+        for i in range(len(encode_state_copy.deck)):
             if i < begin or i >= end:
-                if encode_state_copy.values[i] < 5:
-                    encode_state_copy.values[i] = encode_state_copy.values[i] * (-1)
+                if encode_state_copy.deck[i] < 5:
+                    encode_state_copy.deck[i] = encode_state_copy.deck[i] * (-1)
         return [self.current_player(encode_state)], [encode_state_copy]
 
     """def check_update_score(self, string):
         if string == "moon":
             # Checking for shooting for the moon
             new_state = HeartsState()
-            for i in range(len(new_state.values)):
-                new_state.values[i] = 11
+            for i in range(len(new_state.deck)):
+                new_state.deck[i] = 11
         else:
             new_state = HeartsState()
-            for i in range(len(new_state.values)):
-                new_state.values[i] = 11
-            new_state.values[36] = 12
-        self.state = new_state
-        print(self.state.score)
-        self.update_score()
-        print(self.state.score)"""
+            for i in range(len(new_state.deck)):
+                new_state.deck[i] = 11
+            new_state.deck[36] = 12
+        print(new_state.score)
+        self.update_score(new_state)
+        print(new_state.score)"""

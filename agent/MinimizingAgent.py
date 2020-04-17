@@ -58,8 +58,6 @@ class MinimizingAgent(Agent):
         # elif partial_state.trick_number > 0 and len(cards_in_hand) > 0:
         else:
             choice = self.select_card(partial_state)
-            # print("minimizing agent is leading: " + str(self.is_lead(partial_state)))
-            # print("minimizing agent is not void: " + str(self.not_void(partial_state)))
             self.cards_in_hand = []
             return HeartsAction(choice)
 

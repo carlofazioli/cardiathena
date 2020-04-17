@@ -40,9 +40,8 @@ class RandomHeartsAgent(Agent):
         # Given the masked state, only cards in hand of agent is available
         cards_in_hand = []
 
-        #print("partial_state.values: " + str(partial_state.values))
-        for i in range(len(partial_state.values)):
-            if 0 < partial_state.values[i] < 5:
+        for i in range(len(partial_state.deck)):
+            if 0 < partial_state.deck[i] < 5:
                 cards_in_hand.append(i)
 
         # Agent picks 3 cards to pass
