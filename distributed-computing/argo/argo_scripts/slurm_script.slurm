@@ -21,7 +21,7 @@
 #SBATCH --mem=1G        # Total memory needed per task (units: K,M,G,T)
 
 ## Specify number of threads per task
-##SBATCH --cpus-per-task 1
+#SBATCH --cpus-per-task 8
 
 ## Specify number of processes
 ##SBATCH --ntasks=32
@@ -33,9 +33,9 @@
 ##SBATCH --ntasks-per-node=2
 
 ## Specify how much time your job needs. (default: see partition above)
-##SBATCH --time=0-00:02  # Total time needed for job: Days-Hours:Minutes
+##SBATCH --time=0-01:00  # Total time needed for job: Days-Hours:Minutes
 
-##SBATCH --array=1-30000
+#SBATCH --array=1-30
 
 ## Load the relevant modules needed for the job
 module load python/3.6.7
