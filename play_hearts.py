@@ -25,10 +25,9 @@ def get_agent():
 
     try:
         agent = globals()[agents[agent_type]]()
+        return agent
     except KeyError:
         print("String not working: " + agents[agent_type])
-
-    return agent
 
 
 # Create the players, the adjudicator, and the game object.
