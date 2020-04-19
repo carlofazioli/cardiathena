@@ -48,17 +48,15 @@ def get_connection():
 def insert_game_table():
     dbs = MySQLDatabase()
     my_cursor = dbs.get_cursor()
-    count = 0
     try:
-        for file in game_table_files:
+        for i, file in enumerate(game_table_files):
             query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
                 "LINES TERMINATED BY '\n'" \
                 "(time, agent1, agent2, agent3, agent4, game_uuid)".format(file, GAME_TABLE)
             my_cursor.execute(query)
-            if count == 1000:
-                dbs.cnx.commit()
-            count = count + 1
             shutil.move(file, ARCHIVE_DIR)
+            if i == 10000:
+                break
     except mysql.connector.Error as err:
         print(err)
     finally:
@@ -70,18 +68,16 @@ def insert_game_table():
 def insert_state_table():
     dbs = MySQLDatabase()
     my_cursor = dbs.get_cursor()
-    count = 0
     try:
-        for file in state_table_files:
+        for i, file in enumerate(state_table_files):
             query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
                 "ENCLOSED BY '\"' " \
                 "LINES TERMINATED BY '\n'" \
                 "(deck, action, score, game_uuid)".format(file, STATE_TABLE)
             my_cursor.execute(query)
-            if count == 1000:
-                dbs.cnx.commit()
-            count = count + 1
             shutil.move(file, ARCHIVE_DIR)
+            if i == 10000:
+                break
     except mysql.connector.Error as err:
         print(err)
     finally:
