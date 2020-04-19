@@ -18,7 +18,7 @@
 # SBATCH --mail-user=dha5@gmu.edu     # Put your GMU email address here
 
 ## Specify how much memory your job needs. (2G is the default)
-# SBATCH --mem=1G        # Total memory needed per task (units: K,M,G,T)
+# SBATCH --mem=4G        # Total memory needed per task (units: K,M,G,T)
 
 ## Specify number of threads per task
 ##SBATCH --cpus-per-task 1
