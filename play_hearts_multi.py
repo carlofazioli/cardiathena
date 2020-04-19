@@ -119,7 +119,7 @@ def process_state_data(game_uuid, game):
 
 
 if __name__ == "__main__":
-    num_of_processes = 8
+    num_of_processes = multiprocessing.cpu_count()
     process_list = []
     h = Hearts()
 
