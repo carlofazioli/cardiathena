@@ -15,10 +15,10 @@
 
 ## Slurm can send you updates via email
 #SBATCH --mail-type=BEGIN,END,FAIL         # ALL,NONE,BEGIN,END,FAIL,REQUEUE,..
-#SBATCH --mail-user=dha5@gmu.edu     # Put your GMU email address here
+#SBATCH --mail-user=@gmu.edu     # Put your GMU email address here
 
 ## Specify how much memory your job needs. (2G is the default)
-#SBATCH --mem=1G        # Total memory needed per task (units: K,M,G,T)
+#SBATCH --mem=2G        # Total memory needed per task (units: K,M,G,T)
 
 ## Specify number of threads per task
 #SBATCH --cpus-per-task 8
