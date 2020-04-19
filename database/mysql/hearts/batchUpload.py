@@ -6,12 +6,12 @@ import mysql
 
 from mysql.connector import errorcode
 
-from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, CONFIG, GAME_TABLE, ARCHIVE_DIR, STATE_TABLE
-#from HeartsMySQLVariables import CSV_DIR
-#from HeartsMySQLVariables import ARCHIVE_DIR
-#from HeartsMySQLVariables import STATE_TABLE
-#from HeartsMySQLVariables import GAME_TABLE
-#from HeartsMySQLVariables import CONFIG
+#from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, CONFIG, GAME_TABLE, ARCHIVE_DIR, STATE_TABLE
+from HeartsMySQLVariables import CSV_DIR
+from HeartsMySQLVariables import ARCHIVE_DIR
+from HeartsMySQLVariables import STATE_TABLE
+from HeartsMySQLVariables import GAME_TABLE
+from HeartsMySQLVariables import CONFIG
 game_table_files = glob.glob(os.path.join(CSV_DIR, "*_gametable.csv"))
 state_table_files = glob.glob(os.path.join(CSV_DIR, "*_statetable.csv"))
 
