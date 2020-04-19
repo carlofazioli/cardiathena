@@ -18,7 +18,7 @@ Copy scripts to run the game to scratch directory:
 <br></br>
 Copy the slurm files: 
 <br></br>
-` cp cardiathena/distributed-computing/argo/argo_scripts/slurm_script.slurm cardiathena/distributed/argo/argo_scripts/upload.slurm .`
+` cp cardiathena/distributed-computing/argo/argo_scripts/slurm_script.slurm cardiathena/distributed-computing/argo/argo_scripts/upload.slurm .`
 <br></br>
 
 If you have an import issue with mysql-connector: ` pip3 install --user mysql-connector-python`
