@@ -1,11 +1,9 @@
 import multiprocessing
-from multiprocessing import Pool
 import csv
 import uuid
 import random
 from datetime import datetime
 
-import psutil as psutil
 
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
@@ -104,7 +102,6 @@ def process_state_data(game_uuid, game):
     if CSV_ON:
         with open(directory, 'w') as file:
             writer = csv.writer(file, lineterminator='\n', )
-            # writer.writerow(["deck", "action", "score", "game_uuid"])
             for data in state_data:
                 deck = data["deck"].tolist()
                 action = data["actions"]
@@ -118,11 +115,6 @@ def process_state_data(game_uuid, game):
 if __name__ == "__main__":
     num_of_processes = multiprocessing.cpu_count()
     process_list = []
-
-    """ Gets cpu count """
-    # print(multiprocessing.cpu_count())
-    """ Gets virtual cpu count """
-    # print(psutil.cpu_count())
 
     # Start processes
     for i in range(0, num_of_processes):
