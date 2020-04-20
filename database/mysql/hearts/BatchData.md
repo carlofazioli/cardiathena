@@ -1,5 +1,7 @@
 ##Instructions
 
+Make sure the python3 and singularity modules are loaded `module load singularity/3.3.0` and `module load python/3.6.7`
+
 Change to Scratch directory:  ` cd $SCRATCH`
 
 Clone the project if not already done so: ` git clone https://github.com/c-to-the-fazzy/cardiathena.git`
