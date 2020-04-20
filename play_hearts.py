@@ -89,7 +89,7 @@ def process_state_data():
         db.insert_state(directory)
 
 
-for i in range(0, 100):
+for i in range(0, 10000):
 
     # Create the players, the adjudicator, and the game object.
 

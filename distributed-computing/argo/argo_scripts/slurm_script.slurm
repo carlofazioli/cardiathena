@@ -41,14 +41,11 @@
 module load python/3.6.7
 
 ## Run your program or script
-python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
-python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
-python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
-python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
-python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
-python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
-python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
-python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
+for ((cpu=1; cpu<=$SLURM_NPROCS; cpu++)) do
+    python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py
+done
+wait
+
 
 
 
