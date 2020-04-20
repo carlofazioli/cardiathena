@@ -20,28 +20,25 @@ from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYS
 agents = ["RandomHeartsAgent", "LowLayer", "EqualizerAgent", "Shooter"]
 
 
-class Hearts:
-    def __init__(self):
-        pass
+def run():
 
-    def run(self):
-        game_uuid = uuid.uuid4().hex
-        adj = HeartsAdjudicator()
-        state = HeartsState()
-        agent_1 = get_agent()
-        agent_2 = get_agent()
-        agent_3 = get_agent()
-        agent_4 = get_agent()
-        agent_list = [0, agent_1, agent_2, agent_3, agent_4]
-        game = GameManager(agent_list,
-                           adjudicator=adj,
-                           state=state)
-        # Save starting game information
-        save_game(game_uuid, agent_list)
-        # Play a game.
-        game.play_game()
-        # The game is over, save the states of the game into the database.
-        process_state_data(game_uuid, game)
+    game_uuid = uuid.uuid4().hex
+    adj = HeartsAdjudicator()
+    state = HeartsState()
+    agent_1 = get_agent()
+    agent_2 = get_agent()
+    agent_3 = get_agent()
+    agent_4 = get_agent()
+    agent_list = [0, agent_1, agent_2, agent_3, agent_4]
+    game = GameManager(agent_list,
+                       adjudicator=adj,
+                       state=state)
+    # Save starting game information
+    save_game(game_uuid, agent_list)
+    # Play a game.
+    game.play_game()
+    # The game is over, save the states of the game into the database.
+    process_state_data(game_uuid, game)
 
 
 def get_agent():
@@ -121,7 +118,6 @@ def process_state_data(game_uuid, game):
 if __name__ == "__main__":
     num_of_processes = multiprocessing.cpu_count()
     process_list = []
-    h = Hearts()
 
     """ Gets cpu count """
     # print(multiprocessing.cpu_count())
@@ -130,7 +126,7 @@ if __name__ == "__main__":
 
     # Start processes
     for i in range(0, num_of_processes):
-        process = multiprocessing.Process(target=h.run())
+        process = multiprocessing.Process(run())
         process_list.append(process)
         process.start()
         print("Process pid: ", process.pid, " has started")
