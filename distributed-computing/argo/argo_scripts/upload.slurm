@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## Give your job a name to distinguish it from other jobs you run.
-#SBATCH --job-name=cardiload
+#SBATCH --job-name=
 
 ## General partitions: all-HiPri, bigmem-HiPri   --   (12 hour limit)
 ##                     all-LoPri, bigmem-LoPri, gpuq  (5 days limit)
@@ -41,4 +41,4 @@
 module load python/3.6.7
 
 ## Run your program or script
-python3 /scratch/dha5/cardiathena/database/mysql/hearts/batchUpload.py
+python3 $SCRATCH/cardiathena/database/mysql/hearts/batchUpload.py
