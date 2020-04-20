@@ -4,7 +4,6 @@ import uuid
 import random
 from datetime import datetime
 
-
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from agent.LowLayer import LowLayer
@@ -19,24 +18,24 @@ agents = ["RandomHeartsAgent", "LowLayer", "EqualizerAgent", "Shooter"]
 
 
 def run():
-
-    game_uuid = uuid.uuid4().hex
-    adj = HeartsAdjudicator()
-    state = HeartsState()
-    agent_1 = get_agent()
-    agent_2 = get_agent()
-    agent_3 = get_agent()
-    agent_4 = get_agent()
-    agent_list = [0, agent_1, agent_2, agent_3, agent_4]
-    game = GameManager(agent_list,
-                       adjudicator=adj,
-                       state=state)
-    # Save starting game information
-    save_game(game_uuid, agent_list)
-    # Play a game.
-    game.play_game()
-    # The game is over, save the states of the game into the database.
-    process_state_data(game_uuid, game)
+    for j in range(0, 1):
+        game_uuid = uuid.uuid4().hex
+        adj = HeartsAdjudicator()
+        state = HeartsState()
+        agent_1 = get_agent()
+        agent_2 = get_agent()
+        agent_3 = get_agent()
+        agent_4 = get_agent()
+        agent_list = [0, agent_1, agent_2, agent_3, agent_4]
+        game = GameManager(agent_list,
+                           adjudicator=adj,
+                           state=state)
+        # Save starting game information
+        save_game(game_uuid, agent_list)
+        # Play a game.
+        game.play_game()
+        # The game is over, save the states of the game into the database.
+        process_state_data(game_uuid, game)
 
 
 def get_agent():
@@ -118,7 +117,7 @@ if __name__ == "__main__":
 
     # Start processes
     for i in range(0, num_of_processes):
-        process = multiprocessing.Process(run())
+        process = multiprocessing.Process(target=run)
         process_list.append(process)
         process.start()
         print("Process pid: ", process.pid, " has started")
