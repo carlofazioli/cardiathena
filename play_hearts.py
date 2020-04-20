@@ -30,20 +30,6 @@ def get_agent():
         print("String not working: " + agents[agent_type])
 
 
-# Create the players, the adjudicator, and the game object.
-game_uuid = uuid.uuid4().hex
-adj = HeartsAdjudicator()
-state = HeartsState()
-agent_1 = get_agent()
-agent_2 = get_agent()
-agent_3 = get_agent()
-agent_4 = get_agent()
-agent_list = [0, agent_1, agent_2, agent_3, agent_4]
-game = GameManager(agent_list,
-                   adjudicator=adj,
-                   state=state)
-
-
 def save_game():
     """
     The save_game() method saves information about the game before it starts. Information that is saved includes the game
@@ -103,11 +89,27 @@ def process_state_data():
         db.insert_state(directory)
 
 
-# Save starting game information
-save_game()
-# Play a game.
-game.play_game()
-# The game is over, save the states of the game into the database.
-process_state_data()
+for i in range(0, 100):
+
+    # Create the players, the adjudicator, and the game object.
+
+    game_uuid = uuid.uuid4().hex
+    adj = HeartsAdjudicator()
+    state = HeartsState()
+    agent_1 = get_agent()
+    agent_2 = get_agent()
+    agent_3 = get_agent()
+    agent_4 = get_agent()
+    agent_list = [0, agent_1, agent_2, agent_3, agent_4]
+    game = GameManager(agent_list,
+                       adjudicator=adj,
+                       state=state)
+
+    # Save starting game information
+    save_game()
+    # Play a game.
+    game.play_game()
+    # The game is over, save the states of the game into the database.
+    process_state_data()
 
 
