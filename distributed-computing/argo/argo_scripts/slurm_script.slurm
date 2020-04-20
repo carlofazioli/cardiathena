@@ -21,10 +21,10 @@
 #SBATCH --mem=2G        # Total memory needed per task (units: K,M,G,T)
 
 ## Specify number of threads per task
-#SBATCH --cpus-per-task 8
+##SBATCH --cpus-per-task 8
 
 ## Specify number of processes
-##SBATCH --ntasks=32
+#SBATCH --ntasks=32
 
 ## Specify number of nodes
 ##SBATCH --nodes=8
@@ -41,10 +41,8 @@
 module load python/3.6.7
 
 ## Run your program or script
-for ((cpu=1; cpu<=$SLURM_NTASKS; cpu++)) do
-    python3 $SCRATCH/cardiathena/distributed-computing/argo/argo_scripts/play_hearts.py &
-done
-wait
+python3 $SCRATCH/cardiathena/play_hearts.py
+
 
 
 
