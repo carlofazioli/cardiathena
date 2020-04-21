@@ -17,7 +17,7 @@ from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYS
 agents = ["RandomHeartsAgent", "LowLayer", "EqualizerAgent", "Shooter"]
 
 
-def worker():
+def worker(var):
     # for j in range(0, 25):
     game_uuid = uuid.uuid4().hex
     adj = HeartsAdjudicator()
