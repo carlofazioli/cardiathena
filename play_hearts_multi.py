@@ -3,7 +3,7 @@ import csv
 import uuid
 import random
 from datetime import datetime
-
+from multiprocessing import Pool
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from agent.LowLayer import LowLayer
@@ -17,25 +17,25 @@ from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYS
 agents = ["RandomHeartsAgent", "LowLayer", "EqualizerAgent", "Shooter"]
 
 
-def run():
-    for j in range(0, 1):
-        game_uuid = uuid.uuid4().hex
-        adj = HeartsAdjudicator()
-        state = HeartsState()
-        agent_1 = get_agent()
-        agent_2 = get_agent()
-        agent_3 = get_agent()
-        agent_4 = get_agent()
-        agent_list = [0, agent_1, agent_2, agent_3, agent_4]
-        game = GameManager(agent_list,
-                           adjudicator=adj,
-                           state=state)
-        # Save starting game information
-        save_game(game_uuid, agent_list)
-        # Play a game.
-        game.play_game()
-        # The game is over, save the states of the game into the database.
-        process_state_data(game_uuid, game)
+def worker():
+    # for j in range(0, 25):
+    game_uuid = uuid.uuid4().hex
+    adj = HeartsAdjudicator()
+    state = HeartsState()
+    agent_1 = get_agent()
+    agent_2 = get_agent()
+    agent_3 = get_agent()
+    agent_4 = get_agent()
+    agent_list = [0, agent_1, agent_2, agent_3, agent_4]
+    game = GameManager(agent_list,
+                       adjudicator=adj,
+                       state=state)
+    # Save starting game information
+    save_game(game_uuid, agent_list)
+    # Play a game.
+    game.play_game()
+    # The game is over, save the states of the game into the database.
+    process_state_data(game_uuid, game)
 
 
 def get_agent():
@@ -112,12 +112,17 @@ def process_state_data(game_uuid, game):
 
 
 if __name__ == "__main__":
+    # Specify number of processes
     num_of_processes = multiprocessing.cpu_count()
+    # Create a multiprocessing pool
+    with Pool(processes=num_of_processes) as pool:
+        # Number of tasks
+        result = pool.map(worker, range(10000))
+        #print(result)
+"""
     process_list = []
-
-    # Start processes
     for i in range(0, num_of_processes):
-        process = multiprocessing.Process(target=run)
+        process = multiprocessing.Process(target=worker)
         process_list.append(process)
         process.start()
         print("Process pid: ", process.pid, " has started")
@@ -126,3 +131,4 @@ if __name__ == "__main__":
     for proc in process_list:
         proc.join()
         print("Process pid: ", proc.pid, " has ended")
+"""
