@@ -54,14 +54,14 @@ def get_connection():
 def insert_game_table():
     dbs = MySQLDatabase()
     my_cursor = dbs.get_cursor()
+    saved_files = list()
     try:
         for i, file in enumerate(game_table_files):
             query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
                 "LINES TERMINATED BY '\n'" \
                 "(time, agent1, agent2, agent3, agent4, game_uuid)".format(file, GAME_TABLE)
             my_cursor.execute(query)
-            shutil.move(file, ARCHIVE_DIR)
-
+            saved_files.append(file)
             # with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'a') as fil:
             #    fil.write(file + " has been moved\n")
             if i == 10000:
@@ -73,11 +73,14 @@ def insert_game_table():
         dbs.cnx.commit()
         my_cursor.close()
         dbs.cnx.close()
+        for file in saved_files:
+            shutil.move(file, ARCHIVE_DIR)
 
 
 def insert_state_table():
     dbs = MySQLDatabase()
     my_cursor = dbs.get_cursor()
+    saved_files = list()
     try:
         for i, file in enumerate(state_table_files):
             query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
@@ -85,7 +88,7 @@ def insert_state_table():
                 "LINES TERMINATED BY '\n'" \
                 "(deck, action, score, game_uuid)".format(file, STATE_TABLE)
             my_cursor.execute(query)
-            shutil.move(file, ARCHIVE_DIR)           
+            saved_files.append(file)
             # with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'a') as fil:
             #    fil.write(file + " has been moved\n")
             if i == 10000:
@@ -97,6 +100,9 @@ def insert_state_table():
         dbs.cnx.commit()
         my_cursor.close()
         dbs.cnx.close()
+        for file in saved_files:
+            shutil.move(file, ARCHIVE_DIR)
+
 
 
 while game_table_files:
