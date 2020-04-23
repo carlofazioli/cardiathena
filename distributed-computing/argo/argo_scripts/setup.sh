@@ -1,7 +1,7 @@
 #!/bin/sh
+module load singularity/3.5.2
 mkdir -p /scratch/$USER/logs_argo/out/ /scratch/$USER/logs_argo/err/
 cp $SCRATCH/cardiathena/distributed-computing/argo/helper_scripts/*.sh cardiathena/distributed-computing/argo/argo_scripts/*.sh $SCRATCH
-cp $SCRATCH/cardiathena/distributed-computing/argo/helper_scripts/*.sh cardiathena/distributed-computing/argo/helper_scripts/*.sh $SCRATCH
 cd $SCRATCH
 mkdir singularity
 ln -s /scratch/$USER/singularity /home/$USER/.singularity
