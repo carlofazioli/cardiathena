@@ -81,9 +81,9 @@ SELECT_GAME_ID = "SELECT {} FROM {} WHERE {}=".format(GAME_ID_COLUMN, GAME_TABLE
 
 """ Connection Config details """
 CONFIG = {
-    'user': 'remote_usr',
+    'user': 'teamw',
     'password': '',
-    'host': get_host_name(),
+    'host': '',
     'port': '3306',
     'db': 'cardiathena_db',
     'raise_on_warnings': True,

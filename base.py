@@ -128,11 +128,11 @@ class GameManager:
                 current_player = self.agent_list[agent_index[i]]
                 player_action.append(current_player.get_action(partial_state[i]))
                 # Record this activity in the history.
-                self.state_data.append(self.state.save_state(str(current_player.get_action(partial_state[i]))))
+                self.state_data.append(self.state.save_state(player_action[i]))
             # Adjudicate the action to receive an updated state.
             self.state = self.adjudicator.step_game(player_action, self.state)
         # At this point, the game is over.  Record the final state.
-        self.state_data.append(self.state.save_state(0))
+        self.state_data.append(self.state.save_state(-1))
 
     def save_game(self):
         """

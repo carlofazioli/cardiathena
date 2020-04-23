@@ -1,7 +1,9 @@
+import multiprocessing
 import csv
 import uuid
 import random
 from datetime import datetime
+from multiprocessing import Pool
 from adjudicator.hearts_adjudicator import HeartsAdjudicator
 from adjudicator.state import HeartsState
 from agent.LowLayer import LowLayer
@@ -15,10 +17,31 @@ from database.mysql.hearts.HeartsMySQLVariables import INSERT_GAME, CSV_DIR, MYS
 agents = ["RandomHeartsAgent", "LowLayer", "EqualizerAgent", "Shooter"]
 
 
+def worker(var):
+    # for j in range(0, 25):
+    game_uuid = uuid.uuid4().hex
+    adj = HeartsAdjudicator()
+    state = HeartsState()
+    agent_1 = get_agent()
+    agent_2 = get_agent()
+    agent_3 = get_agent()
+    agent_4 = get_agent()
+    agent_list = [0, agent_1, agent_2, agent_3, agent_4]
+    game = GameManager(agent_list,
+                       adjudicator=adj,
+                       state=state)
+    # Save starting game information
+    save_game(game_uuid, agent_list)
+    # Play a game.
+    game.play_game()
+    # The game is over, save the states of the game into the database.
+    process_state_data(game_uuid, game)
+
+
 def get_agent():
-    """ 
+    """
     This function generates a random number in the range of the agents list and uses the string to make a new agent object to return.
-    
+
     """
 
     agent_type = random.randint(0, (len(agents) - 1))
@@ -30,7 +53,7 @@ def get_agent():
         print("String not working: " + agents[agent_type])
 
 
-def save_game():
+def save_game(game_uuid, agent_list):
     """
     The save_game() method saves information about the game before it starts. Information that is saved includes the game
     uuid to uniquely identify each game, the date and time a game starts, agent_types that will participate in the game.
@@ -52,7 +75,7 @@ def save_game():
     # Save the game table data into csv
     if CSV_ON:
         with open(file_game_table, 'w') as file1:
-            writer = csv.writer(file1, lineterminator='\n',)
+            writer = csv.writer(file1, lineterminator='\n', )
             # writer.writerow(["time_stamp", "agent1", "agent2", "agent3", "agent4", "game_uuid"])
             writer.writerow([time_stamp, id_list[0], id_list[1], id_list[2], id_list[3], game_uuid])
 
@@ -61,7 +84,7 @@ def save_game():
         db.query_database(INSERT_GAME, values)
 
 
-def process_state_data():
+def process_state_data(game_uuid, game):
     """
     The process_state_data() method processes the state data to be stored in the MySQL database. The state data includes
     location of the cards: deck (numPy array converted to a python list), player actions: action, scores, and a game
@@ -78,7 +101,6 @@ def process_state_data():
     if CSV_ON:
         with open(directory, 'w') as file:
             writer = csv.writer(file, lineterminator='\n', )
-            # writer.writerow(["deck", "action", "score", "game_uuid"])
             for data in state_data:
                 deck = data["deck"].tolist()
                 action = data["actions"]
@@ -89,27 +111,24 @@ def process_state_data():
         db.insert_state(directory)
 
 
-for i in range(0, 10000):
+if __name__ == "__main__":
+    # Specify number of processes
+    num_of_processes = multiprocessing.cpu_count()
+    # Create a multiprocessing pool
+    with Pool(processes=num_of_processes) as pool:
+        # Number of tasks
+        result = pool.map(worker, range(10000))
+        #print(result)
+"""
+    process_list = []
+    for i in range(0, num_of_processes):
+        process = multiprocessing.Process(target=worker)
+        process_list.append(process)
+        process.start()
+        print("Process pid: ", process.pid, " has started")
 
-    # Create the players, the adjudicator, and the game object.
-
-    game_uuid = uuid.uuid4().hex
-    adj = HeartsAdjudicator()
-    state = HeartsState()
-    agent_1 = get_agent()
-    agent_2 = get_agent()
-    agent_3 = get_agent()
-    agent_4 = get_agent()
-    agent_list = [0, agent_1, agent_2, agent_3, agent_4]
-    game = GameManager(agent_list,
-                       adjudicator=adj,
-                       state=state)
-
-    # Save starting game information
-    save_game()
-    # Play a game.
-    game.play_game()
-    # The game is over, save the states of the game into the database.
-    process_state_data()
-
-
+    # Join processes
+    for proc in process_list:
+        proc.join()
+        print("Process pid: ", proc.pid, " has ended")
+"""

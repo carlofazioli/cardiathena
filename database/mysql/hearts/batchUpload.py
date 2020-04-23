@@ -2,17 +2,25 @@ import os
 import glob
 import shutil
 import mysql
+from mysql.connector import errorcode
 
+#from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, CONFIG, GAME_TABLE, ARCHIVE_DIR, STATE_TABLE
 from HeartsMySQLVariables import CSV_DIR
 from HeartsMySQLVariables import ARCHIVE_DIR
 from HeartsMySQLVariables import STATE_TABLE
 from HeartsMySQLVariables import GAME_TABLE
 from HeartsMySQLVariables import CONFIG
-from mysql.connector import errorcode
+from HeartsMySQLVariables import SCRATCH_DIR
+
+print(CSV_DIR)
 
 game_table_files = glob.glob(os.path.join(CSV_DIR, "*_gametable.csv"))
 state_table_files = glob.glob(os.path.join(CSV_DIR, "*_statetable.csv"))
 
+
+with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'w') as fil:
+    fil.write("csv paths have been loaded\n")
+print("csv paths have been loaded")
 
 class MySQLDatabase:
     """
@@ -47,12 +55,18 @@ def insert_game_table():
     dbs = MySQLDatabase()
     my_cursor = dbs.get_cursor()
     try:
-        for file in game_table_files:
+        for i, file in enumerate(game_table_files):
             query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
                 "LINES TERMINATED BY '\n'" \
                 "(time, agent1, agent2, agent3, agent4, game_uuid)".format(file, GAME_TABLE)
             my_cursor.execute(query)
             shutil.move(file, ARCHIVE_DIR)
+
+            #with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'a') as fil:
+             #   fil.write(file + " has been moved\n")
+            #print(i)
+            #if i == 10000:
+            #    break
     except mysql.connector.Error as err:
         print(err)
     finally:
@@ -65,13 +79,18 @@ def insert_state_table():
     dbs = MySQLDatabase()
     my_cursor = dbs.get_cursor()
     try:
-        for file in state_table_files:
+        for i, file in enumerate(state_table_files):
             query = "LOAD DATA LOCAL INFILE '{}' INTO TABLE {} FIELDS TERMINATED BY ',' " \
                 "ENCLOSED BY '\"' " \
                 "LINES TERMINATED BY '\n'" \
                 "(deck, action, score, game_uuid)".format(file, STATE_TABLE)
             my_cursor.execute(query)
-            shutil.move(file, ARCHIVE_DIR)
+            shutil.move(file, ARCHIVE_DIR)           
+            #with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'a') as fil:
+            #    fil.write(file + " has been moved\n")
+            #print(i)
+            #if i == 10000:
+            #    break
     except mysql.connector.Error as err:
         print(err)
     finally:
