@@ -62,11 +62,11 @@ def insert_game_table():
             my_cursor.execute(query)
             shutil.move(file, ARCHIVE_DIR)
 
-            #with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'a') as fil:
-             #   fil.write(file + " has been moved\n")
-            #print(i)
-            #if i == 10000:
-            #    break
+            # with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'a') as fil:
+            #    fil.write(file + " has been moved\n")
+            if i == 10000:
+                break
+
     except mysql.connector.Error as err:
         print(err)
     finally:
@@ -86,11 +86,11 @@ def insert_state_table():
                 "(deck, action, score, game_uuid)".format(file, STATE_TABLE)
             my_cursor.execute(query)
             shutil.move(file, ARCHIVE_DIR)           
-            #with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'a') as fil:
+            # with open(SCRATCH_DIR + "/{}".format("sql_logs"), 'a') as fil:
             #    fil.write(file + " has been moved\n")
-            #print(i)
-            #if i == 10000:
-            #    break
+            if i == 10000:
+                break
+
     except mysql.connector.Error as err:
         print(err)
     finally:
@@ -99,5 +99,9 @@ def insert_state_table():
         dbs.cnx.close()
 
 
-insert_game_table()
-insert_state_table()
+while game_table_files:
+    insert_game_table()
+
+
+while state_table_files:
+    insert_state_table()
