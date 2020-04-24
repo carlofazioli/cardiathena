@@ -4,13 +4,13 @@ import shutil
 import mysql
 from mysql.connector import errorcode
 
-from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, CONFIG, GAME_TABLE, ARCHIVE_DIR, STATE_TABLE
-#from HeartsMySQLVariables import CSV_DIR
-#from HeartsMySQLVariables import ARCHIVE_DIR
-#from HeartsMySQLVariables import STATE_TABLE
-#from HeartsMySQLVariables import GAME_TABLE
-#from HeartsMySQLVariables import CONFIG
-#from HeartsMySQLVariables import SCRATCH_DIR
+#from database.mysql.hearts.HeartsMySQLVariables import CSV_DIR, CONFIG, GAME_TABLE, ARCHIVE_DIR, STATE_TABLE
+from HeartsMySQLVariables import CSV_DIR
+from HeartsMySQLVariables import ARCHIVE_DIR
+from HeartsMySQLVariables import STATE_TABLE
+from HeartsMySQLVariables import GAME_TABLE
+from HeartsMySQLVariables import CONFIG
+from HeartsMySQLVariables import SCRATCH_DIR
 
 
 class MySQLDatabase:
