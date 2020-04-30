@@ -1,8 +1,10 @@
 import mysql.connector
 import json
 from mysql.connector import errorcode
+
 from database.mysql.hearts.HeartsMySQLVariables import STATE_TABLE, GAME_ID_COLUMN
 from database.mysql.hearts.HeartsMySQLVariables import CONFIG
+
 
 
 class MySQLDatabase:

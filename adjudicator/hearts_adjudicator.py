@@ -254,8 +254,8 @@ class HeartsAdjudicator(Adjudicator):
         for card in self.cards_of_trick(state):
             state.deck[card] = trick_winner + 10
 
-        print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1, "  High card: ",
-              max_card, " Points: ", self.points(state))
+        # print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1, "  High card: ",
+        #     max_card, " Points: ", self.points(state))
 
     def new_round(self,
                   state: HeartsState):
@@ -270,9 +270,9 @@ class HeartsAdjudicator(Adjudicator):
             state.deck[card] = trick_winner + 10
         
         # Print final results
-        print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1,
-              " Points: ", self.points(state))
-        
+        # print("trick winner:", trick_winner, " trick#:", self.trick_number(state) - 1,
+        #      " Points: ", self.points(state))
+
         # Update the score
         self.update_score(state)
         if self.is_finished(state):

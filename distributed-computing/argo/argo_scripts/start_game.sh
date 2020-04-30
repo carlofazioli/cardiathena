@@ -1,2 +1,6 @@
 #!/bin/bash
-sbatch slurm_script.slurm
+
+for i in {1..10000}
+do
+  python3 $SCRATCH/cardiathena/play_hearts.py
+done

@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `agent`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `agent` (
-  `id` int(11) NOT NULL,
+  `id` tinyint(11) NOT NULL,
   `agent_type` varchar(45) NOT NULL,
   `version` float NOT NULL,
   PRIMARY KEY (`id`),
@@ -51,24 +51,24 @@ DROP TABLE IF EXISTS `game`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `game` (
-  `game_id` int(11) NOT NULL AUTO_INCREMENT,
+  `game_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `agent1` int(11) NOT NULL,
-  `agent2` int(11) NOT NULL,
-  `agent3` int(11) NOT NULL,
-  `agent4` int(11) NOT NULL,
-  `game_uuid` varbinary(32) NOT NULL,
+  `agent1` tinyint(11) NOT NULL,
+  `agent2` tinyint(11) NOT NULL,
+  `agent3` tinyint(11) NOT NULL,
+  `agent4` tinyint(11) NOT NULL,
+  `game_uuid` binary(32) NOT NULL,
   PRIMARY KEY (`game_id`),
   UNIQUE KEY `game_uuid_UNIQUE` (`game_uuid`),
-  KEY `fk_agent_id_idx` (`agent1`),
-  KEY `fk_agent2_id_idx` (`agent2`),
-  KEY `fk_agent3_id_idx` (`agent3`),
-  KEY `fk_agent4_id_idx` (`agent4`),
-  CONSTRAINT `fk_agent1_id` FOREIGN KEY (`agent1`) REFERENCES `agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_agent2_id` FOREIGN KEY (`agent2`) REFERENCES `agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_agent3_id` FOREIGN KEY (`agent3`) REFERENCES `agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_agent4_id` FOREIGN KEY (`agent4`) REFERENCES `agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  KEY `fk_game_1_idx` (`agent1`),
+  KEY `fk_game_2_idx` (`agent2`),
+  KEY `fk_game_3_idx` (`agent3`),
+  KEY `fk_game_4_idx` (`agent4`),
+  CONSTRAINT `fk_game_1` FOREIGN KEY (`agent1`) REFERENCES `agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_game_2` FOREIGN KEY (`agent2`) REFERENCES `agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_game_3` FOREIGN KEY (`agent3`) REFERENCES `agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_game_4` FOREIGN KEY (`agent4`) REFERENCES `agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,15 +88,15 @@ DROP TABLE IF EXISTS `state`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `state` (
-  `state_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `state_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `deck` json NOT NULL,
   `action` json NOT NULL,
   `score` json NOT NULL,
-  `game_uuid` varbinary(32) NOT NULL,
+  `game_uuid` binary(32) NOT NULL,
   PRIMARY KEY (`state_id`),
-  KEY `fk_game_uuid_idx` (`game_uuid`),
-  CONSTRAINT `fk_game_uuid` FOREIGN KEY (`game_uuid`) REFERENCES `game` (`game_uuid`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `fk_state_1_idx` (`game_uuid`),
+  CONSTRAINT `fk_state_1` FOREIGN KEY (`game_uuid`) REFERENCES `game` (`game_uuid`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -117,4 +117,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-03-17 12:51:01
+-- Dump completed on 2020-04-13 23:29:36

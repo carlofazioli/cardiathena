@@ -3,7 +3,7 @@
 hostname > $SCRATCH/mysql_hostname
 
 # Start instance.
-singularity instance start -e -c --bind ${SCRATCH}/mysql/var/lib/mysql/:/var/lib/mysql --bind ${SCRATCH}/mysql/run/mysqld:/run/mysqld mysql_latest.sif mysqlheart
+singularity instance start --userns -e -c --bind ${SCRATCH}/mysql/var/lib/mysql/:/var/lib/mysql --bind ${SCRATCH}/mysql/run/mysqld:/run/mysqld mysql_latest.simg mysqlheart
 
 # Run the instance.
-singularity run instance://mysqlheart
+singularity run --userns instance://mysqlheart
