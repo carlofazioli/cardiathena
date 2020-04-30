@@ -4,7 +4,7 @@ from pathlib import Path
 """ Environment variables """
 
 HOME_DIR = str(Path.home())
-ON_ARGO = True
+ON_ARGO = False
 MYSQL_SERVER = False
 CSV_ON = True
 CSV_DIR = '{}/cardiathena_hearts/csv-files/'.format(HOME_DIR)
